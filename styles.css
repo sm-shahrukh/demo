@@ -2407,11 +2407,7 @@ body {
 .footer-grid-last-div {
   border-bottom: 1px solid var(--border);
 }
-@media (min-width: 768px) {
-  .footer-grid {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
-  }
-}
+
 .footer h4 {
   font-size: 14px;
   font-weight: 700;
@@ -2516,12 +2512,7 @@ body {
   align-items: center;
   text-align: center;
 }
-@media (min-width: 768px) {
-  .footer-bottom {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-}
+
 .footer-bottom p {
   margin: 0;
   font-size: 14px;
@@ -2608,4 +2599,38 @@ body {
   height: 20px;
 }
 
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+  }
+}
+@media (min-width: 768px) {
+  .footer-bottom {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+}
 /****************************** footer code ends here ******************************/
+/* Tablet */
+/* @media (min-width: 768px) and (max-width: 1023px) {
+    .hero {
+        height: 450px;
+        padding: 50px 40px;
+    }
+} */
+
+/* Mobile */
+/* @media (max-width: 767px) {
+    .hero {
+        height: 400px;
+        padding: 30px 20px;
+    }
+} */
