@@ -36,17 +36,44 @@ let tripType = "oneway";
 let pax = { adults: 1, children: 0, infants: 0 };
 
 // ============ HERO BG ============
-(function initHeroBg() {
-  const img = document.getElementById("heroBg");
-  if (img) {
-    img.addEventListener("load", () => img.classList.add("loaded"));
-    if (img.complete && img.naturalWidth) img.classList.add("loaded");
-  }
-})();
+// (function initHeroBg() {
+//   const img = document.getElementById("heroBg");
+//   if (img) {
+//     img.addEventListener("load", () => img.classList.add("loaded"));
+//     if (img.complete && img.naturalWidth) img.classList.add("loaded");
+//   }
+// })();
+document.addEventListener("DOMContentLoaded", () => {
+  const shape = document.querySelector(".hero-banner .hero-shape");
+  if (!shape) return;
+
+  const minScale = 1; // original size
+  const maxScale = 1.15; // zoom level
+  const duration = 25000; // ms for one full zoom in + back out
+
+  shape.style.transformOrigin = "left center";
+  shape.style.willChange = "transform";
+
+  const animate = (now) => {
+    const t = (now % duration) / duration; // 0 -> 1 loop
+    const wave = (1 - Math.cos(t * 2 * Math.PI)) / 2; // 0 -> 1 -> 0, smooth
+    const scale = minScale + (maxScale - minScale) * wave;
+    shape.style.transform = `scale(${scale})`;
+    requestAnimationFrame(animate);
+  };
+
+  requestAnimationFrame(animate);
+});
 
 // ============ MOBILE MENU ============
 function toggleMobileMenu() {
   document.getElementById("mobileMenu").classList.toggle("open");
+}
+function toggleMobileNav() {
+  const menu = document.getElementById("navbarMenu");
+  const toggle = document.querySelector(".mobile-toggle");
+  const isOpen = menu.classList.toggle("open");
+  toggle.setAttribute("aria-expanded", String(isOpen));
 }
 function toggleMobileDropdown(id, btn) {
   document.getElementById(id).classList.toggle("open");
@@ -75,13 +102,11 @@ function toggleSignup(e) {
 // ============ TABS ============
 function switchTab(tab) {
   document
-    .querySelectorAll(".search-tab")
+    .querySelectorAll(".tab-btn")
     .forEach((t) => t.classList.remove("active"));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add("active");
   document
-    .querySelector(`.search-tab[data-tab="${tab}"]`)
-    .classList.add("active");
-  document
-    .querySelectorAll(".search-panel")
+    .querySelectorAll(".tab-panel")
     .forEach((p) => p.classList.remove("active"));
   document.getElementById("panel-" + tab).classList.add("active");
 }
@@ -103,25 +128,74 @@ function setTripType(type, btn) {
   }
 }
 
-let multiCityLegs = 2;
+let multiCityLegId = 2;
+
+function updateMultiCityLegs() {
+  const legs = [
+    ...document.querySelectorAll("#multiCityPanel .multi-city-leg"),
+  ];
+  const flightCount = legs.length + 1;
+  document.getElementById("multiCityCount").textContent =
+    `${flightCount} / 6 flights`;
+  legs.forEach((leg, index) => {
+    const flightNumber = index + 2;
+    leg.querySelector(".multi-city-leg-heading strong").textContent =
+      `FLIGHT ${flightNumber}`;
+    leg
+      .querySelector(".remove-flight-btn")
+      .setAttribute("aria-label", `Remove flight ${flightNumber}`);
+  });
+  document.querySelector(".add-flight-btn").disabled = flightCount >= 6;
+}
+
+function multiCityAirportField(legId, direction, label, placeholder) {
+  const key = `multiCity${legId}${direction}`;
+  return `
+    <label class="multi-city-airport">
+      <span>${label}</span>
+      <div class="input-wrapper" onclick="openAirportPanel('${key}')">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="10" r="3" />
+          <path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z" />
+        </svg>
+        <input id="${key}Input" type="text" placeholder="${placeholder}" readonly />
+      </div>
+      <div class="dropdown-panel" id="${key}Panel">
+        <div class="panel-header">
+          <span>Select ${label}</span>
+          <button type="button" class="close-btn" aria-label="Close airport list" onclick="closeAirportPanel('${key}')">×</button>
+        </div>
+        <input id="${key}Query" class="search-input" type="text" placeholder="Search airports..." oninput="searchAirport('${key}')" />
+        <div id="${key}Results" class="results-list"></div>
+      </div>
+    </label>`;
+}
+
 function addMultiCityLeg() {
-  if (multiCityLegs >= 6) return;
-  multiCityLegs += 1;
+  const legs = document.querySelectorAll("#multiCityPanel .multi-city-leg");
+  if (legs.length >= 5) return;
+
+  const flightNumber = legs.length + 2;
+  const legId = ++multiCityLegId;
   const leg = document.createElement("div");
   leg.className = "multi-city-leg compact-leg";
   leg.innerHTML = `
-    <strong>FLIGHT ${multiCityLegs}</strong>
+    <div class="multi-city-leg-heading">
+      <strong>FLIGHT ${flightNumber}</strong>
+      <button type="button" class="remove-flight-btn" onclick="removeMultiCityLeg(this)" aria-label="Remove flight ${flightNumber}">Remove</button>
+    </div>
     <div class="multi-city-fields">
-      <label><span>Departure From</span><input type="text" placeholder="Departure City or Airport"></label>
-      <label><span>Arrival To</span><input type="text" placeholder="Arrival City or Airport"></label>
+      ${multiCityAirportField(legId, "From", "From", "Departure city or airport")}
+      ${multiCityAirportField(legId, "To", "To", "Arrival city or airport")}
       <label><span>Departure Date</span><input type="date"></label>
     </div>`;
   document.getElementById("additionalFlightLegs").appendChild(leg);
-  document.getElementById("multiCityCount").textContent =
-    `${multiCityLegs} / 6 flights`;
-  if (multiCityLegs === 6) {
-    document.querySelector(".add-flight-btn").disabled = true;
-  }
+  updateMultiCityLegs();
+}
+
+function removeMultiCityLeg(button) {
+  button.closest(".multi-city-leg").remove();
+  updateMultiCityLegs();
 }
 
 function handleModeSearch(event, mode) {
@@ -185,9 +259,11 @@ function selectAirport(which, code, city, country) {
   if (which === "from") {
     fromSelected = { code, city, country };
     document.getElementById("fromInput").value = `${city} (${code})`;
-  } else {
+  } else if (which === "to") {
     toSelected = { code, city, country };
     document.getElementById("toInput").value = `${city} (${code})`;
+  } else {
+    document.getElementById(which + "Input").value = `${city} (${code})`;
   }
   closeAirportPanel(which);
 }
@@ -260,7 +336,9 @@ function setUmrahType(val, el) {
   if (input) input.value = val;
   const menu = document.getElementById("umrahTypeMenu");
   if (menu) {
-    menu.querySelectorAll(".dd-umrah-type-opt").forEach((o) => o.classList.remove("active"));
+    menu
+      .querySelectorAll(".dd-umrah-type-opt")
+      .forEach((o) => o.classList.remove("active"));
     if (el) el.classList.add("active");
     menu.classList.remove("show");
   }
@@ -280,7 +358,9 @@ function toggleUmrahServicesMenu(e) {
 }
 
 function updateUmrahServices() {
-  const checkboxes = document.querySelectorAll('input[name="umrahService"]:checked');
+  const checkboxes = document.querySelectorAll(
+    'input[name="umrahService"]:checked',
+  );
   const selected = Array.from(checkboxes).map((c) => c.value);
   const input = document.getElementById("umrahServicesInput");
   if (!input) return;
@@ -312,7 +392,9 @@ function setVisaVal(type, val, el) {
   if (input) input.value = val;
   const menu = document.getElementById(type + "Menu");
   if (menu) {
-    menu.querySelectorAll(".dd-opt").forEach((o) => o.classList.remove("active"));
+    menu
+      .querySelectorAll(".dd-opt")
+      .forEach((o) => o.classList.remove("active"));
     if (el) el.classList.add("active");
     menu.classList.remove("show");
   }
@@ -325,7 +407,8 @@ function changeVisaTravelers(delta) {
   if (countEl) countEl.textContent = visaTravelers;
   const input = document.getElementById("visaPaxInput");
   if (input) {
-    input.value = visaTravelers + (visaTravelers === 1 ? " Traveler" : " Travelers");
+    input.value =
+      visaTravelers + (visaTravelers === 1 ? " Traveler" : " Travelers");
   }
 }
 
@@ -344,7 +427,7 @@ document.addEventListener("click", (e) => {
     document.getElementById("cabinMenu")?.classList.remove("show");
     document.getElementById("cabinTrigger")?.classList.remove("open");
   }
-  if (!e.target.closest("#paxTrigger")) {
+  if (!e.target.closest("#paxTrigger") && !e.target.closest("#paxPanel")) {
     document.getElementById("paxPanel")?.classList.remove("show");
     document.getElementById("paxTrigger")?.classList.remove("open");
   }
@@ -431,6 +514,76 @@ function showAlert(msg, type) {
   alert.style.display = "block";
 }
 
+// ******************************************** STATS SECTION START ********************************************
+document.addEventListener("DOMContentLoaded", () => {
+  const counters = document.querySelectorAll(".stat-number");
+  const duration = 2000; // animation time in ms
+
+  // Split "50K+" into prefix "", number 50, suffix "K+"
+  const parse = (text) => {
+    const match = text.trim().match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
+    if (!match) return null;
+    return {
+      prefix: match[1],
+      target: parseFloat(match[2]),
+      suffix: match[3],
+      decimals: (match[2].split(".")[1] || "").length,
+    };
+  };
+
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const animate = (el) => {
+    const data = el._counter;
+    if (!data) return;
+
+    cancelAnimationFrame(data.frame);
+    const start = performance.now();
+
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const value = data.target * easeOutCubic(progress);
+      el.textContent = data.prefix + value.toFixed(data.decimals) + data.suffix;
+
+      if (progress < 1) {
+        data.frame = requestAnimationFrame(step);
+      }
+    };
+
+    data.frame = requestAnimationFrame(step);
+  };
+
+  const reset = (el) => {
+    const data = el._counter;
+    if (!data) return;
+    cancelAnimationFrame(data.frame);
+    el.textContent = data.prefix + (0).toFixed(data.decimals) + data.suffix;
+  };
+
+  counters.forEach((el) => {
+    const data = parse(el.textContent);
+    if (data) el._counter = data;
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animate(entry.target); // runs every time it enters the screen
+        } else {
+          reset(entry.target); // resets to 0 so it can replay next time
+        }
+      });
+    },
+    { threshold: 0.4 }, // starts when 40% of the number is visible
+  );
+
+  counters.forEach((el) => {
+    if (el._counter) observer.observe(el);
+  });
+});
+// ******************************************** STATS SECTION END ********************************************
+
 // ******************************************** RENDER FLIGHT FARES start ********************************************
 const flightFares = [
   {
@@ -508,158 +661,505 @@ const umrahPackages = [
     title: "Umrah Journey: Madinah Bliss",
     duration: "7 Days / 7 Nights",
     cat: "economy",
-    price: 1200.0,
-    image: "/images/feature_img1.jpg",
+    price: 1200,
+    image: "images/feature_img1.jpg",
   },
   {
     title: "Pilgrimage in the Heart of Madinah",
     duration: "7 Days / 7 Nights",
     cat: "economy",
-    price: 1200.0,
-    image: "/images/feature_img2.jpg",
+    price: 1200,
+    image: "images/feature_img2.jpg",
+  },
+  {
+    title: "Exclusive 7-Day Umrah Experience in Makkah",
+    duration: "7 Days / 7 Nights",
+    cat: "economy",
+    price: 2200,
+    image: "images/feature_img6.jpg",
   },
   {
     title: "Spiritual Journey to Madinah",
     duration: "7 Days / 7 Nights",
     cat: "economy",
-    price: 1200.0,
-    image: "/images/feature_img3.jpg",
+    price: 1200,
+    image: "images/feature_img3.jpg",
   },
   {
     title: "Sacred Journey of Umrah in Makkah",
     duration: "7 Days / 7 Nights",
     cat: "economy",
-    price: 1500.0,
-    image: "/images/feature_img4.jpg",
+    price: 1500,
+    image: "images/feature_img4.jpg",
   },
   {
     title: "3 Star Umrah Package in Madinah",
     duration: "10 Days / 10 Nights",
     cat: "3star",
-    price: 2400.0,
-    image: "/images/feature_img5.jpg",
+    price: 2400,
+    image: "images/feature_img5.jpg",
   },
   {
     title: "Exclusive 7-Day Umrah Experience in Makkah",
     duration: "7 Days / 7 Nights",
     cat: "3star",
-    price: 2200.0,
-    image: "/images/feature_img6.jpg",
+    price: 2200,
+    image: "images/feature_img6.jpg",
   },
   {
     title: "4 Star Umrah Package in Makkah",
     duration: "7 Days / 7 Nights",
     cat: "5star",
-    price: 2800.0,
-    image: "/images/feature_img7.jpg",
+    price: 2800,
+    image: "images/feature_img7.jpg",
   },
   {
     title: "Luxury Umrah Journey in Madinah",
     duration: "7 Days / 7 Nights",
     cat: "5star",
-    price: 3200.0,
-    image: "/images/feature_img8.jpg",
+    price: 3200,
+    image: "images/feature_img8.jpg",
   },
   {
     title: "Spiritual Journey Umrah Package",
     duration: "10 Days / 10 Nights",
     cat: "5star",
-    price: 2500.0,
-    image: "/images/feature_img9.jpg",
+    price: 2500,
+    image: "images/feature_img9.jpg",
   },
   {
     title: "Luxury Umrah Experience in Jeddah",
     duration: "7 Days / 7 Nights",
     cat: "5star",
-    price: 2500.0,
-    image: "/images/feature_img10.jpg",
+    price: 2500,
+    image: "images/feature_img10.jpg",
   },
 ];
+// Optional per package: desc: "text", url: "/packages/slug", rating: 7.0, reviews: 350
+// (the blue rating box only shows when `rating` is set)
 
-function renderPackages(filter) {
-  const filtered = filter
-    ? umrahPackages.filter((p) => p.cat === filter)
-    : umrahPackages;
-  document.getElementById("packageGrid").innerHTML = filtered
-    .map(
-      (p) => `
-    <a href="#" class="package-card">
-      <div class="package-img">
-        <img src="${p.image}" alt="${p.title}" loading="lazy">
-        <span class="badge">${p.cat === "economy" ? "Economy" : p.cat === "3star" ? "3 Star" : "5 Star"}</span>
-      </div>
-      <div class="package-body">
-        <h3 class="package-title">${p.title}</h3>
-        <div class="package-duration">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          ${p.duration}
+(function () {
+  const LABEL = { economy: "Economy", "3star": "3 Star", "5star": "5 Star" };
+  const DEFAULT_DESC =
+    "Includes flights, accommodation and transport for a smooth, comfortable pilgrimage.";
+  const track = document.getElementById("packageGrid");
+  const viewport = document.getElementById("umViewport");
+  const dotsWrap = document.getElementById("umDots");
+  const filters = document.getElementById("umrahFilters");
+  if (!track || !viewport) return;
+
+  let current = 0,
+    count = 0,
+    curX = 0;
+  const fmt = (n) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+  function rating(p) {
+    if (!p.rating) return "";
+    const label = p.rating >= 8.5 ? "Superb" : p.rating >= 7 ? "Good" : "Fair";
+    const rev = p.reviews ? `<small>${p.reviews} Reviews</small>` : "";
+    return `<div class="um-rating"><div class="um-rating-text">${label}${rev}</div><span class="um-score">${p.rating.toFixed(1)}</span></div>`;
+  }
+
+  function card(p) {
+    return `
+    <div class="um-slide">
+      <article class="um-card">
+        <div class="um-img">
+          <img src="${p.image}" alt="${p.title}" loading="lazy" draggable="false">
+          <span class="um-tag">${LABEL[p.cat] || p.cat}</span>
+          <button type="button" class="um-heart" aria-label="Save package">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3 4.5 6.7 4.5c2 0 3.7 1.1 5.3 3 1.6-1.9 3.3-3 5.3-3 3.7 0 5.8 3.7 4.3 7.2C19.5 16.4 12 21 12 21z"/></svg>
+          </button>
         </div>
-        <div class="package-price-label">From</div>
-        <div class="package-price">USD ${p.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <small>/Person</small></div>
-      </div>
-    </a>
-  `,
-    )
-    .join("");
-}
-function filterPackages(filter, btn) {
-  document
-    .querySelectorAll("#umrahFilters .filter-btn")
-    .forEach((b) => b.classList.remove("active"));
-  btn.classList.add("active");
-  renderPackages(filter);
-}
-renderPackages("economy");
+        <div class="um-body">
+          <h3 class="um-title"><a href="${p.url || "#"}" class="stretched-link">${p.title}</a></h3>
+          <p class="um-desc">${p.desc || DEFAULT_DESC}</p>
+          <div class="um-price">From <strong>USD ${fmt(p.price)}</strong> /per person</div>
+        </div>
+        <div class="um-footer">
+          <span class="um-duration">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            ${p.duration}
+          </span>
+          ${rating(p)}
+        </div>
+      </article>
+    </div>`;
+  }
+
+  function position() {
+    const slides = [...track.children];
+    if (!slides.length) return;
+    const el = slides[current];
+    curX = viewport.clientWidth / 2 - (el.offsetLeft + el.offsetWidth / 2);
+    track.style.transform = `translateX(${curX}px)`;
+    slides.forEach((s, i) => s.classList.toggle("is-active", i === current));
+    [...dotsWrap.children].forEach((d, i) =>
+      d.classList.toggle("active", i === current),
+    );
+  }
+
+  function goTo(i) {
+    current = Math.max(0, Math.min(count - 1, i));
+    position();
+  }
+
+  function renderPackages(filter) {
+    const list = umrahPackages.filter((p) => !filter || p.cat === filter);
+    count = list.length;
+    track.innerHTML = list.map(card).join("");
+    dotsWrap.innerHTML = list
+      .map(
+        (_, i) =>
+          `<button type="button" class="um-dot" data-i="${i}" aria-label="Go to package ${i + 1}"></button>`,
+      )
+      .join("");
+    current = window.innerWidth < 768 ? 0 : Math.floor((count - 1) / 2);
+    track.style.transition = "none";
+    position();
+    void track.offsetWidth;
+    track.style.transition = "";
+  }
+
+  // ---- filters / dots / clicks ----
+  filters.addEventListener("click", (e) => {
+    const btn = e.target.closest(".filter-tab");
+    if (!btn) return;
+    filters
+      .querySelectorAll(".filter-tab")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderPackages(btn.dataset.filter);
+  });
+
+  dotsWrap.addEventListener("click", (e) => {
+    const d = e.target.closest(".um-dot");
+    if (d) goTo(+d.dataset.i);
+  });
+
+  track.addEventListener("click", (e) => {
+    const heart = e.target.closest(".um-heart");
+    if (heart) {
+      e.preventDefault();
+      e.stopPropagation();
+      heart.classList.toggle("liked");
+      return;
+    }
+    const slide = e.target.closest(".um-slide");
+    if (slide && !slide.classList.contains("is-active")) {
+      e.preventDefault();
+      goTo([...track.children].indexOf(slide));
+    }
+  });
+
+  // ---- drag / swipe: the track follows the pointer, then snaps ----
+  let startX = 0,
+    startY = 0,
+    baseX = 0,
+    down = false,
+    moved = false,
+    pid = null;
+  const slideW = () => (track.children[0] ? track.children[0].offsetWidth : 1);
+
+  viewport.addEventListener("dragstart", (e) => e.preventDefault());
+  viewport.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    down = true;
+    moved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    baseX = curX;
+    pid = e.pointerId;
+  });
+  viewport.addEventListener("pointermove", (e) => {
+    if (!down) return;
+    const dx = e.clientX - startX;
+    if (!moved) {
+      if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(e.clientY - startY))
+        return;
+      moved = true;
+      viewport.setPointerCapture(pid);
+      track.style.transition = "none";
+      viewport.classList.add("is-dragging");
+    }
+    track.style.transform = `translateX(${baseX + dx}px)`;
+  });
+  viewport.addEventListener("pointerup", (e) => {
+    if (!down) return;
+    down = false;
+    if (!moved) return;
+    viewport.classList.remove("is-dragging");
+    track.style.transition = "";
+    const dx = e.clientX - startX;
+    let steps = Math.round(-dx / slideW());
+    if (steps === 0 && Math.abs(dx) > 50) steps = dx < 0 ? 1 : -1;
+    goTo(current + steps);
+  });
+  viewport.addEventListener("pointercancel", () => {
+    if (!down) return;
+    down = false;
+    if (moved) {
+      viewport.classList.remove("is-dragging");
+      track.style.transition = "";
+      position();
+    }
+  });
+  viewport.addEventListener(
+    "click",
+    (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    },
+    true,
+  );
+
+  let t;
+  window.addEventListener("resize", () => {
+    clearTimeout(t);
+    t = setTimeout(position, 100);
+  });
+
+  renderPackages("economy");
+})();
 // ******************************************** UMRAH PACKAGES end ********************************************
 
 // ******************************************** RENDER BLOGS start ********************************************
 
-const blogPosts = [
-  {
-    slug: "what-does-your-airline-ticket-actually-include",
-    category: "TRAVEL TIPS",
-    title: "What Does Your Airline Ticket Actually Include?",
-    date: "Sep 2, 2026",
-    image: "/images/blog_img1.png",
-  },
-  {
-    slug: "what-to-pack-for-umrah",
-    category: "TRAVEL TIPS",
-    title: "What to Pack for Umrah: A Complete Packing Checklist for...",
-    date: "Sep 2, 2026",
-    image: "/images/blog_img2.png",
-  },
-  {
-    slug: "how-to-find-cheap-international-flights",
-    category: "TRAVEL TIPS",
-    title: "How to Find Cheap International Flights in 2026",
-    date: "Aug 31, 2026",
-    image: "/images/blog_img3.png",
-  },
-  {
-    slug: "how-to-book-cheap-flights-from-pakistan",
-    category: "TRAVEL TIPS",
-    title: "How to Book Cheap Flights from Pakistan: Complete Guide",
-    date: "Aug 25, 2026",
-    image: "/images/blog_img4.png",
-  },
-];
+(function () {
+  var posts = [
+    {
+      cat: "Travel Tools",
+      title: "Top Travel Apps You Should Use for a Better Travel Experience",
+      excerpt: "The best apps for maps, bookings and budgeting on the road.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+    {
+      cat: "Booking Tips",
+      title: "How to Book Flights at the Best Prices and Save More",
+      excerpt:
+        "Learn smart strategies to book flights at the best prices, from timing your purchase and comparing fares.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+    {
+      cat: "Adventure Travel",
+      title: "Exciting Adventure Travel Ideas for Thrill Seekers",
+      excerpt: "Hiking, diving, rafting and more for your next trip.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+    {
+      cat: "Travel Guide",
+      title: "Complete Solo Travel Guide for Beginners",
+      excerpt:
+        "Start your solo travel journey with confidence using this beginner-friendly guide, packed with practical tips.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+    {
+      cat: "Destinations",
+      title: "Hidden Gems Worth Adding to Your Bucket List",
+      excerpt: "Quiet places that deserve a spot on your itinerary.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+    {
+      cat: "Packing",
+      title: "Smart Packing Checklist for Every Kind of Trip",
+      excerpt:
+        "Pack light and never forget the essentials again, with this simple checklist.",
+      date: "21 April, 2026",
+      img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+      url: "#",
+    },
+  ];
 
-(function renderBlogs() {
-  document.getElementById("blogGrid").innerHTML = blogPosts
-    .map(
-      (b) => `
-    <a href="#" class="blog-card">
-      <img class="blog-img" src="${b.image}" alt="${b.title}" loading="lazy">
-      <div class="blog-body">
-        <div class="blog-category">${b.category}</div>
-        <h3 class="blog-title">${b.title}</h3>
-        <div class="blog-date">${b.date}</div>
-      </div>
-    </a>
-  `,
-    )
+  var arrow =
+    '<svg viewBox="0 0 14 14" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M2 12L12 2M4 2h8v8"/></svg>';
+  var blogSection = document.getElementById("blog");
+  var track = document.getElementById("blogTrack");
+  var dotsBox = document.getElementById("blogDots");
+
+  track.innerHTML = posts
+    .map(function (p, i) {
+      var overlay = i % 2 === 0;
+      var img =
+        '<div class="blog-img g' +
+        (i % 6) +
+        '"><img src="' +
+        p.img +
+        '" alt="' +
+        p.title +
+        '" loading="lazy"></div>';
+      var meta =
+        '<div class="blog-meta"><span>' +
+        p.date +
+        '</span><span class="blog-more">Read More ' +
+        arrow +
+        "</span></div>";
+      var body = overlay
+        ? '<div class="blog-body"><span class="blog-tag">' +
+          p.cat +
+          '</span><h3 class="blog-title">' +
+          p.title +
+          "</h3>" +
+          meta +
+          "</div>"
+        : '<div class="blog-body"><span class="blog-tag">' +
+          p.cat +
+          '</span><h3 class="blog-title">' +
+          p.title +
+          '</h3><p class="blog-excerpt">' +
+          p.excerpt +
+          "</p>" +
+          meta +
+          "</div>";
+      return (
+        '<article class="blog-card ' +
+        (overlay ? "overlay" : "plain") +
+        '"><a href="' +
+        p.url +
+        '">' +
+        img +
+        body +
+        "</a></article>"
+      );
+    })
     .join("");
+
+  // hide broken images so the gradient fallback shows
+  track.querySelectorAll("img").forEach(function (im) {
+    var hide = function () {
+      im.style.display = "none";
+    };
+    im.addEventListener("error", hide);
+    if (im.complete && im.naturalWidth === 0) hide();
+  });
+
+  var viewport = document.getElementById("blogViewport");
+  var idx = 0,
+    timer,
+    startX = 0,
+    dx = 0,
+    dragging = false,
+    moved = false;
+
+  function pv() {
+    return (
+      parseInt(getComputedStyle(blogSection).getPropertyValue("--pv"), 10) || 1
+    );
+  }
+  function gap() {
+    return parseFloat(getComputedStyle(track).columnGap) || 24;
+  }
+  function cardW() {
+    return track.querySelector(".blog-card").offsetWidth;
+  }
+  function step() {
+    return cardW() + gap();
+  }
+  function maxIdx() {
+    return Math.max(0, posts.length - pv());
+  }
+
+  function render() {
+    track.style.transform = "translateX(" + (-idx * step() + dx) + "px)";
+    dotsBox.querySelectorAll("button").forEach(function (b, k) {
+      b.classList.toggle("active", k === idx);
+    });
+  }
+
+  function go(i) {
+    var max = maxIdx();
+    idx = i > max ? 0 : i < 0 ? max : i; // loops back at the ends
+    dx = 0;
+    render();
+  }
+
+  function buildDots() {
+    dotsBox.innerHTML = "";
+    for (var i = 0; i <= maxIdx(); i++) {
+      (function (i) {
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to slide " + (i + 1));
+        b.onclick = function () {
+          go(i);
+          restart();
+        };
+        dotsBox.appendChild(b);
+      })(i);
+    }
+    if (idx > maxIdx()) idx = maxIdx();
+    render();
+  }
+
+  function restart() {
+    clearInterval(timer);
+    timer = setInterval(function () {
+      go(idx + 1);
+    }, 4500);
+  }
+
+  document.getElementById("blogPrev").onclick = function () {
+    go(idx - 1);
+    restart();
+  };
+  document.getElementById("blogNext").onclick = function () {
+    go(idx + 1);
+    restart();
+  };
+
+  // drag / swipe (mouse + touch)
+  viewport.addEventListener("pointerdown", function (e) {
+    dragging = true;
+    moved = false;
+    startX = e.clientX;
+    dx = 0;
+    track.classList.add("no-anim");
+    viewport.classList.add("dragging");
+  });
+  window.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    dx = e.clientX - startX;
+    if (Math.abs(dx) > 6) moved = true;
+    render();
+  });
+  window.addEventListener("pointerup", function () {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove("no-anim");
+    viewport.classList.remove("dragging");
+    var d = dx;
+    dx = 0;
+    if (d < -50) go(idx + 1);
+    else if (d > 50) go(idx - 1);
+    else render();
+    restart();
+  });
+  track.addEventListener("click", function (e) {
+    if (moved) {
+      e.preventDefault();
+      moved = false;
+    }
+  });
+
+  viewport.addEventListener("mouseenter", function () {
+    clearInterval(timer);
+  });
+  viewport.addEventListener("mouseleave", restart);
+  window.addEventListener("resize", buildDots);
+
+  buildDots();
+  restart();
 })();
 
 // ******************************************** RENDER BLOGS end ********************************************
@@ -678,22 +1178,28 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePaxInput();
   // Set min dates
   const today = new Date().toISOString().split("T")[0];
-  if (document.getElementById("depDate")) document.getElementById("depDate").min = today;
-  if (document.getElementById("retDate")) document.getElementById("retDate").min = today;
+  if (document.getElementById("depDate"))
+    document.getElementById("depDate").min = today;
+  if (document.getElementById("retDate"))
+    document.getElementById("retDate").min = today;
   if (document.getElementById("umrahStartDate")) {
     document.getElementById("umrahStartDate").min = today;
-    document.getElementById("umrahStartDate").addEventListener("change", function () {
-      const durInput = document.getElementById("umrahDurationDate");
-      if (durInput) {
-        durInput.min = this.value;
-        if (durInput.value && durInput.value < this.value) {
-          durInput.value = this.value;
+    document
+      .getElementById("umrahStartDate")
+      .addEventListener("change", function () {
+        const durInput = document.getElementById("umrahDurationDate");
+        if (durInput) {
+          durInput.min = this.value;
+          if (durInput.value && durInput.value < this.value) {
+            durInput.value = this.value;
+          }
         }
-      }
-    });
+      });
   }
-  if (document.getElementById("umrahDurationDate")) document.getElementById("umrahDurationDate").min = today;
-  if (document.getElementById("visaDate")) document.getElementById("visaDate").min = today;
+  if (document.getElementById("umrahDurationDate"))
+    document.getElementById("umrahDurationDate").min = today;
+  if (document.getElementById("visaDate"))
+    document.getElementById("visaDate").min = today;
 });
 // ******************************************** INIT end ********************************************
 
