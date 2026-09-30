@@ -101,14 +101,18 @@ function toggleSignup(e) {
 
 // ============ TABS ============
 function switchTab(tab) {
-  document
-    .querySelectorAll(".tab-btn")
-    .forEach((t) => t.classList.remove("active"));
-  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add("active");
-  document
-    .querySelectorAll(".tab-panel")
-    .forEach((p) => p.classList.remove("active"));
-  document.getElementById("panel-" + tab).classList.add("active");
+  const tabButtons = document.querySelectorAll(".tab-btn, .search-tab");
+  const tabPanels = document.querySelectorAll(".tab-panel, .search-panel");
+  const activeButton = [...tabButtons].find(
+    (button) => button.dataset.tab === tab,
+  );
+  const activePanel = document.getElementById(`panel-${tab}`);
+  if (!activeButton || !activePanel) return;
+
+  tabButtons.forEach((button) => button.classList.remove("active"));
+  activeButton.classList.add("active");
+  tabPanels.forEach((panel) => panel.classList.remove("active"));
+  activePanel.classList.add("active");
 }
 
 // ============ TRIP TYPE ============
@@ -246,7 +250,7 @@ function renderAirportResults(which, list) {
         (a) => `
     <div class="airport-opt" style="padding:8px 12px;cursor:pointer;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background=''" onclick="selectAirport('${which}','${a.code}','${a.city}','${a.country}')">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-weight:700;color:var(--primary)">${a.code}</span>
+        <span style="font-weight:700;color:var(--primary-blue)">${a.code}</span>
         <span style="font-size:14px;color:#374151">${a.city} <span style="color:#9ca3af">— ${a.country}</span></span>
       </div>
     </div>

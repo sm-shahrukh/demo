@@ -119,1161 +119,1608 @@
       </nav>
       <!-- ========================================== NAVIGATION BAR END ========================================== -->
 
-      <!-- ========================================== HERO BANNER START ========================================== -->
-      <section class="hero-banner-main">
-        <div class="hero-shape"></div>
-        <div class="hero-grid">
-          <div class="hero-search-side">
-            <div class="search-card">
-              <div class="search-tabs-horizontal">
-                <button
-                  class="tab-btn active"
-                  data-tab="flights"
-                  onclick="switchTab('flights')"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
-                    />
-                  </svg>
-                  Flights
-                </button>
-                <button
-                  class="tab-btn"
-                  data-tab="umrah"
-                  onclick="switchTab('umrah')"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  </svg>
-                  Umrah
-                </button>
-                <button
-                  class="tab-btn"
-                  data-tab="visa"
-                  onclick="switchTab('visa')"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                    />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                  Visa
-                </button>
-              </div>
+      <!-- ========================================== HERO + SEARCH start  ========================================== -->
 
-              <div class="search-content">
-                <!-- FLIGHTS TAB -->
-                <div class="tab-panel active" id="panel-flights">
-                  <form
-                    id="flightSearchForm"
-                    onsubmit="return handleFlightSearch(event);"
+      <section class="hero">
+        <div class="hero-overlay">
+          <div class="hero-content">
+            <div class="widget-main">
+              <!-- SEARCH WIDGET -->
+              <div class="search-widget">
+                <div class="search-tabs">
+                  <button
+                    class="search-tab active"
+                    data-tab="flights"
+                    onclick="switchTab('flights')"
                   >
-                    <div class="alert" id="searchAlert"></div>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      style="height: 17px; width: 17px"
+                    >
+                      <path
+                        d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
+                      />
+                    </svg>
+                    <span>Flights</span>
+                  </button>
+                  <button
+                    class="search-tab"
+                    data-tab="umrah"
+                    onclick="switchTab('umrah')"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      style="height: 17px; width: 17px"
+                    >
+                      <path
+                        d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                      />
+                    </svg>
+                    <span>Umrah</span>
+                  </button>
+                  <button
+                    class="search-tab"
+                    data-tab="visa"
+                    onclick="switchTab('visa')"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      style="height: 17px; width: 17px"
+                    >
+                      <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <span>Visa</span>
+                  </button>
+                </div>
 
-                    <div class="trip-selector">
-                      <label class="radio-card">
-                        <input
-                          type="radio"
-                          name="tripType"
-                          value="oneway"
-                          checked
-                          onclick="setTripType('oneway', this)"
-                        />
-                        <span class="radio-content">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path d="M5 12h14m-7-7 7 7-7 7" />
-                          </svg>
-                          One Way
-                        </span>
-                      </label>
-                      <label class="radio-card">
-                        <input
-                          type="radio"
-                          name="tripType"
-                          value="roundtrip"
-                          onclick="setTripType('roundtrip', this)"
-                        />
-                        <span class="radio-content">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M3 8l4-4m0 0l4 4M7 4v12M21 16l-4 4m0 0l-4-4m4 4V8"
-                            />
-                          </svg>
-                          Round Trip
-                        </span>
-                      </label>
-                      <label class="radio-card">
-                        <input
-                          type="radio"
-                          name="tripType"
-                          value="multicity"
-                          onclick="setTripType('multicity', this)"
-                        />
-                        <span class="radio-content">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <circle cx="12" cy="12" r="6" />
-                            <circle cx="12" cy="12" r="2" />
-                          </svg>
-                          Multi-City
-                        </span>
-                      </label>
-                    </div>
+                <div class="search-panels">
+                  <!-- FLIGHTS PANEL -->
+                  <div class="search-panel active" id="panel-flights">
+                    <form
+                      id="flightSearchForm"
+                      onsubmit="return handleFlightSearch(event);"
+                      novalidate
+                    >
+                      <div class="alert" id="searchAlert"></div>
 
-                    <div class="search-grid">
-                      <div class="input-group">
-                        <label class="input-label">From</label>
-
-                        <div
-                          class="input-wrapper"
-                          onclick="openAirportPanel('from')"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
+                      <!-- Trip Type -->
+                      <div class="trip-and-button">
+                        <div class="trip-types dd-trip-type-row">
+                          <button
+                            type="button"
+                            class="trip-type-btn dd-trip-type-btn active"
+                            data-type="oneway"
+                            onclick="setTripType('oneway', this)"
                           >
-                            <circle cx="12" cy="10" r="3" />
-                            <path
-                              d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="fromInput"
-                            placeholder="Departure city"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="fromPanel">
-                          <div class="panel-header">
-                            <span>Select Departure</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="closeAirportPanel('from')"
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              style="height: 17px; width: 17px"
                             >
-                              ×
-                            </button>
-                          </div>
-                          <input
-                            type="text"
-                            id="fromQuery"
-                            class="search-input"
-                            placeholder="Search..."
-                            oninput="searchAirport('from')"
-                          />
-                          <div id="fromResults" class="results-list"></div>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        class="swap-button"
-                        onclick="swapCities()"
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                          style="width: 20px; height: 20px"
-                        >
-                          <path
-                            d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
-                          />
-                        </svg>
-                      </button>
-
-                      <div class="input-group">
-                        <label class="input-label">To</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="openAirportPanel('to')"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
+                              <path d="M5 12h14m-7-7 7 7-7 7" />
+                            </svg>
+                            One Way
+                          </button>
+                          <button
+                            type="button"
+                            class="trip-type-btn dd-trip-type-btn"
+                            data-type="roundtrip"
+                            onclick="setTripType('roundtrip', this)"
                           >
-                            <circle cx="12" cy="10" r="3" />
-                            <path
-                              d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="toInput"
-                            placeholder="Arrival city"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="toPanel">
-                          <div class="panel-header">
-                            <span>Select Arrival</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="closeAirportPanel('to')"
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              style="height: 17px; width: 17px"
                             >
-                              ×
-                            </button>
-                          </div>
-                          <input
-                            type="text"
-                            id="toQuery"
-                            class="search-input"
-                            placeholder="Search..."
-                            oninput="searchAirport('to')"
-                          />
-                          <div id="toResults" class="results-list"></div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Departure</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
+                              <path
+                                d="M3 8l4-4m0 0l4 4M7 4v12M21 16l-4 4m0 0l-4-4m4 4V8"
+                              />
+                            </svg>
+                            Round Trip
+                          </button>
+                          <button
+                            type="button"
+                            class="trip-type-btn dd-trip-type-btn"
+                            data-type="multicity"
+                            onclick="setTripType('multicity', this)"
                           >
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                          </svg>
-                          <input type="date" id="depDate" />
-                        </div>
-                      </div>
-
-                      <div
-                        class="input-group"
-                        id="returnCol"
-                        style="display: none"
-                      >
-                        <label class="input-label">Return</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                          </svg>
-                          <input type="date" id="retDate" />
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Passengers</label>
-                        <div
-                          class="input-wrapper"
-                          id="paxTrigger"
-                          onclick="togglePassengerPanel()"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-                            />
-                            <circle cx="9" cy="7" r="4" />
-                            <path
-                              d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="paxInput"
-                            value="1 Passenger"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="paxPanel">
-                          <div class="panel-header">
-                            <span>Select Passengers</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="togglePassengerPanel()"
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              style="height: 17px; width: 17px"
                             >
-                              ×
-                            </button>
-                          </div>
-                          <div class="passenger-controls">
-                            <div class="passenger-row">
-                              <div>
-                                <div class="pax-name">Adults</div>
-                                <div class="pax-desc">12+ years</div>
-                              </div>
-                              <div class="counter">
-                                <button
-                                  type="button"
-                                  onclick="changePax('adults', -1)"
-                                >
-                                  −
-                                </button>
-                                <span id="countAdults">1</span>
-                                <button
-                                  type="button"
-                                  onclick="changePax('adults', 1)"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                            <div class="passenger-row">
-                              <div>
-                                <div class="pax-name">Children</div>
-                                <div class="pax-desc">2-11 years</div>
-                              </div>
-                              <div class="counter">
-                                <button
-                                  type="button"
-                                  onclick="changePax('children', -1)"
-                                >
-                                  −
-                                </button>
-                                <span id="countChildren">0</span>
-                                <button
-                                  type="button"
-                                  onclick="changePax('children', 1)"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                            <div class="passenger-row">
-                              <div>
-                                <div class="pax-name">Infants</div>
-                                <div class="pax-desc">Under 2</div>
-                              </div>
-                              <div class="counter">
-                                <button
-                                  type="button"
-                                  onclick="changePax('infants', -1)"
-                                >
-                                  −
-                                </button>
-                                <span id="countInfants">0</span>
-                                <button
-                                  type="button"
-                                  onclick="changePax('infants', 1)"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                              <circle cx="12" cy="12" r="10" />
+                              <circle cx="12" cy="12" r="6" />
+                              <circle cx="12" cy="12" r="2" />
+                            </svg>
+                            Multi-City
+                          </button>
                         </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Class</label>
-                        <div
-                          class="input-wrapper"
-                          id="cabinTrigger"
-                          onclick="toggleCabinMenu()"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="2" y="7" width="20" height="14" rx="2" />
-                            <path
-                              d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="cabinInput"
-                            value="Economy"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="cabinMenu">
-                          <div class="panel-header">
-                            <span>Select Class</span>
-                            <button
-                              type="button"
-                              class="close-btn"
+                        <div class="trip-class-wrap">
+                          <!-- Economy button start -->
+                          <div class="form-col-economy">
+                            <div
+                              class="field-box"
+                              id="cabinTrigger"
                               onclick="toggleCabinMenu()"
                             >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setCabin('Economy')"
-                          >
-                            Economy
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setCabin('Business')"
-                          >
-                            Business
-                          </div>
-                          <div class="option-item" onclick="setCabin('First')">
-                            First Class
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                              <span class="field-box-icon">
+                                <svg
+                                  class="input-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  style="height: 17px; width: 17px"
+                                >
+                                  <rect
+                                    x="2"
+                                    y="7"
+                                    width="20"
+                                    height="14"
+                                    rx="2"
+                                  />
+                                  <path
+                                    d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"
+                                  />
+                                </svg>
+                              </span>
+                              <div class="field-box-content">
+                                <input
+                                  class="field-box-input"
+                                  id="cabinInput"
+                                  type="text"
+                                  readonly
+                                  placeholder="Economy"
+                                  value="Economy"
+                                />
+                              </div>
 
-                    <div class="multi-city-panel" id="multiCityPanel">
-                      <div class="multi-city-heading">
-                        <span>Additional Flights</span>
-                        <div class="multi-city-heading-actions">
-                          <small id="multiCityCount">2 / 6 flights</small>
-                          <button
-                            type="button"
-                            class="add-flight-btn"
-                            onclick="addMultiCityLeg()"
-                          >
-                            + Add flight
-                          </button>
+                              <div
+                                class="dd-panel cabin-select-menu"
+                                id="cabinMenu"
+                              >
+                                <div class="dd-panel-header">
+                                  <span>Select Class</span>
+                                  <button
+                                    type="button"
+                                    class="dd-panel-close"
+                                    onclick="toggleCabinMenu()"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                                <div
+                                  class="dd-opt dd-cabin-opt"
+                                  data-value="Economy"
+                                  onclick="setCabin('Economy')"
+                                >
+                                  Economy
+                                </div>
+                                <div
+                                  class="dd-opt dd-cabin-opt"
+                                  data-value="Business"
+                                  onclick="setCabin('Business')"
+                                >
+                                  Business
+                                </div>
+                                <div
+                                  class="dd-opt dd-cabin-opt"
+                                  data-value="First"
+                                  onclick="setCabin('First')"
+                                >
+                                  First Class
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Economy button start -->
                         </div>
                       </div>
-                      <div class="multi-city-leg">
-                        <div class="multi-city-leg-heading">
-                          <strong>FLIGHT 2</strong>
-                          <button
-                            type="button"
-                            class="remove-flight-btn"
-                            onclick="removeMultiCityLeg(this)"
-                            aria-label="Remove flight 2"
+
+                      <!-- =============================== Flight Grid Row Start ================================= -->
+
+                      <!-- Route Row -->
+                      <div class="form-row" id="routeRow">
+                        <!-- ========================================================= 1. FROM ========================================================== -->
+                        <div class="form-col from-col">
+                          <div
+                            class="field-box"
+                            id="fromTrigger"
+                            onclick="openAirportPanel('from')"
                           >
-                            Remove
-                          </button>
-                        </div>
-                        <div class="multi-city-fields">
-                          <label class="multi-city-airport">
-                            <span>From</span>
-                            <div
-                              class="input-wrapper"
-                              onclick="openAirportPanel('multiCity2From')"
-                            >
+                            <span class="field-box-icon">
                               <svg
                                 class="input-icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="2"
+                                style="height: 17px; width: 17px"
                               >
                                 <circle cx="12" cy="10" r="3" />
                                 <path
                                   d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
                                 />
                               </svg>
+                            </span>
+
+                            <div class="field-box-content">
+                              <span class="field-box-label"> From </span>
+
                               <input
-                                id="multiCity2FromInput"
+                                class="field-box-input"
+                                id="fromInput"
                                 type="text"
-                                placeholder="Departure city or airport"
+                                placeholder="Departure City"
                                 readonly
+                                onclick="openAirportPanel('from')"
                               />
                             </div>
-                            <div
-                              class="dropdown-panel"
-                              id="multiCity2FromPanel"
+                          </div>
+
+                          <button
+                            type="button"
+                            class="swap-button"
+                            onclick="swapCities()"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1"
+                              style="width: 17px; height: 17px"
                             >
-                              <div class="panel-header">
-                                <span>Select From</span>
-                                <button
-                                  type="button"
-                                  class="close-btn"
-                                  aria-label="Close airport list"
-                                  onclick="closeAirportPanel('multiCity2From')"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                              <input
-                                id="multiCity2FromQuery"
-                                class="search-input"
-                                type="text"
-                                placeholder="Search airports..."
-                                oninput="searchAirport('multiCity2From')"
+                              <path
+                                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
                               />
-                              <div
-                                id="multiCity2FromResults"
-                                class="results-list"
-                              ></div>
+                            </svg>
+                          </button>
+
+                          <div class="dd-panel airport-panel" id="fromPanel">
+                            <div class="dd-panel-header">
+                              <span>Select Departure</span>
+                              <button
+                                type="button"
+                                class="dd-panel-close"
+                                onclick="closeAirportPanel('from')"
+                              >
+                                ✕
+                              </button>
                             </div>
-                          </label>
-                          <label class="multi-city-airport">
-                            <span>To</span>
-                            <div
-                              class="input-wrapper"
-                              onclick="openAirportPanel('multiCity2To')"
-                            >
+
+                            <input
+                              type="text"
+                              id="fromQuery"
+                              placeholder="Search airport or city..."
+                              oninput="searchAirport('from')"
+                              class="airport-search-input"
+                            />
+
+                            <!-- JS CAN INSERT AIRPORT RESULTS HERE -->
+                            <div id="fromResults" class="airport-results"></div>
+                          </div>
+                        </div>
+
+                        <!-- =========================================================2. TO========================================================== -->
+                        <div class="form-col to-col">
+                          <div
+                            class="field-box"
+                            id="toTrigger"
+                            onclick="openAirportPanel('to')"
+                          >
+                            <span class="field-box-icon">
                               <svg
                                 class="input-icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
                                 stroke-width="2"
+                                style="height: 17px; width: 17px"
                               >
                                 <circle cx="12" cy="10" r="3" />
                                 <path
                                   d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
                                 />
                               </svg>
+                            </span>
+
+                            <div class="field-box-content">
+                              <span class="field-box-label"> To </span>
+
                               <input
-                                id="multiCity2ToInput"
+                                class="field-box-input"
+                                id="toInput"
                                 type="text"
-                                placeholder="Arrival city or airport"
+                                placeholder="Arrival City"
                                 readonly
+                                onclick="openAirportPanel('to')"
                               />
                             </div>
-                            <div class="dropdown-panel" id="multiCity2ToPanel">
-                              <div class="panel-header">
-                                <span>Select To</span>
+                          </div>
+
+                          <!-- ===================================================== TO AIRPORT PANEL  ====================================================== -->
+                          <div class="dd-panel airport-panel" id="toPanel">
+                            <div class="dd-panel-header">
+                              <span>Select Arrival</span>
+                              <button
+                                type="button"
+                                class="dd-panel-close"
+                                onclick="closeAirportPanel('to')"
+                              >
+                                ✕
+                              </button>
+                            </div>
+
+                            <input
+                              type="text"
+                              id="toQuery"
+                              placeholder="Search airport or city..."
+                              oninput="searchAirport('to')"
+                              class="airport-search-input"
+                            />
+
+                            <!-- JS CAN INSERT AIRPORT RESULTS HERE -->
+                            <div id="toResults" class="airport-results"></div>
+                          </div>
+                        </div>
+
+                        <!-- ========================================================= 3. DEPARTURE + RETURN DATE (side by side in one box) ========================================================== -->
+                        <div class="form-col date-col">
+                          <div class="date-row">
+                            <!-- Departure Date -->
+                            <div
+                              class="field-box date-half"
+                              id="depTrigger"
+                              onclick="openDatePicker('dep')"
+                            >
+                              <span class="field-box-icon"
+                                ><svg
+                                  class="input-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  style="height: 17px; width: 17px"
+                                >
+                                  <rect
+                                    x="3"
+                                    y="4"
+                                    width="18"
+                                    height="18"
+                                    rx="2"
+                                  />
+                                  <line x1="16" y1="2" x2="16" y2="6" />
+                                  <line x1="8" y1="2" x2="8" y2="6" />
+                                  <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                              </span>
+                              <div class="field-box-content">
+                                <span class="field-box-label">Departure</span>
+                                <input
+                                  class="field-box-input"
+                                  id="depDate"
+                                  type="date"
+                                  placeholder="Departure Date"
+                                />
+                              </div>
+                            </div>
+
+                            <!-- Return Date (shown only for round trip) -->
+                            <div
+                              class="field-box date-half"
+                              id="returnCol"
+                              style="display: none"
+                              onclick="openDatePicker('ret')"
+                            >
+                              <span class="field-box-icon">
+                                <svg
+                                  class="input-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  style="width: 17px; height: 17px"
+                                >
+                                  <rect
+                                    x="3"
+                                    y="4"
+                                    width="18"
+                                    height="18"
+                                    rx="2"
+                                  />
+                                  <line x1="16" y1="2" x2="16" y2="6" />
+                                  <line x1="8" y1="2" x2="8" y2="6" />
+                                  <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                              </span>
+                              <div class="field-box-content">
+                                <span class="field-box-label">Return</span>
+                                <input
+                                  class="field-box-input"
+                                  id="retDate"
+                                  type="date"
+                                  placeholder="Return Date"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ========================================================= 4. PASSENGERS ========================================================== -->
+                        <div class="form-col pax-col">
+                          <div
+                            class="field-box"
+                            id="paxTrigger"
+                            onclick="togglePassengerPanel()"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <path
+                                  d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                                />
+                                <circle cx="9" cy="7" r="4" />
+                                <path
+                                  d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                                />
+                              </svg>
+                            </span>
+
+                            <div class="field-box-content">
+                              <span class="field-box-label"> Passengers </span>
+
+                              <!-- ORIGINAL HARD-CODED VALUE PRESERVED -->
+                              <input
+                                class="field-box-input"
+                                id="paxInput"
+                                type="text"
+                                readonly
+                                placeholder="1 Passenger"
+                                value="1 Passenger"
+                              />
+                            </div>
+
+                            <!-- ================================================= PASSENGER DROPDOWN Original values preserved  ================================================== -->
+                            <div class="dd-panel pax-panel" id="paxPanel">
+                              <div class="dd-panel-header">
+                                <span>Passengers</span>
                                 <button
                                   type="button"
-                                  class="close-btn"
-                                  aria-label="Close airport list"
-                                  onclick="closeAirportPanel('multiCity2To')"
+                                  class="dd-panel-close"
+                                  onclick="togglePassengerPanel()"
                                 >
-                                  ×
+                                  ✕
                                 </button>
                               </div>
-                              <input
-                                id="multiCity2ToQuery"
-                                class="search-input"
-                                type="text"
-                                placeholder="Search airports..."
-                                oninput="searchAirport('multiCity2To')"
-                              />
+                              <!-- ADULTS -->
+                              <div class="dd-opt dd-pax-row passenger-row">
+                                <div class="passenger-info">
+                                  <div class="name">Adults</div>
+
+                                  <div class="desc">12+ years</div>
+                                </div>
+
+                                <div class="pax-btns">
+                                  <button
+                                    type="button"
+                                    onclick="changePax('adults', -1)"
+                                  >
+                                    −
+                                  </button>
+
+                                  <span class="count" id="countAdults">
+                                    1
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onclick="changePax('adults', 1)"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+
+                              <!-- CHILDREN -->
+                              <div class="dd-opt dd-pax-row passenger-row">
+                                <div class="passenger-info">
+                                  <div class="name">Children</div>
+
+                                  <div class="desc">2-11 yrs</div>
+                                </div>
+
+                                <div class="pax-btns">
+                                  <button
+                                    type="button"
+                                    onclick="changePax('children', -1)"
+                                  >
+                                    −
+                                  </button>
+
+                                  <span class="count" id="countChildren">
+                                    0
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onclick="changePax('children', 1)"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+
+                              <!-- INFANTS -->
+                              <div class="dd-opt dd-pax-row passenger-row">
+                                <div class="passenger-info">
+                                  <div class="name">Infants</div>
+
+                                  <div class="desc">Under 2</div>
+                                </div>
+
+                                <div class="pax-btns">
+                                  <button
+                                    type="button"
+                                    onclick="changePax('infants', -1)"
+                                  >
+                                    −
+                                  </button>
+
+                                  <span class="count" id="countInfants">
+                                    0
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    onclick="changePax('infants', 1)"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- =========================================================5. SEARCH BUTTON ========================================================== -->
+                        <button type="submit" class="search-submit">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <circle cx="11" cy="11" r="8" />
+
+                            <path d="m21 21-4.35-4.35" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- =============================== Flight Grid Row End ================================= -->
+
+                      <div class="multi-city-panel" id="multiCityPanel">
+                        <div class="multi-city-heading">
+                          <span>Additional Flights</span>
+                          <div class="multi-city-heading-actions">
+                            <small id="multiCityCount">2 / 6 flights</small>
+                            <button
+                              type="button"
+                              class="add-flight-btn"
+                              onclick="addMultiCityLeg()"
+                            >
+                              + Add flight
+                            </button>
+                          </div>
+                        </div>
+                        <div class="multi-city-leg">
+                          <div class="multi-city-leg-heading">
+                            <strong>FLIGHT 2</strong>
+                            <button
+                              type="button"
+                              class="remove-flight-btn"
+                              onclick="removeMultiCityLeg(this)"
+                              aria-label="Remove flight 2"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                          <div class="multi-city-fields">
+                            <label class="multi-city-airport">
+                              <span>From</span>
                               <div
-                                id="multiCity2ToResults"
-                                class="results-list"
-                              ></div>
-                            </div>
-                          </label>
-                          <label><span>Date</span><input type="date" /></label>
-                        </div>
-                      </div>
-                      <div id="additionalFlightLegs"></div>
-                    </div>
-
-                    <button type="submit" class="search-button">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                      </svg>
-                      Search Flights
-                    </button>
-
-                    <div class="search-result" id="searchResult">
-                      <h4 id="resultTitle">Search Result</h4>
-                      <div class="summary" id="resultSummary"></div>
-                      <p id="resultText"></p>
-                    </div>
-                  </form>
-                </div>
-
-                <!-- UMRAH TAB -->
-                <div class="tab-panel" id="panel-umrah">
-                  <form onsubmit="return handleModeSearch(event, 'Umrah');">
-                    <div class="search-grid">
-                      <div class="input-group">
-                        <label class="input-label">Destination</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <circle cx="12" cy="10" r="3" />
-                            <path
-                              d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            value="Jeddah, Saudi Arabia"
-                            readonly
-                          />
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Start Date</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                          </svg>
-                          <input type="date" id="umrahStartDate" />
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">End Date</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                          </svg>
-                          <input type="date" id="umrahDurationDate" />
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Package Type</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleUmrahTypeMenu(event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <polygon
-                              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="umrahTypeInput"
-                            value="Economy"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="umrahTypeMenu">
-                          <div class="panel-header">
-                            <span>Package Type</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleUmrahTypeMenu()"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setUmrahType('Economy', this)"
-                          >
-                            Economy
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setUmrahType('3 Star', this)"
-                          >
-                            3 Star
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setUmrahType('5 Star', this)"
-                          >
-                            5 Star
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Services</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleUmrahServicesMenu(event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                          <input
-                            type="text"
-                            id="umrahServicesInput"
-                            value="Flights, Hotel, Transport"
-                            readonly
-                          />
-                        </div>
-                        <div
-                          class="dropdown-panel services-panel"
-                          id="umrahServicesMenu"
-                          onclick="event.stopPropagation()"
-                        >
-                          <div class="panel-header">
-                            <span>Select Services</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleUmrahServicesMenu()"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <label class="checkbox-item">
-                            <input
-                              type="checkbox"
-                              name="umrahService"
-                              value="Flights"
-                              checked
-                              onchange="updateUmrahServices()"
-                            />
-                            <span>Flights</span>
-                          </label>
-                          <label class="checkbox-item">
-                            <input
-                              type="checkbox"
-                              name="umrahService"
-                              value="Hotel"
-                              checked
-                              onchange="updateUmrahServices()"
-                            />
-                            <span>Hotel</span>
-                          </label>
-                          <label class="checkbox-item">
-                            <input
-                              type="checkbox"
-                              name="umrahService"
-                              value="Transport"
-                              checked
-                              onchange="updateUmrahServices()"
-                            />
-                            <span>Transport</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button type="submit" class="search-button">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                      </svg>
-                      Search Packages
-                    </button>
-                  </form>
-                </div>
-
-                <!-- VISA TAB -->
-                <div class="tab-panel" id="panel-visa">
-                  <form onsubmit="return handleModeSearch(event, 'Visa');">
-                    <div class="search-grid">
-                      <div class="input-group">
-                        <label class="input-label">From</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaFrom', event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                          </svg>
-                          <input
-                            type="text"
-                            id="visaFromInput"
-                            value="Pakistan"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="visaFromMenu">
-                          <div class="panel-header">
-                            <span>From Country</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleVisaDropdown('visaFrom')"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setVisaVal('visaFrom', 'Pakistan', this)"
-                          >
-                            Pakistan
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal(
-                                'visaFrom',
-                                'United Arab Emirates',
-                                this,
-                              )
-                            "
-                          >
-                            UAE
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaFrom', 'United Kingdom', this)
-                            "
-                          >
-                            UK
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaFrom', 'United States', this)
-                            "
-                          >
-                            USA
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">To</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaTo', event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                          </svg>
-                          <input
-                            type="text"
-                            id="visaToInput"
-                            value="Saudi Arabia"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="visaToMenu">
-                          <div class="panel-header">
-                            <span>To Country</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleVisaDropdown('visaTo')"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setVisaVal('visaTo', 'Saudi Arabia', this)"
-                          >
-                            Saudi Arabia
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaTo', 'United Kingdom', this)
-                            "
-                          >
-                            UK
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaTo', 'United Arab Emirates', this)
-                            "
-                          >
-                            UAE
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Travel Date</label>
-                        <div class="input-wrapper">
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <line x1="16" y1="2" x2="16" y2="6" />
-                            <line x1="8" y1="2" x2="8" y2="6" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                          </svg>
-                          <input type="date" id="visaDate" />
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Visa Type</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaType', event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
-                          </svg>
-                          <input
-                            type="text"
-                            id="visaTypeInput"
-                            value="Tourist Visa"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="visaTypeMenu">
-                          <div class="panel-header">
-                            <span>Visa Type</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleVisaDropdown('visaType')"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaType', 'Tourist Visa', this)
-                            "
-                          >
-                            Tourist
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="
-                              setVisaVal('visaType', 'Business Visa', this)
-                            "
-                          >
-                            Business
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Processing</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaSpeed', event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                          </svg>
-                          <input
-                            type="text"
-                            id="visaSpeedInput"
-                            value="Standard"
-                            readonly
-                          />
-                        </div>
-                        <div class="dropdown-panel" id="visaSpeedMenu">
-                          <div class="panel-header">
-                            <span>Speed</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleVisaDropdown('visaSpeed')"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setVisaVal('visaSpeed', 'Standard', this)"
-                          >
-                            Standard
-                          </div>
-                          <div
-                            class="option-item"
-                            onclick="setVisaVal('visaSpeed', 'Express', this)"
-                          >
-                            Express
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="input-group">
-                        <label class="input-label">Travelers</label>
-                        <div
-                          class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaPax', event)"
-                        >
-                          <svg
-                            class="input-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path
-                              d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-                            />
-                            <circle cx="9" cy="7" r="4" />
-                          </svg>
-                          <input
-                            type="text"
-                            id="visaPaxInput"
-                            value="1 Traveler"
-                            readonly
-                          />
-                        </div>
-                        <div
-                          class="dropdown-panel"
-                          id="visaPaxMenu"
-                          onclick="event.stopPropagation()"
-                        >
-                          <div class="panel-header">
-                            <span>Travelers</span>
-                            <button
-                              type="button"
-                              class="close-btn"
-                              onclick="toggleVisaDropdown('visaPax')"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div class="passenger-row">
-                            <div>
-                              <div class="pax-name">Applicants</div>
-                            </div>
-                            <div class="counter">
-                              <button
-                                type="button"
-                                onclick="changeVisaTravelers(-1)"
+                                class="input-wrapper"
+                                onclick="openAirportPanel('multiCity2From')"
                               >
-                                −
-                              </button>
-                              <span id="countVisaTravelers">1</span>
-                              <button
-                                type="button"
-                                onclick="changeVisaTravelers(1)"
+                                <svg
+                                  class="input-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  style="height: 17px; width: 17px"
+                                >
+                                  <circle cx="12" cy="10" r="3" />
+                                  <path
+                                    d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
+                                  />
+                                </svg>
+                                <input
+                                  id="multiCity2FromInput"
+                                  type="text"
+                                  placeholder="Departure city or airport"
+                                  readonly
+                                />
+                              </div>
+                              <div
+                                class="dropdown-panel"
+                                id="multiCity2FromPanel"
                               >
-                                +
-                              </button>
+                                <div class="panel-header">
+                                  <span>Select From</span>
+                                  <button
+                                    type="button"
+                                    class="close-btn"
+                                    aria-label="Close airport list"
+                                    onclick="
+                                      closeAirportPanel('multiCity2From')
+                                    "
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                                <input
+                                  id="multiCity2FromQuery"
+                                  class="search-input"
+                                  type="text"
+                                  placeholder="Search airports..."
+                                  oninput="searchAirport('multiCity2From')"
+                                />
+                                <div
+                                  id="multiCity2FromResults"
+                                  class="results-list"
+                                ></div>
+                              </div>
+                            </label>
+                            <label class="multi-city-airport">
+                              <span>To</span>
+                              <div
+                                class="input-wrapper"
+                                onclick="openAirportPanel('multiCity2To')"
+                              >
+                                <svg
+                                  class="input-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  style="height: 17px; width: 17px"
+                                >
+                                  <circle cx="12" cy="10" r="3" />
+                                  <path
+                                    d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
+                                  />
+                                </svg>
+                                <input
+                                  id="multiCity2ToInput"
+                                  type="text"
+                                  placeholder="Arrival city or airport"
+                                  readonly
+                                />
+                              </div>
+                              <div
+                                class="dropdown-panel"
+                                id="multiCity2ToPanel"
+                              >
+                                <div class="panel-header">
+                                  <span>Select To</span>
+                                  <button
+                                    type="button"
+                                    class="close-btn"
+                                    aria-label="Close airport list"
+                                    onclick="closeAirportPanel('multiCity2To')"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                                <input
+                                  id="multiCity2ToQuery"
+                                  class="search-input"
+                                  type="text"
+                                  placeholder="Search airports..."
+                                  oninput="searchAirport('multiCity2To')"
+                                />
+                                <div
+                                  id="multiCity2ToResults"
+                                  class="results-list"
+                                ></div>
+                              </div>
+                            </label>
+                            <label
+                              ><span>Date</span><input type="date"
+                            /></label>
+                          </div>
+                        </div>
+                        <div id="additionalFlightLegs"></div>
+                      </div>
+
+                      <div class="search-result" id="searchResult">
+                        <h4 id="resultTitle">Search Result</h4>
+                        <div class="summary" id="resultSummary"></div>
+                        <p id="resultText"></p>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- UMRAH PANEL Start-->
+                  <div class="search-panel" id="panel-umrah">
+                    <form
+                      class="mode-form"
+                      onsubmit="return handleModeSearch(event, 'Umrah');"
+                    >
+                      <div class="form-row umrah-form-row">
+                        <!-- ================= 1. DESTINATION (Fixed Text) ================= -->
+                        <div class="form-col">
+                          <div class="field-box field-box-static">
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <circle cx="12" cy="10" r="3" />
+                                <path
+                                  d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z"
+                                />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Destination</span>
+                              <span class="field-box-input fixed-text">
+                                Jeddah, Saudi Arabia
+                              </span>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <button type="submit" class="search-button">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                      </svg>
-                      Search Visas
-                    </button>
-                  </form>
+                        <!-- ================= 2. START DATE ================= -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="umrahStartTrigger"
+                            onclick="openDatePicker('umrahStartDate')"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <rect
+                                  x="3"
+                                  y="4"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Start Date</span>
+                              <input
+                                class="field-box-input"
+                                id="umrahStartDate"
+                                type="date"
+                                placeholder="Start Date"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ================= 3. DURATION DATE ================= -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="umrahDurationTrigger"
+                            onclick="openDatePicker('umrahDurationDate')"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <rect
+                                  x="3"
+                                  y="4"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Duration</span>
+                              <input
+                                class="field-box-input"
+                                id="umrahDurationDate"
+                                type="date"
+                                placeholder="Duration Date"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ================= 4. UMRAH TYPE (3 Types Custom Dropdown) ================= -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="umrahTypeTrigger"
+                            onclick="toggleUmrahTypeMenu(event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <polygon
+                                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Package Type</span>
+                              <input
+                                class="field-box-input"
+                                id="umrahTypeInput"
+                                type="text"
+                                readonly
+                                placeholder="Select Umrah Type"
+                                value="Economy"
+                              />
+                            </div>
+
+                            <!-- Dropdown Panel -->
+                            <div class="dd-panel" id="umrahTypeMenu">
+                              <div class="dd-panel-header">
+                                <span>Select Umrah Type</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="
+                                    event.stopPropagation();
+                                    toggleUmrahTypeMenu();
+                                  "
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div
+                                class="dd-opt dd-umrah-type-opt active"
+                                data-value="Economy"
+                                onclick="setUmrahType('Economy', this)"
+                              >
+                                Economy
+                              </div>
+                              <div
+                                class="dd-opt dd-umrah-type-opt"
+                                data-value="3 Star"
+                                onclick="setUmrahType('3 Star', this)"
+                              >
+                                3 Star
+                              </div>
+                              <div
+                                class="dd-opt dd-umrah-type-opt"
+                                data-value="5 Star"
+                                onclick="setUmrahType('5 Star', this)"
+                              >
+                                5 Star
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ================= 5. SERVICES (Checkboxes Custom Dropdown) ================= -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="umrahServicesTrigger"
+                            onclick="toggleUmrahServicesMenu(event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Services</span>
+                              <input
+                                class="field-box-input"
+                                id="umrahServicesInput"
+                                type="text"
+                                readonly
+                                placeholder="Select Services"
+                                value="Flights, Hotel, Transport"
+                              />
+                            </div>
+
+                            <!-- Dropdown Panel with Checkboxes -->
+                            <div
+                              class="dd-panel dd-services-panel"
+                              id="umrahServicesMenu"
+                              onclick="event.stopPropagation()"
+                            >
+                              <div class="dd-panel-header">
+                                <span>Select Services</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="toggleUmrahServicesMenu()"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div class="dd-services-list">
+                                <label class="dd-checkbox-row">
+                                  <input
+                                    type="checkbox"
+                                    name="umrahService"
+                                    value="Flights"
+                                    checked
+                                    onchange="updateUmrahServices()"
+                                  />
+                                  <span class="dd-checkbox-label">
+                                    <strong>Flights</strong>
+                                    <small>Return tickets included</small>
+                                  </span>
+                                </label>
+                                <label class="dd-checkbox-row">
+                                  <input
+                                    type="checkbox"
+                                    name="umrahService"
+                                    value="Hotel"
+                                    checked
+                                    onchange="updateUmrahServices()"
+                                  />
+                                  <span class="dd-checkbox-label">
+                                    <strong>Hotel</strong>
+                                    <small>Makkah & Madinah stay</small>
+                                  </span>
+                                </label>
+                                <label class="dd-checkbox-row">
+                                  <input
+                                    type="checkbox"
+                                    name="umrahService"
+                                    value="Transport"
+                                    checked
+                                    onchange="updateUmrahServices()"
+                                  />
+                                  <span class="dd-checkbox-label">
+                                    <strong>Transport</strong>
+                                    <small>Airport & Ziyarat transfers</small>
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ================= 6. SEARCH BUTTON ================= -->
+                        <button
+                          type="submit"
+                          class="search-submit mode-search-submit"
+                          aria-label="Search Umrah"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                          </svg>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- UMRAH PANEL End-->
+
+                  <!-- VISA PANEL Start -->
+                  <div class="search-panel" id="panel-visa">
+                    <form
+                      class="mode-form"
+                      onsubmit="return handleModeSearch(event, 'Visa');"
+                    >
+                      <div class="form-row visa-form-row">
+                        <!-- 1. FROM COUNTRY -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaFromTrigger"
+                            onclick="toggleVisaDropdown('visaFrom', event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <rect
+                                  x="3"
+                                  y="3"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">From</span>
+                              <input
+                                class="field-box-input"
+                                id="visaFromInput"
+                                type="text"
+                                readonly
+                                value="Pakistan"
+                              />
+                            </div>
+
+                            <div class="dd-panel" id="visaFromMenu">
+                              <div class="dd-panel-header">
+                                <span>Select Country</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="
+                                    event.stopPropagation();
+                                    toggleVisaDropdown('visaFrom');
+                                  "
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div class="dd-panel-list">
+                                <div
+                                  class="dd-opt active"
+                                  data-value="Pakistan"
+                                  onclick="
+                                    setVisaVal('visaFrom', 'Pakistan', this)
+                                  "
+                                >
+                                  Pakistan
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United Arab Emirates"
+                                  onclick="
+                                    setVisaVal(
+                                      'visaFrom',
+                                      'United Arab Emirates',
+                                      this,
+                                    )
+                                  "
+                                >
+                                  United Arab Emirates
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United Kingdom"
+                                  onclick="
+                                    setVisaVal(
+                                      'visaFrom',
+                                      'United Kingdom',
+                                      this,
+                                    )
+                                  "
+                                >
+                                  United Kingdom
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United States"
+                                  onclick="
+                                    setVisaVal(
+                                      'visaFrom',
+                                      'United States',
+                                      this,
+                                    )
+                                  "
+                                >
+                                  United States
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="Saudi Arabia"
+                                  onclick="
+                                    setVisaVal('visaFrom', 'Saudi Arabia', this)
+                                  "
+                                >
+                                  Saudi Arabia
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="India"
+                                  onclick="
+                                    setVisaVal('visaFrom', 'India', this)
+                                  "
+                                >
+                                  India
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="Canada"
+                                  onclick="
+                                    setVisaVal('visaFrom', 'Canada', this)
+                                  "
+                                >
+                                  Canada
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 2. TO COUNTRY -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaToTrigger"
+                            onclick="toggleVisaDropdown('visaTo', event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">To</span>
+                              <input
+                                class="field-box-input"
+                                id="visaToInput"
+                                type="text"
+                                readonly
+                                value="Saudi Arabia"
+                              />
+                            </div>
+
+                            <div class="dd-panel" id="visaToMenu">
+                              <div class="dd-panel-header">
+                                <span>Select Destination</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="
+                                    event.stopPropagation();
+                                    toggleVisaDropdown('visaTo');
+                                  "
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div class="dd-panel-list">
+                                <div
+                                  class="dd-opt active"
+                                  data-value="Saudi Arabia"
+                                  onclick="
+                                    setVisaVal('visaTo', 'Saudi Arabia', this)
+                                  "
+                                >
+                                  Saudi Arabia
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United Kingdom"
+                                  onclick="
+                                    setVisaVal('visaTo', 'United Kingdom', this)
+                                  "
+                                >
+                                  United Kingdom
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United Arab Emirates"
+                                  onclick="
+                                    setVisaVal(
+                                      'visaTo',
+                                      'United Arab Emirates',
+                                      this,
+                                    )
+                                  "
+                                >
+                                  United Arab Emirates
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="Turkey"
+                                  onclick="setVisaVal('visaTo', 'Turkey', this)"
+                                >
+                                  Turkey
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="Schengen / Europe"
+                                  onclick="
+                                    setVisaVal(
+                                      'visaTo',
+                                      'Schengen / Europe',
+                                      this,
+                                    )
+                                  "
+                                >
+                                  Schengen / Europe
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="United States"
+                                  onclick="
+                                    setVisaVal('visaTo', 'United States', this)
+                                  "
+                                >
+                                  United States
+                                </div>
+                                <div
+                                  class="dd-opt"
+                                  data-value="Canada"
+                                  onclick="setVisaVal('visaTo', 'Canada', this)"
+                                >
+                                  Canada
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 3. DATE (Flight-style date picker) -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaDateTrigger"
+                            onclick="openDatePicker('visaDate')"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <rect
+                                  x="3"
+                                  y="4"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Travel Date</span>
+                              <input
+                                class="field-box-input"
+                                id="visaDate"
+                                type="date"
+                                value="2026-10-08"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 4. VISA TYPE -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaTypeTrigger"
+                            onclick="toggleVisaDropdown('visaType', event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <path
+                                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                                />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Visa Type</span>
+                              <input
+                                class="field-box-input"
+                                id="visaTypeInput"
+                                type="text"
+                                readonly
+                                value="Tourist Visa"
+                              />
+                            </div>
+
+                            <div class="dd-panel" id="visaTypeMenu">
+                              <div class="dd-panel-header">
+                                <span>Select Visa Type</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="
+                                    event.stopPropagation();
+                                    toggleVisaDropdown('visaType');
+                                  "
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div
+                                class="dd-opt active"
+                                data-value="Tourist Visa"
+                                onclick="
+                                  setVisaVal('visaType', 'Tourist Visa', this)
+                                "
+                              >
+                                Tourist Visa
+                              </div>
+                              <div
+                                class="dd-opt"
+                                data-value="Business Visa"
+                                onclick="
+                                  setVisaVal('visaType', 'Business Visa', this)
+                                "
+                              >
+                                Business Visa
+                              </div>
+                              <div
+                                class="dd-opt"
+                                data-value="Transit Visa"
+                                onclick="
+                                  setVisaVal('visaType', 'Transit Visa', this)
+                                "
+                              >
+                                Transit Visa
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 5. PROCESSING SPEED -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaSpeedTrigger"
+                            onclick="toggleVisaDropdown('visaSpeed', event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label"
+                                >Processing Speed</span
+                              >
+                              <input
+                                class="field-box-input"
+                                id="visaSpeedInput"
+                                type="text"
+                                readonly
+                                value="Standard"
+                              />
+                            </div>
+
+                            <div class="dd-panel" id="visaSpeedMenu">
+                              <div class="dd-panel-header">
+                                <span>Processing Speed</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="
+                                    event.stopPropagation();
+                                    toggleVisaDropdown('visaSpeed');
+                                  "
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div
+                                class="dd-opt active"
+                                data-value="Standard"
+                                onclick="
+                                  setVisaVal('visaSpeed', 'Standard', this)
+                                "
+                              >
+                                Standard
+                              </div>
+                              <div
+                                class="dd-opt"
+                                data-value="Express"
+                                onclick="
+                                  setVisaVal('visaSpeed', 'Express', this)
+                                "
+                              >
+                                Express
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 6. TRAVELERS -->
+                        <div class="form-col">
+                          <div
+                            class="field-box"
+                            id="visaPaxTrigger"
+                            onclick="toggleVisaDropdown('visaPax', event)"
+                          >
+                            <span class="field-box-icon">
+                              <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                style="height: 17px; width: 17px"
+                              >
+                                <path
+                                  d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                                />
+                                <circle cx="9" cy="7" r="4" />
+                              </svg>
+                            </span>
+                            <div class="field-box-content">
+                              <span class="field-box-label">Travelers</span>
+                              <input
+                                class="field-box-input"
+                                id="visaPaxInput"
+                                type="text"
+                                readonly
+                                value="1 Traveler"
+                              />
+                            </div>
+
+                            <div
+                              class="dd-panel"
+                              id="visaPaxMenu"
+                              onclick="event.stopPropagation()"
+                            >
+                              <div class="dd-panel-header">
+                                <span>Travelers</span>
+                                <button
+                                  type="button"
+                                  class="dd-panel-close"
+                                  onclick="toggleVisaDropdown('visaPax')"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div class="dd-opt dd-pax-row passenger-row">
+                                <div class="passenger-info">
+                                  <div class="name">Applicants</div>
+                                  <div class="desc">All travelers</div>
+                                </div>
+                                <div class="pax-btns">
+                                  <button
+                                    type="button"
+                                    onclick="changeVisaTravelers(-1)"
+                                  >
+                                    −
+                                  </button>
+                                  <span class="count" id="countVisaTravelers"
+                                    >1</span
+                                  >
+                                  <button
+                                    type="button"
+                                    onclick="changeVisaTravelers(1)"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 7. SEARCH BUTTON -->
+                        <button
+                          type="submit"
+                          class="search-submit mode-search-submit"
+                          aria-label="Search Visa"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                          </svg>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <!-- VISA PANEL End-->
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <!-- ========================================== HERO BANNER END ========================================== -->
+
+      <!-- ========================================== HERO + SEARCH end ========================================== -->
 
       <!-- ========================================== FOOTER START ========================================== -->
       <footer class="footer">
