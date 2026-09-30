@@ -1,6 +1,3 @@
-/* ==========================================
-   RESET & BASE
-========================================== */
 * {
   margin: 0;
   padding: 0;
@@ -41,7 +38,7 @@
 
 body {
   font-family:
-    "Inter",
+    "system-ui",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -65,9 +62,7 @@ body {
   padding: 0 var(--container-padding);
 }
 
-/* ==========================================
-   NAVIGATION BAR
-========================================== */
+/* ========================================== NAVIGATION BAR START ========================================== */
 .navbar {
   position: sticky;
   top: 0;
@@ -234,23 +229,9 @@ body {
     display: none;
   }
 }
+/* ========================================== NAVIGATION BAR END ========================================== */
 
-/* ==========================================
-   HERO BANNER
-========================================== */
-/* tablet */
-@media (max-width: 991.98px) {
-  .hero-content-side {
-    display: none;
-  }
-}
-
-/* mobile: ONE card at a time */
-@media (max-width: 767.98px) {
-  .hero-content-side {
-    display: none;
-  }
-}
+/* ========================================== HERO BANNER START ========================================== */
 
 .hero-banner {
   position: relative;
@@ -940,10 +921,22 @@ body {
   color: var(--gray-700);
   margin-bottom: 6px;
 }
+/* tablet */
+@media (max-width: 991.98px) {
+  .hero-content-side {
+    display: none;
+  }
+}
 
-/* ==========================================
-   STATS SECTION
-========================================== */
+/* mobile: ONE card at a time */
+@media (max-width: 767.98px) {
+  .hero-content-side {
+    display: none;
+  }
+}
+/* ========================================== HERO BANNER END ========================================== */
+
+/* ========================================== STATS SECTION START ========================================= */
 .stats-section {
   background: white;
   padding: 40px var(--container-padding);
@@ -994,10 +987,9 @@ body {
   font-weight: 600;
   color: var(--gray-600);
 }
+/* ========================================== STATS SECTION END ========================================= */
 
-/* ==========================================
-   SECTION HEADERS
-========================================== */
+/* ========================================== SECTION HEADERS START ========================================== */
 .section-head {
   display: flex;
   flex-direction: column;
@@ -1064,10 +1056,182 @@ body {
   color: var(--primary-blue);
   background: rgba(2, 132, 199, 0.05);
 }
+/* ========================================== SECTION HEADERS END ========================================== */
 
-/* ==========================================
-   DEALS SECTION
-========================================== */
+/* ========================================== DEALS SECTION START ========================================== */
+
+.flight-section {
+  /* padding: 56px 0 64px;  */
+  background: #fff;
+}
+.flight-fares-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.flight-section-inner {
+  /* margin: 0 auto; */
+  /* padding: 0 10px;  */
+}
+.flight-section .section-header {
+  display: block;
+  /* margin-bottom: 30px;  */
+}
+.flight-section .section-header h2 {
+  margin: 0 0 10px;
+  color: #101828;
+  font-size: 24px;
+  font-weight: 700;
+}
+.flight-section .section-header p {
+  margin: 0;
+  color: #344054;
+  font-size: 14px;
+}
+.flight-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.flight-card {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #dfe3e8;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.flight-card:hover {
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--primary-dark);
+  /* transform: translateY(-2px); */
+}
+.flight-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+  height: 64px;
+  background: var(--primary-light);
+  border-radius: 0 0 0 64px;
+}
+.flight-card-inner {
+  position: relative;
+  padding: 12px;
+}
+.flight-route,
+.flight-details {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.flight-route {
+  grid-template-columns: 1fr 5fr 1fr;
+}
+.flight-code {
+  color: #101828;
+  font-size: 18px;
+  font-weight: 700;
+}
+.flight-code:last-child,
+.flight-details .flight-city:last-child {
+  text-align: right;
+}
+.flight-arrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.flight-arrow::before,
+.flight-arrow::after {
+  flex: 1;
+  margin-inline: -10px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-blue-dark),
+    var(--primary-blue),
+    var(--accent-teal)
+  );
+  content: "";
+}
+.flight-airline-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(2, 132, 199, 0.1);
+  margin: 0 10px;
+}
+.flight-airline-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--primary-blue);
+  color: var(--primary-blue);
+  stroke: var(--primary-blue);
+  stroke-width: 1.8;
+}
+.flight-details {
+  margin-top: 12px;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 500;
+}
+.flight-city.center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-weight: 400;
+}
+.flight-city.center svg {
+  color: #667085;
+}
+.flight-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: #475467;
+  font-size: 12px;
+  border: 1px solid #e4e7ec;
+  padding: 6px 10px;
+  border-radius: 6px;
+  width: fit-content;
+
+  color: #fff;
+  font-weight: 500;
+  background: linear-gradient(90deg, var(--primary-blue), var(--accent-teal));
+}
+.flight-meta svg {
+  width: 16px;
+  height: 16px;
+}
+.flight-price {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+}
+.price-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .deals-section {
   padding: 50px 0;
   background: white;
@@ -1201,15 +1365,21 @@ body {
   font-weight: 600;
 }
 
-/* ==========================================
-   UMRAH SECTION - RESPONSIVE GRID
-========================================== */
-/* ==========================================
-   UMRAH PACKAGES - CENTER-FOCUS DRAG CAROUSEL
-   Needs: Bootstrap 5.3.3 + Poppins font + your theme vars
-   (--gray-50, --gray-100, --gray-300, --gray-600, --gray-700,
-    --primary-blue, --radius-md)
-========================================== */
+@media (min-width: 700px) {
+  .flight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .flight-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ========================================== DEALS SECTION END ========================================== */
+
+/* ========================================== UMRAH SECTION START ========================================== */
+
 .umrah-section {
   --um-accent: var(--primary-blue);
   --um-blue: var(--accent-teal-dark);
@@ -1497,10 +1667,9 @@ body {
     transform: none;
   }
 }
+/* ========================================== UMRAH SECTION END ========================================== */
 
-/* ==========================================
-   WHY CHOOSE US
-========================================== */
+/* ========================================== WHY CHOOSE US START ========================================== */
 .why-section {
   padding: 50px 0;
   background: white;
@@ -1556,9 +1725,9 @@ body {
   line-height: 1.5;
 }
 
-/* ==========================================
-   BLOG SECTION - RESPONSIVE GRID
-========================================== */
+/* ========================================== WHY CHOOSE US END ========================================== */
+
+/* ========================================== BLOG SECTION START ========================================== */
 /* Same side margin as your home page: auto 140px */
 .blog-section {
   --blog-accent: var(--primary-blue);
@@ -1843,10 +2012,9 @@ body {
     height: 270px;
   }
 }
+/* ========================================== BLOG SECTION END ========================================== */
 
-/* ==========================================
-   CTA SECTION
-========================================== */
+/* ========================================== CTA SECTION START ========================================== */
 .cta-section {
   padding: 50px var(--container-padding);
   background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
@@ -1929,10 +2097,9 @@ body {
 .cta-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+/* ========================================== CTA SECTION END ========================================== */
 
-/* ==========================================
-   FOOTER
-========================================== */
+/* ========================================== FOOTER START ========================================== */
 .footer {
   background: var(--dark-navy);
   color: var(--gray-300);
@@ -1961,7 +2128,7 @@ body {
 }
 
 .footer-about {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--gray-400);
   margin-bottom: 20px;
@@ -2064,10 +2231,9 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50px;
 }
+/* ========================================== FOOTER END ========================================== */
 
-/* ==========================================
-   SCROLL TO TOP
-========================================== */
+/* ========================================== SCROLL TO TOP START ========================================== */
 .scroll-top {
   position: fixed;
   bottom: 20px;
@@ -2100,10 +2266,9 @@ body {
   transform: translateY(-3px);
   box-shadow: var(--shadow-2xl);
 }
+/* ========================================== SCROLL TO TOP END ========================================== */
 
-/* ==========================================
-   RESPONSIVE - TABLET (768px+)
-========================================== */
+/* ========================================== RESPONSIVE - TABLET (768px+) START ========================================== */
 @media (min-width: 768px) {
   :root {
     --container-padding: 60px;
@@ -2258,10 +2423,9 @@ body {
     width: auto;
   }
 }
+/* ========================================== RESPONSIVE - TABLET (768px+) END ========================================== */
 
-/* ==========================================
-   RESPONSIVE - DESKTOP (1024px+)
-========================================== */
+/* ========================================== RESPONSIVE - DESKTOP (1024px+) START ========================================== */
 @media (min-width: 1024px) {
   :root {
     --container-padding: 140px;
@@ -2305,10 +2469,9 @@ body {
     max-width: 350px;
   }
 }
+/* ========================================== RESPONSIVE - DESKTOP (1024px+) END ========================================== */
 
-/* ==========================================
-   RESPONSIVE - LARGE DESKTOP (1440px+)
-========================================== */
+/* ========================================== RESPONSIVE - LARGE DESKTOP (1440px+) START ========================================== */
 @media (min-width: 1440px) {
   .section-title {
     font-size: 32px;
@@ -2318,194 +2481,7 @@ body {
     font-size: 42px;
   }
 }
-
-/* asdsdasdsadassadads */
-/****************************** flight cards code start here ******************************/
-
-/* FLIGHT CARDS */
-
-.flight-section {
-  /* padding: 56px 0 64px;  */
-  background: #fff;
-}
-.flight-fares-main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-.flight-section-inner {
-  /* margin: 0 auto; */
-  /* padding: 0 10px;  */
-}
-.flight-section .section-header {
-  display: block;
-  /* margin-bottom: 30px;  */
-}
-.flight-section .section-header h2 {
-  margin: 0 0 10px;
-  color: #101828;
-  font-size: 24px;
-  font-weight: 700;
-}
-.flight-section .section-header p {
-  margin: 0;
-  color: #344054;
-  font-size: 14px;
-}
-.flight-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-@media (min-width: 700px) {
-  .flight-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (min-width: 1100px) {
-  .flight-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-.flight-card {
-  position: relative;
-  display: block;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid #dfe3e8;
-  border-radius: 10px;
-  background: #fff;
-  overflow: hidden;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-.flight-card:hover {
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--primary-dark);
-  /* transform: translateY(-2px); */
-}
-.flight-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 64px;
-  height: 64px;
-  background: var(--primary-light);
-  border-radius: 0 0 0 64px;
-}
-.flight-card-inner {
-  position: relative;
-  padding: 12px;
-}
-.flight-route,
-.flight-details {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  align-items: center;
-  gap: 10px;
-}
-.flight-route {
-  grid-template-columns: 1fr 5fr 1fr;
-}
-.flight-code {
-  color: #101828;
-  font-size: 18px;
-  font-weight: 700;
-}
-.flight-code:last-child,
-.flight-details .flight-city:last-child {
-  text-align: right;
-}
-.flight-arrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.flight-arrow::before,
-.flight-arrow::after {
-  flex: 1;
-  margin-inline: -10px;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-blue-dark),
-    var(--primary-blue),
-    var(--accent-teal)
-  );
-  content: "";
-}
-.flight-airline-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(2, 132, 199, 0.1);
-  margin: 0 10px;
-}
-.flight-airline-icon svg {
-  width: 16px;
-  height: 16px;
-  fill: var(--primary-blue);
-  color: var(--primary-blue);
-  stroke: var(--primary-blue);
-  stroke-width: 1.8;
-}
-.flight-details {
-  margin-top: 12px;
-  color: #475467;
-  font-size: 12px;
-  font-weight: 500;
-}
-.flight-city.center {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-weight: 400;
-}
-.flight-city.center svg {
-  color: #667085;
-}
-.flight-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  color: #475467;
-  font-size: 12px;
-  border: 1px solid #e4e7ec;
-  padding: 6px 10px;
-  border-radius: 6px;
-  width: fit-content;
-
-  color: #fff;
-  font-weight: 500;
-  background: linear-gradient(90deg, var(--primary-blue), var(--accent-teal));
-}
-.flight-meta svg {
-  width: 16px;
-  height: 16px;
-}
-.flight-price {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-}
-.price-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 5px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/****************************** flight cards code start here ******************************/
+/* ========================================== RESPONSIVE - LARGE DESKTOP (1440px+) END ========================================== */
 /* tablet */
 /* @media (max-width: 991.98px) {
 
