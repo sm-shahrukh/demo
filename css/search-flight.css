@@ -53,6 +53,7 @@
 
 body {
   font-family:
+    "system-ui",
     "Inter",
     -apple-system,
     BlinkMacSystemFont,
@@ -267,7 +268,6 @@ small {
 /* ========================================== NAVIGATION BAR END ========================================== */
 
 /* ========================================== SEARCH FLIGHT START ========================================== */
-/* One single flight / umrah / visa search widget (slim design) */
 
 /* ---------- HERO ---------- */
 .hero {
@@ -309,6 +309,7 @@ small {
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #14b8a6 100%);
   padding: 30px 0px;
   overflow: visible;
+  width: 100%;
 }
 .hero-content {
   position: relative;
@@ -412,13 +413,6 @@ small {
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
-  .search-tab {
-    font-size: 14px;
-    padding: 16px 20px;
-  }
-}
-
 .search-panels {
   position: relative;
   padding: 20px;
@@ -438,6 +432,13 @@ small {
   }
   to {
     opacity: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .search-tab {
+    font-size: 14px;
+    padding: 16px 20px;
   }
 }
 
@@ -868,7 +869,7 @@ small {
 
 /* Airport search panels */
 .airport-panel {
-  width: max-content;
+  width: 100%;
   max-width: calc(100vw - 48px);
 }
 .airport-search-input {

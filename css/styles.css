@@ -1148,12 +1148,13 @@ body {
 .flight-arrow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  width: 100%;
 }
+
 .flight-arrow::before,
 .flight-arrow::after {
-  flex: 1;
-  margin-inline: -10px;
+  content: "";
+  flex: 1 1 auto;
   height: 1px;
   background: linear-gradient(
     90deg,
@@ -1161,7 +1162,6 @@ body {
     var(--primary-blue),
     var(--accent-teal)
   );
-  content: "";
 }
 .flight-airline-icon {
   display: flex;
