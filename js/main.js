@@ -5,6 +5,10 @@
   let selectedTo = null;
   let selectedTripType = "oneway";
   let selectedVisaTravelers = 1;
+  // Multi-city leg ids: leg 1 is the main From/To/Departure row and leg 2 is the
+  // "Flight 2" block already present in the markup, so added legs start at 3.
+  // Ids stay unique across removals and each leg carries its own id in
+  // data-leg-id, so collection never has to guess.
   let nextMultiCityId = 3;
   let multiCitySelections = {};
 
@@ -222,6 +226,7 @@
     const legId = nextMultiCityId++;
     const leg = document.createElement("div");
     leg.className = "multi-city-leg";
+    leg.dataset.legId = String(legId);
     leg.innerHTML = `
       <div class="multi-city-leg-heading">
         <strong>FLIGHT ${flightNumber}</strong>
@@ -230,14 +235,10 @@
       <div class="multi-city-fields">
         ${airportField(legId, "From", "From", "Departure city")}
         ${airportField(legId, "To", "To", "Arrival city")}
-        <label><span>Date</span><input type="date" id="multiCity${legId}Date" onchange="setMultiCityDate(${legId}, this.value)" /></label>
+        <label><span>Date</span><input type="date" id="multiCity${legId}Date" /></label>
       </div>`;
     getElement("additionalFlightLegs")?.appendChild(leg);
     updateMultiCityCount();
-  };
-
-  window.setMultiCityDate = function (legId, value) {
-    multiCitySelections[`multiCity${legId}Date`] = value;
   };
 
   window.removeMultiCityLeg = function (button) {
@@ -246,6 +247,10 @@
   };
 
   // Read the multi-city legs the user has filled in, in document order.
+  // Airport picks come from `multiCitySelections` (set by selectAirport), but
+  // the date is read straight off each input so it is correct even if the
+  // change event has not fired yet — and leg ids stay bound to their own input
+  // instead of drifting when a middle leg is removed.
   function collectMultiCityLegs() {
     const legs = [];
 
@@ -261,10 +266,10 @@
     document
       .querySelectorAll("#multiCityPanel .multi-city-leg")
       .forEach((node, index) => {
-        const id = index + 2;
+        const id = node.dataset.legId || index + 2;
         const from = multiCitySelections[`multiCity${id}From`];
         const to = multiCitySelections[`multiCity${id}To`];
-        const date = multiCitySelections[`multiCity${id}Date`];
+        const date = getElement(`multiCity${id}Date`)?.value;
         if (from && to) legs.push({ from, to, date });
       });
 
@@ -278,15 +283,12 @@
     return date.toISOString().slice(0, 10);
   }
 
+  // Nothing is pre-selected: the traveller picks the route from the dropdowns, so
+  // the results always match what was actually searched for. Dates still get a
+  // sensible two-week offset so the search form is usable on first open.
   function defaultSearch() {
-    selectedFrom = { code: "ISB", city: "Islamabad", country: "Pakistan" };
-    selectedTo = { code: "DXB", city: "Dubai", country: "United Arab Emirates" };
-    const fromInput = getElement("fromInput");
-    const toInput = getElement("toInput");
     const depDate = getElement("depDate");
     const retDate = getElement("retDate");
-    if (fromInput) fromInput.value = "Islamabad (ISB)";
-    if (toInput) toInput.value = "Dubai (DXB)";
     if (depDate && !depDate.value) depDate.value = isoDateIn(14);
     if (retDate && !retDate.value) retDate.value = isoDateIn(21);
   }
@@ -478,5 +480,9 @@
   document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.trip === "oneway");
   });
-  runSearch("oneway", true);
+
+  // No search is run on load: with no route chosen there is nothing to show, and
+  // running one would raise a validation error before the user has touched anything.
+  const emptyState = document.getElementById("frResults");
+  if (emptyState) emptyState.classList.add("fr-awaiting-search");
 })();

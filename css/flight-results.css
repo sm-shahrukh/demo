@@ -1,27 +1,36 @@
-/* ============================================================================
-   flight-results.css — results page styling
-   Matches the one-way / round-trip / multi-city web and mobile designs:
-   editorial route title, blue notice banner, filter sidebar, expanded
-   itinerary card with fare packages, and compact "more ways to fly" cards.
-   ========================================================================== */
-
 /* ---------- Results shell ---------- */
 #frResults[hidden] {
   display: none !important;
 }
 
+/* Mobile */
 .fr-page {
+  box-sizing: border-box;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 16px 56px;
+  padding: 20px;
 }
 
-@media (min-width: 992px) {
+/* Tablet + Desktop */
+@media (min-width: 768px) {
   .fr-page {
-    padding: 36px 32px 72px;
+    width: calc(100% - 280px);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
   }
 }
 
+/* Large Desktop */
+@media (min-width: 992px) {
+  .fr-page {
+    width: calc(100% - 280px);
+    max-width: 1400px;
+    padding: 0 0 20px 0;
+  }
+}
 /* ---------- Trip type tabs ---------- */
 .fr-trip-tabs {
   display: inline-flex;
@@ -371,6 +380,76 @@
 .fr-card-top-left small {
   color: var(--muted);
   font-size: 12.5px;
+}
+
+/* Route rows in the featured card stay visible when the card is collapsed, so the
+   whole route, its operators and its times can be read at a glance. One row per
+   journey leg, stacked as columns. */
+.fr-route {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.fr-route-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  background: var(--gray-50);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+
+.fr-route-logos {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+
+.fr-route-logos .fr-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 9.5px;
+}
+
+.fr-route-line b,
+.fr-route-time b {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.fr-route-line small,
+.fr-route-time small {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: 1px;
+}
+
+.fr-route-time {
+  text-align: right;
+}
+
+.fr-route-foot {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+
+@media (max-width: 575px) {
+  .fr-route-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .fr-route-time {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
 }
 
 .fr-card-top-right b {
@@ -1218,6 +1297,52 @@
   font-weight: 600;
   font-size: 13px;
   padding: 9px 18px;
+}
+
+/* ---------- Awaiting search ----------
+   Nothing is preselected, so the results area stays collapsed until a route has
+   been searched for. This keeps the page from opening on an empty grid. */
+
+/* The header carries the route and the itinerary count, both of which are unknown
+   until a search runs, so it is withheld along with the grid. */
+.fr-awaiting-search .fr-header {
+  display: none;
+}
+
+.fr-await {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1.5px dashed var(--border-dark);
+  border-radius: 16px;
+  padding: 56px 24px;
+  color: var(--muted);
+}
+
+.fr-await i {
+  font-size: 30px;
+  color: var(--gray-300);
+}
+
+.fr-await b {
+  color: var(--gray-900);
+  font-size: 15px;
+}
+
+.fr-await span {
+  font-size: 13px;
+  max-width: 380px;
+}
+
+.fr-awaiting-search .fr-layout {
+  display: none;
+}
+
+.fr-awaiting-search .fr-await {
+  display: flex;
 }
 
 /* ---------- Booking notice ---------- */

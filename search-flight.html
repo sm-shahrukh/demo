@@ -743,7 +743,7 @@
                             </button>
                           </div>
                         </div>
-                        <div class="multi-city-leg">
+                        <div class="multi-city-leg" data-leg-id="2">
                           <div class="multi-city-leg-heading">
                             <strong>FLIGHT 2</strong>
                             <button
@@ -867,8 +867,10 @@
                               </div>
                             </label>
                             <label
-                              ><span>Date</span><input type="date"
-                            /></label>
+                              ><span>Date</span><input
+                                type="date"
+                                id="multiCity2Date"
+                              /></label>
                           </div>
                         </div>
                         <div id="additionalFlightLegs"></div>
@@ -1775,6 +1777,15 @@
             availability or verified company offerings.</span
           >
         </p>
+
+        <div class="fr-await" id="frAwait">
+          <i class="bi bi-search"></i>
+          <b>Choose a route to see flights</b>
+          <span>
+            Pick your departure and arrival cities above, then search. Results,
+            filters and fares are built around the route you choose.
+          </span>
+        </div>
 
         <div class="fr-layout">
           <!-- Filter sidebar (desktop) / offcanvas (mobile) -->

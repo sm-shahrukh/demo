@@ -25,6 +25,10 @@
     sort: "recommended",
     featuredId: null,
     packageId: "standard",
+    // Whether the featured card's details are open. Held in state rather than read
+    // back off the DOM, because renderList() rebuilds the card on every package
+    // change and would otherwise snap it shut again.
+    featuredExpanded: false,
     selectedPackageName: "Sample Standard",
     cabinBaggage: "1 × 8 kg",
     checkedBaggage: "1 × 23 kg",
@@ -66,7 +70,9 @@
   function paxLabel(passengers) {
     const parts = [];
     if (passengers.adults) {
-      parts.push(`${passengers.adults} adult${passengers.adults > 1 ? "s" : ""}`);
+      parts.push(
+        `${passengers.adults} adult${passengers.adults > 1 ? "s" : ""}`,
+      );
     }
     if (passengers.children) {
       parts.push(
@@ -95,7 +101,9 @@
   function legName(index, total) {
     if (total === 1) return `Journey leg ${index}`;
     if (tripLabel(state.search.tripType) === "round-trip") {
-      return index === 1 ? "Journey leg 1 · Outbound" : "Journey leg 2 · Return";
+      return index === 1
+        ? "Journey leg 1 · Outbound"
+        : "Journey leg 2 · Return";
     }
     return `Journey leg ${index}`;
   }
@@ -136,12 +144,18 @@
 
   function stopBucket(itinerary) {
     // Figma filters on stops per journey leg, so use the busiest leg
-    const busiest = itinerary.legs.reduce((max, leg) => Math.max(max, leg.stops), 0);
+    const busiest = itinerary.legs.reduce(
+      (max, leg) => Math.max(max, leg.stops),
+      0,
+    );
     return String(Math.min(busiest, 2));
   }
 
   function itineraryMatches(itinerary, filters) {
-    if (filters.stops.length && !filters.stops.includes(stopBucket(itinerary))) {
+    if (
+      filters.stops.length &&
+      !filters.stops.includes(stopBucket(itinerary))
+    ) {
       return false;
     }
     if (
@@ -156,7 +170,10 @@
     if (filters.baggage.includes("checked") && !itinerary.checkedBag) {
       return false;
     }
-    if (filters.maxPrice < filters.priceMax && itinerary.price > filters.maxPrice) {
+    if (
+      filters.maxPrice < filters.priceMax &&
+      itinerary.price > filters.maxPrice
+    ) {
       return false;
     }
     if (
@@ -209,20 +226,19 @@
   function renderHeader(total) {
     const search = state.search;
 
-    // Search legs carry `from`/`to`; assembled legs carry `origin`/`destination`.
-    // The headline is where the traveller is heading. A round trip collapses to
-    // its turnaround city; multi-city lists every stop in order.
-    const destinations = search.legs.map((leg) => leg.to);
-    const headline =
-      search.tripType === "multicity" ? destinations : destinations.slice(0, 1);
+    // The headline is the whole route chained together, so a round trip reads
+    // ISB → KHI → ISB and multi-city lists every stop in order. Taking only the
+    // first origin avoids repeating the junction between two legs.
+    const route = [
+      search.legs[0].from.code,
+      ...search.legs.map((leg) => leg.to.code),
+    ];
 
     getEl("frDate").textContent = formatHeaderDate(search.legs[0].date);
-    getEl("frTitle").innerHTML = headline
-      .map((airport) => escapeHtml(airport.city))
+    getEl("frTitle").innerHTML = route
+      .map((code) => escapeHtml(code))
       .join('<span class="fr-arrow"> → </span>');
-    getEl("frSub").textContent = `${headline
-      .map((airport) => airport.code)
-      .join(" + ")} · ${paxLabel(search.passengers)} · ${
+    getEl("frSub").textContent = `${paxLabel(search.passengers)} · ${
       CABINS[search.cabin].label
     }`;
     getEl("frCount").textContent = `${total} itinerar${
@@ -449,7 +465,8 @@
           toggleInArray(state.filters.airlines, input.value, input.checked);
         if (input.name === "frBaggage")
           toggleInArray(state.filters.baggage, input.value, input.checked);
-        if (input.name === "frConnection") state.filters[input.value] = input.checked;
+        if (input.name === "frConnection")
+          state.filters[input.value] = input.checked;
         refresh();
       });
     });
@@ -530,8 +547,7 @@
 
     filters.stops.forEach((value) => {
       chips.push({
-        label:
-          { 0: "Nonstop", 1: "1 stop", 2: "2+ stops" }[value] || value,
+        label: { 0: "Nonstop", 1: "1 stop", 2: "2+ stops" }[value] || value,
         group: "stops",
         value,
       });
@@ -568,16 +584,18 @@
         group: "duration",
       });
     }
-    ["hideSelfTransfer", "hideAirportChange", "hideOvernight"].forEach((key) => {
-      if (filters[key]) {
-        const label = {
-          hideSelfTransfer: "No self-transfer",
-          hideAirportChange: "No airport changes",
-          hideOvernight: "No overnight",
-        }[key];
-        chips.push({ label, group: key });
-      }
-    });
+    ["hideSelfTransfer", "hideAirportChange", "hideOvernight"].forEach(
+      (key) => {
+        if (filters[key]) {
+          const label = {
+            hideSelfTransfer: "No self-transfer",
+            hideAirportChange: "No airport changes",
+            hideOvernight: "No overnight",
+          }[key];
+          chips.push({ label, group: key });
+        }
+      },
+    );
 
     const html = chips
       .map(
@@ -653,7 +671,8 @@
       }),
     );
     if (filters.maxPrice < filters.priceMax) chips.push({ group: "price" });
-    if (filters.maxDuration < filters.durationMax) chips.push({ group: "duration" });
+    if (filters.maxDuration < filters.durationMax)
+      chips.push({ group: "duration" });
     if (filters.hideSelfTransfer) chips.push({ group: "hideSelfTransfer" });
     if (filters.hideAirportChange) chips.push({ group: "hideAirportChange" });
     if (filters.hideOvernight) chips.push({ group: "hideOvernight" });
@@ -722,8 +741,7 @@
     const airline = FlightData.AIRLINE_BY_CODE[segment.carrier];
     const departDay = FlightData.addDays(leg.date, segment.departDayOffset);
     const arriveDay = FlightData.addDays(leg.date, segment.arriveDayOffset);
-    const dayOffset =
-      segment.arriveDayOffset - segment.departDayOffset;
+    const dayOffset = segment.arriveDayOffset - segment.departDayOffset;
 
     return `
       <div class="fr-segment">
@@ -825,7 +843,8 @@
 
     leg.segments.forEach((segment, index) => {
       html += buildSegment(segment, leg);
-      if (leg.connections[index]) html += buildConnectionNote(leg.connections[index]);
+      if (leg.connections[index])
+        html += buildConnectionNote(leg.connections[index]);
     });
 
     return `${html}</div>`;
@@ -967,27 +986,85 @@
       </div>`;
   }
 
-  function buildFeaturedCard(itinerary, selectedPackage) {
+  // Route rows for the collapsed summary: one per journey leg, each with the
+  // operating airline's logo, the city pair and the local departure/arrival times.
+  // Round trip and multi-city show one row per leg so the whole chain is visible
+  // without expanding the card.
+  function buildFeaturedRouteRows(itinerary) {
     const totalLegs = itinerary.legs.length;
 
     return `
-      <article class="fr-card fr-card-featured" data-id="${escapeHtml(itinerary.id)}">
+      <div class="fr-route">
+        ${itinerary.legs
+          .map((leg) => {
+            const stopText =
+              leg.stops === 0
+                ? "Nonstop"
+                : `${leg.stops} stop${leg.stops > 1 ? "s" : ""}`;
+
+            // The operators actually flying this leg, not the whole itinerary, so a
+            // multi-city card does not repeat one airline's logo on every row.
+            const carriers = [...new Set(leg.segments.map((s) => s.carrier))];
+
+            return `
+              <div class="fr-route-row">
+                <div class="fr-route-logos">
+                  ${carriers.map((code) => airlineLogo(code)).join("")}
+                </div>
+                <div class="fr-route-line">
+                  <b>${escapeHtml(leg.origin.code)} → ${escapeHtml(
+                    leg.destination.code,
+                  )}</b>
+                  <small>${escapeHtml(leg.origin.city)} → ${escapeHtml(
+                    leg.destination.city,
+                  )}</small>
+                </div>
+                <div class="fr-route-time">
+                  <b>${escapeHtml(minutesToClock(leg.departAt))} – ${escapeHtml(
+                    minutesToClock(leg.arriveAt),
+                  )}${dayOffset(leg)}</b>
+                  <small>${escapeHtml(shortDate(leg.date))} · ${escapeHtml(
+                    formatDuration(leg.totalMin),
+                  )} · ${escapeHtml(stopText)}</small>
+                </div>
+              </div>`;
+          })
+          .join("")}
+      </div>
+      <small class="fr-route-foot">${totalLegs} journey leg${
+        totalLegs > 1 ? "s" : ""
+      } · ${itinerary.segments.length} flight segment${
+        itinerary.segments.length > 1 ? "s" : ""
+      } · ${escapeHtml(itinerary.cabin.label)}</small>`;
+  }
+
+  function buildFeaturedCard(itinerary, selectedPackage) {
+    const totalLegs = itinerary.legs.length;
+    const expanded = state.featuredExpanded;
+    const collapseLabel = expanded
+      ? "Hide itinerary &amp; fare details"
+      : "Show itinerary &amp; fare details";
+    const pillText = expanded ? "Details expanded" : "Details collapsed";
+
+    return `
+      <article class="fr-card fr-card-featured${
+        expanded ? "" : " collapsed"
+      }" data-id="${escapeHtml(itinerary.id)}">
         <div class="fr-card-top">
           <div class="fr-card-top-left">
             <span class="fr-badge fr-badge-green">Recommended</span>
-            <span class="fr-pill">Details expanded</span>
+            <span class="fr-pill">${pillText}</span>
             <h3>${escapeHtml(carrierNames(itinerary))}</h3>
-            <small>${itinerary.legs.length} journey leg${
-              totalLegs > 1 ? "s" : ""
-            } · ${itinerary.segments.length} flight segment${
-              itinerary.segments.length > 1 ? "s" : ""
-            } · ${escapeHtml(itinerary.cabin.label)}</small>
+            ${buildFeaturedRouteRows(itinerary)}
           </div>
           <div class="fr-card-top-right">
             <b>${money(
               selectedPackage.price + itinerary.taxes + itinerary.serviceFee,
             )}</b>
             <small>${escapeHtml(paxLabel(state.search.passengers))} · all legs included</small>
+            <small>${money(itinerary.price)} fare · ${money(
+              itinerary.taxes,
+            )} taxes</small>
             <a href="#" class="fr-fare-link">${escapeHtml(
               selectedPackage.name,
             )} fare</a>
@@ -1016,7 +1093,7 @@
         ${buildPackages(itinerary, selectedPackage)}
 
         <button type="button" class="fr-collapse-btn" data-collapse>
-          Hide itinerary &amp; fare details <i class="bi bi-chevron-down"></i>
+          ${collapseLabel} <i class="bi bi-chevron-down"></i>
         </button>
       </article>`;
   }
@@ -1138,7 +1215,9 @@
            <div class="fr-compact-list">
              ${rest
                .slice(0, 2)
-               .map((itinerary) => buildCompactCard(itinerary, tagFor(itinerary, rest)))
+               .map((itinerary) =>
+                 buildCompactCard(itinerary, tagFor(itinerary, rest)),
+               )
                .join("")}
            </div>`
         : "");
@@ -1156,7 +1235,9 @@
       moreList.className = "fr-compact-list fr-compact-more";
       moreList.innerHTML = rest
         .slice(2)
-        .map((itinerary) => buildCompactCard(itinerary, tagFor(itinerary, rest)))
+        .map((itinerary) =>
+          buildCompactCard(itinerary, tagFor(itinerary, rest)),
+        )
         .join("");
       event.currentTarget.closest("#frMoreWrap").before(moreList);
       getEl("frMoreWrap").innerHTML = "";
@@ -1187,9 +1268,11 @@
     }[state.sort];
 
     getEl("frSortNote").innerHTML = `<i class="bi bi-stars"></i> ${note}`;
-    getEl("frSortTabs").querySelectorAll("[data-sort]").forEach((tab) => {
-      tab.classList.toggle("active", tab.dataset.sort === state.sort);
-    });
+    getEl("frSortTabs")
+      .querySelectorAll("[data-sort]")
+      .forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.sort === state.sort);
+      });
     getEl("frSortCount").textContent = `${list.length} shown`;
   }
 
@@ -1258,11 +1341,17 @@
       return { ok: false, itineraries: [] };
     }
 
-    getEl("frResults").hidden = false;
+    // A real result set exists, so swap the "choose a route" prompt for the grid.
+    // This only happens on success, so a rejected search cannot reveal a stale grid.
+    const results = getEl("frResults");
+    results.hidden = false;
+    results.classList.remove("fr-awaiting-search");
     state.search = built;
     state.itineraries = generateItineraries(built);
     state.packageId = "standard";
     state.featuredId = null;
+    // A fresh search starts from the collapsed card again, as in the design.
+    state.featuredExpanded = false;
 
     // Slider bounds come from the generated set
     const prices = state.itineraries.map((itinerary) => itinerary.price);
@@ -1326,7 +1415,21 @@
     // Collapse the featured card's details
     if (target.closest("[data-collapse]")) {
       const featured = getEl("frList").querySelector(".fr-card-featured");
-      if (featured) featured.classList.toggle("collapsed");
+      if (featured) {
+        const collapsed = featured.classList.toggle("collapsed");
+        // Record the state as well as applying it, so a later re-render — changing
+        // the fare package, for instance — rebuilds the card in the same open or
+        // shut position instead of snapping back to collapsed.
+        state.featuredExpanded = !collapsed;
+        const button = featured.querySelector(".fr-collapse-btn");
+        const pill = featured.querySelector(".fr-pill");
+        if (button) {
+          button.childNodes[0].nodeValue = collapsed
+            ? " Show itinerary & fare details "
+            : " Hide itinerary & fare details ";
+        }
+        if (pill) pill.textContent = collapsed ? "Details collapsed" : "Details expanded";
+      }
       return;
     }
 
@@ -1384,7 +1487,9 @@
         )} total</span>
       </div>
       <button type="button" aria-label="Dismiss"><i class="bi bi-x-lg"></i></button>`;
-    notice.querySelector("button").addEventListener("click", () => notice.remove());
+    notice
+      .querySelector("button")
+      .addEventListener("click", () => notice.remove());
     getEl("frResults").prepend(notice);
     notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
