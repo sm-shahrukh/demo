@@ -2109,8 +2109,6 @@ small {
   padding-top: 50px;
 }
 
-/* Long addresses and phone numbers are the widest things in the footer, so let
-   them break rather than push the column wider than the viewport. */
 .footer-about,
 .contact-info p,
 .footer-bottom p {
@@ -2509,10 +2507,7 @@ small {
 } */
 
 /* ========================================== DATE PICKER DROPDOWN ========================================== */
-/* The calendar reuses the .dd-panel chrome so it reads as one of the other
-   dropdowns, but floats against the viewport because the same panel serves
-   date fields in three different forms. JS writes left/top from the field's
-   rect, so the base left/top rules are intentionally overridden. */
+
 .date-panel {
   position: fixed;
   top: 0;
@@ -2548,7 +2543,9 @@ small {
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .date-nav-btn:hover {
   background: #f2f4f7;
@@ -2589,7 +2586,9 @@ small {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .date-cell:hover:not(:disabled):not(.is-selected) {
   background: var(--primary-light);
@@ -2639,7 +2638,9 @@ small {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .date-clear:hover,
 .date-today:hover {
@@ -2657,15 +2658,12 @@ small {
   color: #fff;
 }
 
-/* The field opens its calendar the way the others open theirs. */
 .field-box.open {
   border-color: var(--primary-blue);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
-/* The native control keeps the ISO value but hands its own text and calendar
-   icon over to the mirror, so there is only one calendar affordance. */
 .field-box-input-mirror {
   display: block;
   width: 100%;
@@ -2678,7 +2676,7 @@ small {
 .field-box-input-mirror.is-placeholder {
   color: var(--gray-400);
 }
-.field-box.date-mirrored .field-box-input[type="date"] {
+.field-box:has(.field-box-input-mirror) .field-box-input[type="date"] {
   position: absolute;
   inset: 0;
   width: 100%;

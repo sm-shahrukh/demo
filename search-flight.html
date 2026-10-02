@@ -124,8 +124,7 @@
       </nav>
       <!-- ========================================== NAVIGATION BAR END ========================================== -->
 
-      <!-- ========================================== HERO + SEARCH start  ========================================== -->
-
+      <!-- ========================================== HERO + SEARCH START  ========================================== -->
       <section class="hero">
         <div class="hero-overlay">
           <div class="hero-content">
@@ -568,8 +567,7 @@
                               </div>
                             </div>
                           </div>
-
-                          </div>
+                        </div>
 
                         <!-- ========================================================= 4. PASSENGERS ========================================================== -->
                         <div class="form-col pax-col">
@@ -868,10 +866,9 @@
                               </div>
                             </label>
                             <label
-                              ><span>Date</span><input
-                                type="date"
-                                id="multiCity2Date"
-                              /></label>
+                              ><span>Date</span
+                              ><input type="date" id="multiCity2Date"
+                            /></label>
                           </div>
                         </div>
                         <div id="additionalFlightLegs"></div>
@@ -1727,8 +1724,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ========================================== HERO + SEARCH end ========================================== -->
+      <!-- ========================================== HERO + SEARCH END  ========================================== -->
 
       <!-- ========================================== FILTER + PRODUCT CARD START ========================================== -->
       <div class="fr-page" id="frResults">
@@ -1825,12 +1821,18 @@
               data-bs-toggle="offcanvas"
               data-bs-target="#frFiltersPanel"
             >
-              <i class="bi bi-sliders"></i> Filters<span id="frFilterCount"></span>
+              <i class="bi bi-sliders"></i> Filters<span
+                id="frFilterCount"
+              ></span>
             </button>
 
             <div class="fr-toolbar">
               <div class="fr-sort-tabs" id="frSortTabs">
-                <button type="button" class="fr-sort-tab" data-sort="recommended">
+                <button
+                  type="button"
+                  class="fr-sort-tab"
+                  data-sort="recommended"
+                >
                   Recommended
                 </button>
                 <button type="button" class="fr-sort-tab" data-sort="price">
@@ -1972,9 +1974,7 @@
         </svg>
       </button>
     </div>
-    <!-- Shared calendar for every date field. It lives at body level because the
-         flight, Umrah and Visa forms are separate panels and only one is on
-         screen at a time — inside any of them the picker would be hidden. -->
+
     <div class="dd-panel date-panel" id="datePickerPanel">
       <div class="dd-panel-header">
         <span id="datePickerTitle">Select date</span>

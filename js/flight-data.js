@@ -1,16 +1,5 @@
-/* ============================================================================
-   flight-data.js — reference data + itinerary generator
-   Real airports (IATA, city, country, lat/lon, UTC offset) and real airlines.
-   Itineraries are generated deterministically from the search conditions, so
-   every combination the user picks produces a coherent set of flights.
-   ========================================================================== */
-
 // ---------- 1. Airports -----------------------------------------------------
-// utc = standard UTC offset in hours (fractional where zones are half/quarter)
-// Searchable airports, limited to the five markets this booking flow covers:
-// UAE, Qatar, Saudi Arabia, Turkiye and Pakistan. Every airport here has real
-// coordinates and a UTC offset, so distances, block times and local arrival
-// times stay correct.
+
 const AIRPORTS = [
   {
     code: "DXB",
@@ -121,10 +110,6 @@ const AIRPORTS = [
 const AIRPORT_BY_CODE = Object.fromEntries(AIRPORTS.map((a) => [a.code, a]));
 
 // ---------- 2. Airlines -----------------------------------------------------
-// Carriers that genuinely serve the airports above. `colour` drives the square
-// logo tile on each card; `hubs` are the gateways a carrier operates from,
-// which is what keeps an itinerary plausible (a Saudia connection out of RUH,
-// an Emirates hop out of DXB, and so on).
 const AIRLINES = [
   {
     code: "EK",
@@ -294,8 +279,6 @@ function formatDistanceKm(km) {
 }
 
 // ---------- 5. Date / time utilities ---------------------------------------
-// Dates are handled as UTC-noon Date objects so day arithmetic never drifts
-// across a timezone boundary.
 
 function parseISODate(value) {
   if (!value) return null;
@@ -361,9 +344,7 @@ function minutesToClock(minutes) {
 }
 
 // ---------- 5b. Currency ---------------------------------------------------
-// Fares, taxes and fees are modelled in EUR because the pricing formula reads
-// naturally in a major currency, then converted once at the presentation
-// boundary so every figure on the page moves together.
+
 const CURRENCY = {
   code: "PKR",
   symbol: "Rs",
@@ -377,8 +358,6 @@ function formatPKR(amountInEur) {
 }
 
 // ---------- 6. Fare packages ----------------------------------------------
-// Three illustrative tiers built off the base fare of each itinerary, so the
-// prices always add up the way the designs show them.
 
 function buildFarePackages(baseFare, cabin) {
   const tiers = [
@@ -432,19 +411,12 @@ function buildFarePackages(baseFare, cabin) {
 }
 
 // ---------- 7. Routing ------------------------------------------------------
-// Hubs that carriers genuinely use as connecting points, grouped so a
-// connection is plausible for the region pair involved.
 
-// Connection points that make sense for each origin region. Every code here is
-// an airport that still exists in AIRPORTS, so a routed connection can never
-// point at a city the search cannot reach.
 const HUBS = {
   me: ["DXB", "DOH", "RUH", "JED", "IST", "SAW"],
   pk: ["DXB", "DOH", "IST", "RUH", "LHE"],
 };
 
-// Carriers that plausibly serve a given connection, keyed by hub. Repeats
-// weight the choice, so Emirates dominates out of DXB and Saudia out of RUH.
 const CARRIERS_BY_HUB = {
   DXB: ["EK", "EK", "FZ", "QR", "GF"],
   DOH: ["QR", "QR", "QR", "GF"],
@@ -459,7 +431,6 @@ const CARRIERS_BY_HUB = {
 };
 
 // ---------- 8. Deterministic pseudo-random ---------------------------------
-// Same search -> same itineraries, so results never shuffle on re-render.
 
 function hashString(value) {
   let hash = 2166136261;
@@ -556,10 +527,6 @@ function describeLayover(
   };
 }
 
-// Build the flight segments for one journey leg from `origin` to `destination`.
-// `departMinutes` is minutes past local midnight on the leg's travel date.
-// Times are carried as "minutes past the leg's departure midnight" so that a
-// +1 day arrival is just a value past 1440.
 function buildLegSegments(
   origin,
   destination,
@@ -571,9 +538,6 @@ function buildLegSegments(
   const segments = [];
   const viaList = pickViaAirports(origin, destination, random, preferDirect);
 
-  // The via airports are connection points *inside* the route, not the route
-  // itself. A leg is always at least origin -> destination, so a nonstop has
-  // a single hop and a two-connection itinerary has three.
   const hops = [...viaList.map((code) => AIRPORT_BY_CODE[code]), destination];
 
   let cursor = origin;
@@ -609,8 +573,7 @@ function buildLegSegments(
       departAt,
       arriveAt,
       durationMin: minutes,
-      // Calendar-day offsets relative to the leg's own departure date, so the
-      // card can render "Departs 15 Oct 2026" and "+1 day" without guessing.
+
       departDayOffset: Math.floor(departAt / 1440),
       arriveDayOffset: Math.floor(arriveAt / 1440),
     });
@@ -622,8 +585,6 @@ function buildLegSegments(
   return segments;
 }
 
-// Choose 0, 1 or 2 connection points. Long routes get connections; short ones
-// can go nonstop. `preferDirect` biases towards a nonstop first hop.
 function pickViaAirports(origin, destination, random, preferDirect) {
   const directKm = distanceKm(origin, destination);
   const sameCountry = origin.country === destination.country;
@@ -659,14 +620,6 @@ function pickViaAirports(origin, destination, random, preferDirect) {
   return pool.length ? [pickRandom(random, pool)] : [];
 }
 
-// Pick a carrier that plausibly flies this hop.
-//
-// A carrier is only eligible if one of its own hubs sits at either end of the
-// hop, so PIA can fly ISB → KHI (both Pakistani PIA bases) and Saudia can fly
-// RUH → JED, but Pegasus — an Istanbul low-cost carrier — is never picked for
-// Karachi → Dubai. `previous` carries the last carrier on this leg so a
-// connection can stay with one operator, which is what produces a single
-// "EK 241 → EK 715" rather than two unrelated airlines.
 function pickCarrier(origin, destination, random, previous) {
   const eligible = AIRLINES.filter(
     (airline) =>
@@ -674,15 +627,11 @@ function pickCarrier(origin, destination, random, previous) {
       airline.hubs.includes(destination.code),
   );
 
-  // Staying with the same operator across a connection is the common case, so
-  // it gets a strong weight — but only if that carrier is actually eligible.
   const continuing = eligible.filter((airline) => airline.code === previous);
   if (continuing.length && random() < 0.72) {
     return continuing[0].code;
   }
 
-  // Otherwise weight by the CARRIERS_BY_HUB lists for this hop's two airports,
-  // which encode who actually operates out of each gateway.
   const weighted = [];
   [origin.code, destination.code].forEach((code) => {
     (CARRIERS_BY_HUB[code] || []).forEach((carrier) => {
@@ -874,24 +823,10 @@ function assembleItinerary(id, legs, search) {
 
 // ---------- 11. Public generator -------------------------------------------
 
-// Departure hours spread across the day so the departure-time filter has
-// something meaningful to bite on.
 const DEPART_HOURS = [6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
-// How many itineraries to show per trip type. Kept small so every result is
-// visible without paging through a long list.
 const ITINERARY_COUNTS = { oneway: 5, roundtrip: 5, multicity: 5 };
 
-/**
- * Build the full result set for a search.
- * search = {
- *   tripType: "oneway" | "roundtrip" | "multicity",
- *   from: { code, city }, to: { code, city },
- *   legs: [{ from, to, date }],   // already normalised to 1..N journey legs
- *   passengers: { adults, children, infants },
- *   cabin: "Economy" | ...
- * }
- */
 function generateItineraries(search) {
   const totalPax =
     search.passengers.adults +

@@ -372,10 +372,6 @@
   font-size: 12px;
 }
 
-/* ---------- Card top: one row per journey leg ----------
-   Mirrors the reference design — operator logo with the carrier code and flight
-   number beneath it on the left, times and stops in the middle, price on the
-   right, split by a vertical rule. */
 .fr-card-top-rows {
   display: flex;
   flex-direction: column-reverse;
@@ -409,7 +405,6 @@
   }
 }
 
-/* Operator cell: logo, then carrier code, then flight number */
 .fr-row-carrier {
   display: flex;
   flex-direction: column;
@@ -987,8 +982,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* The heading is the active tab's label, so only the "selected" badge remains
-   here and it sits at the start rather than pushed to the far edge. */
 .fr-fare-head {
   display: flex;
   align-items: center;
@@ -1275,10 +1268,6 @@
   flex: none;
 }
 
-/* ---------- Detail tabs ----------
-   The expanded card shows one of three detail sections at a time. The tab row sits
-   at the top of the detail area, above the section it controls, and is hidden
-   along with the rest of the details when the card is collapsed. */
 .fr-detail-panel[hidden] {
   display: none;
 }
@@ -1318,7 +1307,6 @@
   display: none;
 }
 
-/* Sits in the fare cell under "Total trip price", not as a full-width bar. */
 .fr-collapse-btn {
   border: 0;
   background: none;
@@ -1358,7 +1346,6 @@
   margin-top: 14px;
 }
 
-/* Padding lives on the children now, so the card itself must not add any. */
 .fr-card-compact {
   display: block;
   overflow: hidden;
@@ -1426,12 +1413,7 @@
   padding: 9px 18px;
 }
 
-/* ---------- Awaiting search ----------
-   Nothing is preselected, so the results area stays collapsed until a route has
-   been searched for. This keeps the page from opening on an empty grid. */
-
-/* The header carries the route and the itinerary count, both of which are unknown
-   until a search runs, so it is withheld along with the grid. */
+/* ---------- Awaiting search ---------- */
 .fr-awaiting-search .fr-header {
   display: none;
 }

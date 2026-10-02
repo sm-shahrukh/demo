@@ -1,9 +1,3 @@
-/* ============================================================================
-   flight-results.js — renders the search results
-   Header, filter panel, itinerary cards, fare packages and "more ways to fly",
-   matching the one-way / round-trip / multi-city web and mobile designs.
-   ========================================================================== */
-
 (() => {
   const {
     CABINS,
@@ -25,13 +19,9 @@
     sort: "recommended",
     featuredId: null,
     packageId: "standard",
-    // Whether the featured card's details are open. Held in state rather than read
-    // back off the DOM, because renderList() rebuilds the card on every package
-    // change and would otherwise snap it shut again.
+
     featuredExpanded: false,
-    // Which of the three detail sections the open card is showing. Held in state
-    // for the same reason as featuredExpanded, so changing fare package rebuilds
-    // the card on the tab the traveller was already reading.
+
     detailTab: "itinerary",
     selectedPackageName: "Sample Standard",
     cabinBaggage: "1 × 8 kg",
@@ -56,8 +46,6 @@
 
   const getEl = (id) => document.getElementById(id);
 
-  // Single conversion point: every figure on the page goes through here, so
-  // fares, taxes and fees always move together.
   function money(amount) {
     return formatPKR(amount);
   }
@@ -91,7 +79,6 @@
     return parts.join(", ");
   }
 
-  // Total seats travelling — drives "1 adult · all legs included"
   function paxCount(passengers) {
     return passengers.adults + passengers.children + passengers.infants;
   }
@@ -112,7 +99,6 @@
     return `Journey leg ${index}`;
   }
 
-  // "15 Oct" — compact cards only need day + month, not the full date
   function shortDate(date) {
     return date.toLocaleDateString("en-GB", {
       day: "numeric",
@@ -121,7 +107,6 @@
     });
   }
 
-  // "+1 day" badge when a leg lands on a later calendar day
   function dayOffset(leg) {
     const days = Math.round((leg.arrivalDate - leg.date) / 86400000);
     if (days <= 0) return "";
@@ -162,7 +147,6 @@
   // ---------- 3. Filtering --------------------------------------------------
 
   function stopBucket(itinerary) {
-    // Figma filters on stops per journey leg, so use the busiest leg
     const busiest = itinerary.legs.reduce(
       (max, leg) => Math.max(max, leg.stops),
       0,
@@ -218,7 +202,6 @@
     return true;
   }
 
-  // Recommendation score: price, travel time and connections, balanced.
   function recommendScore(itinerary) {
     return itinerary.price / 6 + itinerary.totalMin / 24 + itinerary.stops * 55;
   }
@@ -245,9 +228,6 @@
   function renderHeader(total) {
     const search = state.search;
 
-    // The headline is the whole route chained together, so a round trip reads
-    // ISB → KHI → ISB and multi-city lists every stop in order. Taking only the
-    // first origin avoids repeating the junction between two legs.
     const route = [
       search.legs[0].from.code,
       ...search.legs.map((leg) => leg.to.code),
@@ -267,8 +247,6 @@
 
   // ---------- 5. Filters ----------------------------------------------------
 
-  // Counts for each option, computed against everything that passes the
-  // other filters — the same way a real results page behaves.
   function optionCount(name, value) {
     const probe = { ...state.filters };
     probe[name] = [value];
@@ -277,8 +255,6 @@
     ).length;
   }
 
-  // Both filter containers hold the same markup, so identifiers are classes and
-  // every lookup is scoped to its own panel. No duplicate ids.
   const FILTER_CONTAINERS = ["frFilters", "frFiltersMobile"];
 
   function filterPanelMarkup() {
@@ -510,7 +486,6 @@
       });
     });
 
-    // Sliders update their own panel's label, then re-render results only
     panel.querySelectorAll(".fr-price-slider").forEach((slider) => {
       slider.addEventListener("input", () => {
         state.filters.maxPrice = Number(slider.value);
@@ -640,8 +615,6 @@
     const chip = collectChips()[index];
     if (!chip) return;
 
-    // Chip indices are global, but each group's values are a flat list, so the
-    // chip must carry the value to drop rather than re-slicing by index.
     if (chip.group === "stops")
       filters.stops = filters.stops.filter((value) => value !== chip.value);
     if (chip.group === "airlines")
@@ -698,8 +671,6 @@
     return chips;
   }
 
-  // Bag strings read "1 × 23 kg"; the reference design shows a single combined
-  // "Total: 30kg", so add the pieces up rather than printing both strings.
   function totalBagKg(cabin) {
     const sum = (label) => {
       const match = /(\d+)\s*×\s*(\d+)\s*kg/i.exec(label || "");
@@ -708,11 +679,6 @@
     return sum(cabin.cabinBag) + sum(cabin.checkedBag);
   }
 
-  // One leg as a horizontal strip: operator logo on the left with the carrier
-  // code and flight number beneath it, times and stops in the middle, and the
-  // fare on the right behind a vertical rule. Multi-leg itineraries stack one of
-  // these per journey leg; the fare cell rides on the first row only, since a
-  // trip is priced once however many legs it has.
   function buildCardTopRow(leg, options) {
     const { totalLegs, showFare, itinerary, selectedPackage } = options;
 
@@ -721,13 +687,9 @@
         ? "Nonstop"
         : `${leg.stops} stop${leg.stops > 1 ? "s" : ""}`;
 
-    // Later legs are tagged with their day offset, so a round trip's return row
-    // is distinguishable from its outbound without needing the journey-leg bar.
     const offset = Math.round((leg.date - options.firstLegDate) / 86400000);
     const dayTag = totalLegs > 1 && offset > 0 ? `${offset}d · ` : "";
 
-    // Operators on this leg only, so a multi-city card doesn't repeat one
-    // airline across rows that a different carrier flies.
     const carriers = [...new Set(leg.segments.map((s) => s.carrier))];
     const flightNumbers = leg.segments
       .map((segment) => segment.flightNumber.replace(/ /g, "-"))
@@ -801,10 +763,6 @@
       </div>`;
   }
 
-  // All legs of an itinerary as card-top rows. The fare column rides on the
-  // first row; the rest are left empty so the price aligns with row one.
-  // `options.collapse` is the featured card's show/hide control, tucked under
-  // the fare so the bottom of the card carries nothing but the details.
   function buildCardTop(itinerary, selectedPackage, options = {}) {
     const totalLegs = itinerary.legs.length;
     const savings = Math.max(0, itinerary.price - selectedPackage.price);
@@ -844,9 +802,6 @@
 
   // ---------- 7. Card building ---------------------------------------------
 
-  // The three detail sections the featured card switches between once expanded.
-  // Each label doubles as the heading for its panel, so the panels themselves
-  // carry no duplicate h4.
   const DETAIL_TABS = [
     { id: "itinerary", label: "Flight itinerary" },
     { id: "fare", label: "Fare summary" },
@@ -1130,8 +1085,6 @@
     const pillText = expanded ? "Details expanded" : "Details collapsed";
     const activeTab = state.detailTab;
 
-    // One panel per tab. Only the active one is rendered visible, so the section
-    // a tab names is exactly the markup it had when every section was stacked.
     const panel = (id, content) => `
         <div class="fr-detail-panel" role="tabpanel" id="frPanel-${id}"
              aria-labelledby="frTab-${id}" data-detail="${id}"${
@@ -1335,8 +1288,6 @@
 
   // ---------- 10. Refresh ---------------------------------------------------
 
-  // A slider tick must not rebuild the panel, or the element being dragged is
-  // destroyed mid-gesture. Update the labels in place and re-render results.
   function refreshFromSlider() {
     const filters = state.filters;
 
@@ -1383,13 +1334,6 @@
 
   // ---------- 11. Public API ------------------------------------------------
 
-  /**
-   * Run a search and render the results.
-   * options = {
-   *   tripType, from, to, departure, return, multiLegs,
-   *   adults, children, infants, cabin
-   * }
-   */
   function search(options) {
     const built = buildSearch(options);
 
@@ -1398,8 +1342,6 @@
       return { ok: false, itineraries: [] };
     }
 
-    // A real result set exists, so swap the "choose a route" prompt for the grid.
-    // This only happens on success, so a rejected search cannot reveal a stale grid.
     const results = getEl("frResults");
     results.hidden = false;
     results.classList.remove("fr-awaiting-search");
@@ -1407,11 +1349,10 @@
     state.itineraries = generateItineraries(built);
     state.packageId = "standard";
     state.featuredId = null;
-    // A fresh search starts from the collapsed card again, as in the design.
+
     state.featuredExpanded = false;
     state.detailTab = "itinerary";
 
-    // Slider bounds come from the generated set
     const prices = state.itineraries.map((itinerary) => itinerary.price);
     const durations = state.itineraries.map((itinerary) => itinerary.totalMin);
     state.filters.priceMin = Math.floor(Math.min(...prices) / 10) * 10;
@@ -1442,14 +1383,11 @@
       return;
     }
 
-    // Switch the open card's detail section
     const detailTab = target.closest("[data-detail-tab]");
     if (detailTab) {
       state.detailTab = detailTab.dataset.detailTab;
       const featured = getEl("frList").querySelector(".fr-card-featured");
       if (featured) {
-        // Swap the panel in place instead of re-rendering: a re-render would
-        // rebuild the card under the pointer and jump the scroll position.
         featured.querySelectorAll("[data-detail-tab]").forEach((button) => {
           const active = button.dataset.detailTab === state.detailTab;
           button.classList.toggle("active", active);
@@ -1462,14 +1400,12 @@
       return;
     }
 
-    // Remove an active filter chip
     const chip = target.closest(".chip[data-chip]");
     if (chip) {
       removeChip(Number(chip.dataset.chip));
       return;
     }
 
-    // Promote a compact card to the featured card
     const featureButton = target.closest("[data-featured]");
     if (featureButton) {
       state.featuredId = featureButton.dataset.featured;
@@ -1502,9 +1438,7 @@
       const featured = getEl("frList").querySelector(".fr-card-featured");
       if (featured) {
         const collapsed = featured.classList.toggle("collapsed");
-        // Record the state as well as applying it, so a later re-render — changing
-        // the fare package, for instance — rebuilds the card in the same open or
-        // shut position instead of snapping back to collapsed.
+
         state.featuredExpanded = !collapsed;
         const buttons = featured.querySelectorAll(".fr-collapse-btn");
         const pill = featured.querySelector(".fr-pill");
@@ -1542,7 +1476,6 @@
     }
   });
 
-  // Package radios are inside a label, so keep state in sync on change too
   document.addEventListener("keydown", (event) => {
     const packageCard = event.target.closest("[data-package-card]");
     if (
