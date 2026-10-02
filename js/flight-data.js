@@ -12,20 +12,110 @@
 // coordinates and a UTC offset, so distances, block times and local arrival
 // times stay correct.
 const AIRPORTS = [
-  { code: "DXB", city: "Dubai", name: "Dubai International", country: "UAE", lat: 25.25, lon: 55.36, utc: 4, region: "me" },
+  {
+    code: "DXB",
+    city: "Dubai",
+    name: "Dubai International",
+    country: "UAE",
+    lat: 25.25,
+    lon: 55.36,
+    utc: 4,
+    region: "me",
+  },
 
-  { code: "DOH", city: "Doha", name: "Hamad International", country: "Qatar", lat: 25.27, lon: 51.61, utc: 3, region: "me" },
+  {
+    code: "DOH",
+    city: "Doha",
+    name: "Hamad International",
+    country: "Qatar",
+    lat: 25.27,
+    lon: 51.61,
+    utc: 3,
+    region: "me",
+  },
 
-  { code: "RUH", city: "Riyadh", name: "King Khalid International", country: "Saudi Arabia", lat: 24.96, lon: 46.7, utc: 3, region: "me" },
-  { code: "JED", city: "Jeddah", name: "King Abdulaziz International", country: "Saudi Arabia", lat: 21.68, lon: 39.16, utc: 3, region: "me" },
-  { code: "MED", city: "Medina", name: "Prince Mohammad bin Abdulaziz", country: "Saudi Arabia", lat: 24.55, lon: 39.7, utc: 3, region: "me" },
+  {
+    code: "RUH",
+    city: "Riyadh",
+    name: "King Khalid International",
+    country: "Saudi Arabia",
+    lat: 24.96,
+    lon: 46.7,
+    utc: 3,
+    region: "me",
+  },
+  {
+    code: "JED",
+    city: "Jeddah",
+    name: "King Abdulaziz International",
+    country: "Saudi Arabia",
+    lat: 21.68,
+    lon: 39.16,
+    utc: 3,
+    region: "me",
+  },
+  {
+    code: "MED",
+    city: "Medina",
+    name: "Prince Mohammad bin Abdulaziz",
+    country: "Saudi Arabia",
+    lat: 24.55,
+    lon: 39.7,
+    utc: 3,
+    region: "me",
+  },
 
-  { code: "IST", city: "Istanbul", name: "Istanbul Airport", country: "Turkiye", lat: 41.26, lon: 28.74, utc: 3, region: "me" },
-  { code: "SAW", city: "Istanbul", name: "Sabiha Gokcen International", country: "Turkiye", lat: 40.9, lon: 29.31, utc: 3, region: "me" },
+  {
+    code: "IST",
+    city: "Istanbul",
+    name: "Istanbul Airport",
+    country: "Turkiye",
+    lat: 41.26,
+    lon: 28.74,
+    utc: 3,
+    region: "me",
+  },
+  {
+    code: "SAW",
+    city: "Istanbul",
+    name: "Sabiha Gokcen International",
+    country: "Turkiye",
+    lat: 40.9,
+    lon: 29.31,
+    utc: 3,
+    region: "me",
+  },
 
-  { code: "ISB", city: "Islamabad", name: "Islamabad International", country: "Pakistan", lat: 33.55, lon: 72.83, utc: 5, region: "pk" },
-  { code: "KHI", city: "Karachi", name: "Jinnah International", country: "Pakistan", lat: 24.91, lon: 67.16, utc: 5, region: "pk" },
-  { code: "LHE", city: "Lahore", name: "Allama Iqbal International", country: "Pakistan", lat: 31.52, lon: 74.4, utc: 5, region: "pk" },
+  {
+    code: "ISB",
+    city: "Islamabad",
+    name: "Islamabad International",
+    country: "Pakistan",
+    lat: 33.55,
+    lon: 72.83,
+    utc: 5,
+    region: "pk",
+  },
+  {
+    code: "KHI",
+    city: "Karachi",
+    name: "Jinnah International",
+    country: "Pakistan",
+    lat: 24.91,
+    lon: 67.16,
+    utc: 5,
+    region: "pk",
+  },
+  {
+    code: "LHE",
+    city: "Lahore",
+    name: "Allama Iqbal International",
+    country: "Pakistan",
+    lat: 31.52,
+    lon: 74.4,
+    utc: 5,
+    region: "pk",
+  },
 ];
 
 const AIRPORT_BY_CODE = Object.fromEntries(AIRPORTS.map((a) => [a.code, a]));
@@ -36,15 +126,78 @@ const AIRPORT_BY_CODE = Object.fromEntries(AIRPORTS.map((a) => [a.code, a]));
 // which is what keeps an itinerary plausible (a Saudia connection out of RUH,
 // an Emirates hop out of DXB, and so on).
 const AIRLINES = [
-  { code: "EK", name: "Emirates", country: "UAE", colour: "#d71921", hubs: ["DXB"], fleet: ["Boeing 777-300ER", "Airbus A380-800", "Boeing 777-8"] },
-  { code: "FZ", name: "flydubai", country: "UAE", colour: "#e5007e", hubs: ["DXB"], fleet: ["Boeing 737-800", "Boeing 737 MAX 8"] },
-  { code: "QR", name: "Qatar Airways", country: "Qatar", colour: "#5c0632", hubs: ["DOH"], fleet: ["Airbus A350-900", "Airbus A330-200", "Boeing 777-300ER"] },
-  { code: "SV", name: "Saudia", country: "Saudi Arabia", colour: "#0f8b4c", hubs: ["JED", "RUH", "MED"], fleet: ["Boeing 777-300ER", "Boeing 787-9", "Airbus A320"] },
-  { code: "TK", name: "Turkish Airlines", country: "Turkiye", colour: "#c70a0c", hubs: ["IST", "SAW"], fleet: ["Airbus A321", "Boeing 737-800", "Airbus A330-200"] },
-  { code: "PC", name: "Pegasus Airlines", country: "Turkiye", colour: "#1a3a8f", hubs: ["SAW", "IST"], fleet: ["Boeing 737-800", "Airbus A320neo"] },
-  { code: "PK", name: "PIA", country: "Pakistan", colour: "#1b7a43", hubs: ["KHI", "LHE", "ISB"], fleet: ["Airbus A320", "Boeing 777-300ER", "ATR 72"] },
-  { code: "AZ", name: "ITA Airways", country: "Italy", colour: "#004b85", hubs: ["IST"], fleet: ["Airbus A320", "Airbus A321"] },
-  { code: "GF", name: "Gulf Air", country: "Bahrain", colour: "#8a1538", hubs: ["DOH", "DXB"], fleet: ["Boeing 787-8", "Airbus A320"] },
+  {
+    code: "EK",
+    name: "Emirates",
+    country: "UAE",
+    colour: "#d71921",
+    hubs: ["DXB"],
+    fleet: ["Boeing 777-300ER", "Airbus A380-800", "Boeing 777-8"],
+  },
+  {
+    code: "FZ",
+    name: "flydubai",
+    country: "UAE",
+    colour: "#e5007e",
+    hubs: ["DXB"],
+    fleet: ["Boeing 737-800", "Boeing 737 MAX 8"],
+  },
+  {
+    code: "QR",
+    name: "Qatar Airways",
+    country: "Qatar",
+    colour: "#5c0632",
+    hubs: ["DOH"],
+    fleet: ["Airbus A350-900", "Airbus A330-200", "Boeing 777-300ER"],
+  },
+  {
+    code: "SV",
+    name: "Saudia",
+    country: "Saudi Arabia",
+    colour: "#0f8b4c",
+    hubs: ["JED", "RUH", "MED"],
+    fleet: ["Boeing 777-300ER", "Boeing 787-9", "Airbus A320"],
+  },
+  {
+    code: "TK",
+    name: "Turkish Airlines",
+    country: "Turkiye",
+    colour: "#c70a0c",
+    hubs: ["IST", "SAW"],
+    fleet: ["Airbus A321", "Boeing 737-800", "Airbus A330-200"],
+  },
+  {
+    code: "PC",
+    name: "Pegasus Airlines",
+    country: "Turkiye",
+    colour: "#1a3a8f",
+    hubs: ["SAW", "IST"],
+    fleet: ["Boeing 737-800", "Airbus A320neo"],
+  },
+  {
+    code: "PK",
+    name: "PIA",
+    country: "Pakistan",
+    colour: "#1b7a43",
+    hubs: ["KHI", "LHE", "ISB"],
+    fleet: ["Airbus A320", "Boeing 777-300ER", "ATR 72"],
+  },
+  {
+    code: "AZ",
+    name: "ITA Airways",
+    country: "Italy",
+    colour: "#004b85",
+    hubs: ["IST"],
+    fleet: ["Airbus A320", "Airbus A321"],
+  },
+  {
+    code: "GF",
+    name: "Gulf Air",
+    country: "Bahrain",
+    colour: "#8a1538",
+    hubs: ["DOH", "DXB"],
+    fleet: ["Boeing 787-8", "Airbus A320"],
+  },
 ];
 
 const AIRLINE_BY_CODE = {};
@@ -123,7 +276,7 @@ function distanceKm(a, b) {
 function blockTimeMinutes(a, b) {
   const km = distanceKm(a, b);
   const hours = km / 840 + 0.55;
-  const minutes = Math.round(hours * 60 / 5) * 5;
+  const minutes = Math.round((hours * 60) / 5) * 5;
   return Math.max(45, minutes);
 }
 
@@ -348,7 +501,14 @@ const TERMINAL_NAMES = [
 ];
 
 // Same-airport, same-terminal layovers read differently from airport changes.
-function describeLayover(layoverMinutes, fromAirport, toAirport, fromTerminal, toTerminal, sameCarrier) {
+function describeLayover(
+  layoverMinutes,
+  fromAirport,
+  toAirport,
+  fromTerminal,
+  toTerminal,
+  sameCarrier,
+) {
   const airportChange = fromAirport.code !== toAirport.code;
   const terminalChange = airportChange && fromTerminal !== toTerminal;
 
@@ -400,7 +560,13 @@ function describeLayover(layoverMinutes, fromAirport, toAirport, fromTerminal, t
 // `departMinutes` is minutes past local midnight on the leg's travel date.
 // Times are carried as "minutes past the leg's departure midnight" so that a
 // +1 day arrival is just a value past 1440.
-function buildLegSegments(origin, destination, departMinutes, seedKey, preferDirect) {
+function buildLegSegments(
+  origin,
+  destination,
+  departMinutes,
+  seedKey,
+  preferDirect,
+) {
   const random = mulberry32(hashString(seedKey));
   const segments = [];
   const viaList = pickViaAirports(origin, destination, random, preferDirect);
@@ -416,12 +582,7 @@ function buildLegSegments(origin, destination, departMinutes, seedKey, preferDir
   let previousCarrier = null;
 
   hops.forEach((target, index) => {
-    const carrierCode = pickCarrier(
-      cursor,
-      target,
-      random,
-      previousCarrier,
-    );
+    const carrierCode = pickCarrier(cursor, target, random, previousCarrier);
     const airline = AIRLINE_BY_CODE[carrierCode] || AIRLINE_BY_CODE.EK;
     previousCarrier = carrierCode;
     const minutes = blockTimeMinutes(cursor, target);
@@ -429,7 +590,8 @@ function buildLegSegments(origin, destination, departMinutes, seedKey, preferDir
     const terminalIn = pickRandom(random, TERMINAL_NAMES);
 
     // First departure is the requested time; connections add a little slack
-    const departAt = index === 0 ? clock : clock + 5 + Math.floor(random() * 20);
+    const departAt =
+      index === 0 ? clock : clock + 5 + Math.floor(random() * 20);
     const arriveAt = departAt + minutes;
 
     segments.push({
@@ -476,15 +638,17 @@ function pickViaAirports(origin, destination, random, preferDirect) {
 
   // Only worth connecting when there is no sensible nonstop: same-country
   // hops under ~900 km, or anything short of a normal widebody sector.
-  const nonstopReasonable =
-    sameCountry ? directKm < 900 : directKm < 2600;
+  const nonstopReasonable = sameCountry ? directKm < 900 : directKm < 2600;
 
   if (preferDirect || nonstopReasonable) return [];
 
   // One connection covers most of this market; two only for the longer runs.
   if (directKm >= 4200 && pool.length >= 2 && random() < 0.3) {
     const first = pickRandom(random, pool);
-    const second = pickRandom(random, pool.filter((code) => code !== first));
+    const second = pickRandom(
+      random,
+      pool.filter((code) => code !== first),
+    );
     return [first, second];
   }
 
@@ -506,7 +670,8 @@ function pickViaAirports(origin, destination, random, preferDirect) {
 function pickCarrier(origin, destination, random, previous) {
   const eligible = AIRLINES.filter(
     (airline) =>
-      airline.hubs.includes(origin.code) || airline.hubs.includes(destination.code),
+      airline.hubs.includes(origin.code) ||
+      airline.hubs.includes(destination.code),
   );
 
   // Staying with the same operator across a connection is the common case, so
@@ -531,7 +696,9 @@ function pickCarrier(origin, destination, random, previous) {
 
   // Last resort: a carrier based at the origin, so the operator at least has a
   // presence where the flight begins.
-  const fromBase = eligible.filter((airline) => airline.hubs.includes(origin.code));
+  const fromBase = eligible.filter((airline) =>
+    airline.hubs.includes(origin.code),
+  );
   if (fromBase.length) return pickRandom(random, fromBase).code;
 
   return eligible.length ? pickRandom(random, eligible).code : "EK";
@@ -567,9 +734,23 @@ function seasonalFactor(date) {
 }
 
 // Turn one journey leg into the display shape the cards expect.
-function assembleLeg(legIndex, origin, destination, date, departHour, seedKey, preferDirect) {
+function assembleLeg(
+  legIndex,
+  origin,
+  destination,
+  date,
+  departHour,
+  seedKey,
+  preferDirect,
+) {
   const departMinutes = departHour * 60;
-  const segments = buildLegSegments(origin, destination, departMinutes, seedKey, preferDirect);
+  const segments = buildLegSegments(
+    origin,
+    destination,
+    departMinutes,
+    seedKey,
+    preferDirect,
+  );
   const first = segments[0];
   const last = segments[segments.length - 1];
 
@@ -618,8 +799,12 @@ function assembleLeg(legIndex, origin, destination, date, departHour, seedKey, p
     distanceKm: distance,
     // Unique carriers on the leg — the headline names every one of them
     carriers: [...new Set(segments.map((segment) => segment.carrier))],
-    hasAirportChange: connections.some((connection) => connection.airportChange),
-    hasOvernight: connections.some((connection) => connection.kind === "overnight"),
+    hasAirportChange: connections.some(
+      (connection) => connection.airportChange,
+    ),
+    hasOvernight: connections.some(
+      (connection) => connection.kind === "overnight",
+    ),
     hasSelfTransfer: connections.some((connection) => !connection.sameCarrier),
   };
 }
@@ -639,9 +824,7 @@ function assembleItinerary(id, legs, search) {
     return sum + legBase;
   }, 0);
   const seasonFactor = seasonalFactor(firstLeg.date);
-  const baseFare = Math.round(
-    rawBase * cabin.multiplier * seasonFactor,
-  );
+  const baseFare = Math.round(rawBase * cabin.multiplier * seasonFactor);
 
   // Taxes and airport charges scale with distance; the service fee is flat
   const totalDistance = legs.reduce((sum, leg) => sum + leg.distanceKm, 0);
@@ -685,9 +868,7 @@ function assembleItinerary(id, legs, search) {
     overnight: legs.some((leg) => leg.hasOvernight),
     airportChange: legs.some((leg) => leg.hasAirportChange),
     selfTransfer: legs.some((leg) => leg.hasSelfTransfer),
-    routeLabel: legs
-      .map((leg) => leg.destination.city)
-      .join(" → "),
+    routeLabel: legs.map((leg) => leg.destination.city).join(" → "),
   };
 }
 
@@ -712,9 +893,15 @@ const ITINERARY_COUNTS = { oneway: 5, roundtrip: 5, multicity: 5 };
  * }
  */
 function generateItineraries(search) {
-  const totalPax = search.passengers.adults + search.passengers.children + search.passengers.infants;
+  const totalPax =
+    search.passengers.adults +
+    search.passengers.children +
+    search.passengers.infants;
   const seedBase = `${search.tripType}|${search.legs
-    .map((leg) => `${leg.from.code}-${leg.to.code}-${leg.date.toISOString().slice(0, 10)}`)
+    .map(
+      (leg) =>
+        `${leg.from.code}-${leg.to.code}-${leg.date.toISOString().slice(0, 10)}`,
+    )
     .join(",")}|${search.cabin}|${totalPax}`;
 
   const target = ITINERARY_COUNTS[search.tripType] || 18;
@@ -726,7 +913,8 @@ function generateItineraries(search) {
 
     // First 3 itineraries showcase a nonstop and a fast connection
     const preferDirect = index < 3;
-    const hourOffset = (index * 3 + Math.floor(random() * 2)) % DEPART_HOURS.length;
+    const hourOffset =
+      (index * 3 + Math.floor(random() * 2)) % DEPART_HOURS.length;
 
     const legs = search.legs.map((legSpec, legPosition) => {
       const origin = AIRPORT_BY_CODE[legSpec.from.code];

@@ -378,7 +378,7 @@
    right, split by a vertical rule. */
 .fr-card-top-rows {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
 }
 
 .fr-row {
@@ -386,6 +386,10 @@
   grid-template-columns: 1fr;
   gap: 12px;
   padding: 16px 18px;
+}
+
+.fr-mobile-fare {
+  display: none;
 }
 
 .fr-row + .fr-row {
@@ -398,6 +402,10 @@
     align-items: center;
     gap: 20px;
     padding: 18px;
+  }
+  .fr-card-top-rows {
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -551,6 +559,82 @@
 .fr-row-price-note {
   color: var(--muted);
   font-size: 12.5px;
+}
+
+@media (max-width: 767px) {
+  .fr-mobile-fare {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fr-mobile-fare .fr-row-price {
+    margin: 0;
+  }
+
+  .fr-mobile-fare .fr-row-price-note {
+    margin: 0;
+  }
+
+  .fr-mobile-fare .fr-collapse-btn {
+    flex: none;
+    margin: 2px 0 0;
+  }
+
+  .fr-row {
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .fr-row-carrier {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 1px;
+    text-align: left;
+  }
+
+  .fr-row-logos {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .fr-row-carrier .fr-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fr-row-code {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .fr-row-flightno {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .fr-row-times {
+    gap: 8px;
+  }
+
+  .fr-row-time {
+    font-size: 24px;
+  }
+
+  .fr-row-route {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .fr-row-fare {
+    display: none;
+  }
 }
 
 .fr-compact-actions {
@@ -829,9 +913,9 @@
   left: 3px;
   right: 3px;
   top: 50%;
-  height: 2px;
+  height: 0;
   transform: translateY(-50%);
-  background: var(--primary-pale);
+  border-top: 2px dotted var(--primary-pale);
 }
 
 .fr-baggage-line {
@@ -1241,7 +1325,7 @@
   color: var(--primary);
   font-weight: 600;
   font-size: 13px;
-  padding: 8px 0 0;
+  padding: 0;
 }
 
 .fr-collapse-btn i {

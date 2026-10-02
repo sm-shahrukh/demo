@@ -2505,5 +2505,195 @@ small {
 
 /* mobile: ONE card at a time */
 /* @media (max-width: 767.98px) {
-  
+
 } */
+
+/* ========================================== DATE PICKER DROPDOWN ========================================== */
+/* The calendar reuses the .dd-panel chrome so it reads as one of the other
+   dropdowns, but floats against the viewport because the same panel serves
+   date fields in three different forms. JS writes left/top from the field's
+   rect, so the base left/top rules are intentionally overridden. */
+.date-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 296px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 12px 8px;
+}
+.date-nav-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #101828;
+}
+.date-nav-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.date-nav-btn:hover {
+  background: #f2f4f7;
+  border-color: #98a2b3;
+}
+
+.date-weekdays,
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding: 0 12px;
+}
+.date-weekdays {
+  padding-bottom: 6px;
+}
+.date-weekdays span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.date-cell {
+  width: 38px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #101828;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.date-cell:hover:not(:disabled):not(.is-selected) {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.date-cell.is-blank {
+  cursor: default;
+  pointer-events: none;
+}
+.date-cell:disabled {
+  color: var(--gray-400);
+  cursor: default;
+}
+.date-cell.is-today {
+  box-shadow: inset 0 0 0 1px var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+.date-cell.is-selected {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: none;
+}
+.date-cell.is-selected:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.date-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+.date-clear,
+.date-today {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.date-clear:hover,
+.date-today:hover {
+  background: #f2f4f7;
+  border-color: #98a2b3;
+}
+.date-today {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.date-today:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+
+/* The field opens its calendar the way the others open theirs. */
+.field-box.open {
+  border-color: var(--primary-blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+/* The native control keeps the ISO value but hands its own text and calendar
+   icon over to the mirror, so there is only one calendar affordance. */
+.field-box-input-mirror {
+  display: block;
+  width: 100%;
+  font-size: 13px;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.field-box-input-mirror.is-placeholder {
+  color: var(--gray-400);
+}
+.field-box.date-mirrored .field-box-input[type="date"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+@media (max-width: 767.98px) {
+  .date-panel {
+    min-width: 280px;
+  }
+  .date-cell {
+    width: 34px;
+    height: 34px;
+  }
+}

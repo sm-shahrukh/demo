@@ -568,7 +568,8 @@
                               </div>
                             </div>
                           </div>
-                        </div>
+
+                          </div>
 
                         <!-- ========================================================= 4. PASSENGERS ========================================================== -->
                         <div class="form-col pax-col">
@@ -1971,6 +1972,55 @@
         </svg>
       </button>
     </div>
+    <!-- Shared calendar for every date field. It lives at body level because the
+         flight, Umrah and Visa forms are separate panels and only one is on
+         screen at a time — inside any of them the picker would be hidden. -->
+    <div class="dd-panel date-panel" id="datePickerPanel">
+      <div class="dd-panel-header">
+        <span id="datePickerTitle">Select date</span>
+        <button
+          type="button"
+          class="dd-panel-close"
+          onclick="closeDatePicker()"
+          aria-label="Close date picker"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="date-nav">
+        <button
+          type="button"
+          class="date-nav-btn"
+          onclick="shiftCalendarMonth(-1)"
+          aria-label="Previous month"
+        >
+          ‹
+        </button>
+        <span class="date-nav-label" id="datePickerMonth"></span>
+        <button
+          type="button"
+          class="date-nav-btn"
+          onclick="shiftCalendarMonth(1)"
+          aria-label="Next month"
+        >
+          ›
+        </button>
+      </div>
+      <div class="date-weekdays" aria-hidden="true">
+        <span>Mo</span><span>Tu</span><span>We</span><span>Th</span
+        ><span>Fr</span><span>Sa</span><span>Su</span>
+      </div>
+      <div class="date-grid" id="datePickerGrid"></div>
+      <div class="date-panel-foot">
+        <button type="button" class="date-clear" onclick="clearCalendarDate()">
+          Clear
+        </button>
+        <button type="button" class="date-today" onclick="goToToday()">
+          Today
+        </button>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/flight-data.js"></script>
     <script src="js/flight-results.js"></script>

@@ -111,7 +111,7 @@
       type === "multicity",
     );
     if (type !== "roundtrip" && getElement("retDate")) {
-      getElement("retDate").value = "";
+      setDateValue(getElement("retDate"), "");
     }
     closeDropdowns();
 
@@ -193,12 +193,235 @@
     [fromInput.value, toInput.value] = [toInput.value, fromInput.value];
   };
 
-  window.openDatePicker = function (id) {
-    const input = getElement(id);
-    if (!input) return;
-    if (typeof input.showPicker === "function") input.showPicker();
-    else input.click();
+  // ---------- Calendar ----------
+  // One shared panel drives every date field, styled like the airport and
+  // passenger dropdowns rather than the browser's own picker. It floats
+  // next to whichever field opened it, so the Umrah and Visa date fields —
+  // which sit in a different form entirely — get the picker at their own edge.
+  const calendar = {
+    input: null,
+    view: new Date(),
+    min: null,
   };
+
+  function toIso(date) {
+    // Local parts, not toISOString, so the value never slips a day for anyone
+    // west of UTC.
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${date.getFullYear()}-${month}-${day}`;
+  }
+
+  function parseIso(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+    if (!match) return null;
+    const date = new Date(
+      Number(match[1]),
+      Number(match[2]) - 1,
+      Number(match[3]),
+    );
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  // The markup calls openDatePicker('dep') and ('ret') but the inputs are
+  // #depDate and #retDate, so resolve the short names rather than trusting the
+  // argument to already be an element id.
+  function resolveDateInput(id) {
+    return getElement(id) || getElement(`${id}Date`);
+  }
+
+  // Keeps the form valid: nothing books in the past, and a return date cannot
+  // land before the departure it follows.
+  function calendarMinFor(input) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (input.id === "retDate") {
+      const departure = parseIso(getElement("depDate")?.value);
+      return departure && departure > today ? departure : today;
+    }
+    return today;
+  }
+
+  function renderCalendar() {
+    const grid = getElement("datePickerGrid");
+    const monthLabel = getElement("datePickerMonth");
+    if (!grid || !monthLabel) return;
+
+    const selected = parseIso(calendar.input?.value);
+    const view = calendar.view;
+
+    monthLabel.textContent = view.toLocaleDateString("en-GB", {
+      month: "long",
+      year: "numeric",
+    });
+
+    // Monday-first offset, to match the Mo–Su weekday header.
+    const leading = (view.getDay() + 6) % 7;
+    const daysInMonth = new Date(
+      view.getFullYear(),
+      view.getMonth() + 1,
+      0,
+    ).getDate();
+    const todayIso = toIso(new Date());
+
+    const cells = [];
+    for (let i = 0; i < leading; i += 1) {
+      cells.push('<span class="date-cell is-blank"></span>');
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(view.getFullYear(), view.getMonth(), day);
+      const iso = toIso(date);
+      const classes = ["date-cell"];
+      if (selected && toIso(selected) === iso) classes.push("is-selected");
+      if (iso === todayIso) classes.push("is-today");
+      cells.push(
+        `<button type="button" class="${classes.join(" ")}" data-date="${iso}"${
+          date < calendar.min ? " disabled" : ""
+        }>${day}</button>`,
+      );
+    }
+    grid.innerHTML = cells.join("");
+  }
+
+  // Anchor the panel to the field's bottom-left, flipping above the field when
+  // there isn't room below and clamping to the viewport so it never runs off
+  // the right edge on a narrow screen.
+  function positionDatePanel(panel, trigger) {
+    const gap = 6;
+    const box = panel.getBoundingClientRect();
+    const rect = trigger.getBoundingClientRect();
+    const margin = 8;
+
+    let left = rect.left;
+    if (left + box.width > window.innerWidth - margin) {
+      left = window.innerWidth - box.width - margin;
+    }
+    left = Math.max(margin, left);
+
+    let top = rect.bottom + gap;
+    if (top + box.height > window.innerHeight - margin) {
+      const above = rect.top - gap - box.height;
+      top = above >= margin ? above : Math.max(margin, window.innerHeight - box.height - margin);
+    }
+
+    panel.style.left = `${Math.round(left)}px`;
+    panel.style.top = `${Math.round(top)}px`;
+  }
+
+  window.openDatePicker = function (id) {
+    const input = resolveDateInput(id);
+    const panel = getElement("datePickerPanel");
+    const trigger = input?.closest(".field-box");
+    if (!input || !panel || !trigger) return;
+
+    // Re-opening on the same field closes it again, matching the other panels.
+    if (calendar.input === input && panel.classList.contains("show")) {
+      closeDatePicker();
+      return;
+    }
+
+    closeDropdowns();
+    calendar.input = input;
+    calendar.min = calendarMinFor(input);
+
+    const title = getElement("datePickerTitle");
+    const label = trigger.querySelector(".field-box-label");
+    if (title) {
+      title.textContent = label ? `Select ${label.textContent.trim()} date` : "Select date";
+    }
+
+    // Open on the chosen month when there is one, otherwise the current month.
+    const chosen = parseIso(input.value);
+    const today = new Date();
+    calendar.view = chosen
+      ? new Date(chosen.getFullYear(), chosen.getMonth(), 1)
+      : new Date(today.getFullYear(), today.getMonth(), 1);
+
+    panel.classList.add("show");
+    trigger.classList.add("open");
+    renderCalendar();
+    positionDatePanel(panel, trigger);
+  };
+
+  function closeDatePicker() {
+    const panel = getElement("datePickerPanel");
+    panel?.classList.remove("show");
+    calendar.input?.closest(".field-box")?.classList.remove("open");
+    calendar.input = null;
+  }
+  window.closeDatePicker = closeDatePicker;
+
+  // The native input keeps holding the ISO value every other script reads, but
+  // its own text is hidden under the mirror so the date can be shown in the
+  // format the rest of the form uses rather than the browser's locale guess.
+  function syncDateMirror(input) {
+    const mirror = input?.parentElement?.querySelector(".field-box-input-mirror");
+    if (!mirror) return;
+    const picked = parseIso(input.value);
+    mirror.textContent = picked
+      ? picked.toLocaleDateString("en-GB", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : input.placeholder || "";
+    mirror.classList.toggle("is-placeholder", !picked);
+  }
+
+  window.selectCalendarDate = function (iso) {
+    if (!calendar.input) return;
+    setDateValue(calendar.input, iso);
+    renderCalendar();
+    closeDatePicker();
+  };
+
+  window.shiftCalendarMonth = function (delta) {
+    calendar.view = new Date(
+      calendar.view.getFullYear(),
+      calendar.view.getMonth() + delta,
+      1,
+    );
+    renderCalendar();
+  };
+
+  window.goToToday = function () {
+    const today = new Date();
+    calendar.view = new Date(today.getFullYear(), today.getMonth(), 1);
+    renderCalendar();
+  };
+
+  window.clearCalendarDate = function () {
+    if (calendar.input) setDateValue(calendar.input, "");
+    renderCalendar();
+  };
+
+  // Give every date field the mirror span and hide the native control, so all
+  // five fields — flights, Umrah and Visa — behave identically.
+  function initDateFields() {
+    document.querySelectorAll('.field-box-input[type="date"]').forEach((input) => {
+      const content = input.parentElement;
+      const trigger = input.closest(".field-box");
+      if (!content || !trigger || content.querySelector(".field-box-input-mirror"))
+        return;
+
+      input.setAttribute("readonly", "");
+      trigger.classList.add("date-mirrored");
+      const mirror = document.createElement("span");
+      mirror.className = "field-box-input-mirror is-placeholder";
+      content.appendChild(mirror);
+      syncDateMirror(input);
+    });
+  }
+
+  // Every script writes the ISO value straight onto the input, so mirror it in
+  // one place rather than making each caller remember.
+  function setDateValue(input, value) {
+    if (!input) return;
+    input.value = value;
+    syncDateMirror(input);
+  }
 
   window.togglePassengerPanel = function () {
     const panel = getElement("paxPanel");
@@ -283,7 +506,7 @@
   function isoDateIn(days) {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    return date.toISOString().slice(0, 10);
+    return toIso(date);
   }
 
   // Nothing is pre-selected: the traveller picks the route from the dropdowns, so
@@ -292,8 +515,8 @@
   function defaultSearch() {
     const depDate = getElement("depDate");
     const retDate = getElement("retDate");
-    if (depDate && !depDate.value) depDate.value = isoDateIn(14);
-    if (retDate && !retDate.value) retDate.value = isoDateIn(21);
+    if (depDate && !depDate.value) setDateValue(depDate, isoDateIn(14));
+    if (retDate && !retDate.value) setDateValue(retDate, isoDateIn(21));
   }
 
   // Switching trip type only re-marks the tabs and the search form. Results are
@@ -474,14 +697,36 @@
   };
 
   document.addEventListener("click", (event) => {
+    // Day cells live inside the panel, which the guard below treats as "inside
+    // a dropdown" — so the pick has to be handled before the early return.
+    const day = event.target.closest(".date-cell[data-date]");
+    if (day && !day.disabled) {
+      selectCalendarDate(day.dataset.date);
+      return;
+    }
+
     if (event.target.closest(".field-box, .dd-panel, .multi-city-airport"))
       return;
     closeDropdowns();
   });
 
+  // Keep the panel anchored to its field if the page scrolls while it's open.
+  window.addEventListener("scroll", () => {
+    const panel = getElement("datePickerPanel");
+    const trigger = calendar.input?.closest(".field-box");
+    if (panel?.classList.contains("show") && trigger) {
+      positionDatePanel(panel, trigger);
+    }
+  }, true);
+
   // ---------- Start ----------
   updateMultiCityCount();
+  initDateFields();
   defaultSearch();
+  // The two-week default is set after the mirrors exist, so seed them once more.
+  document
+    .querySelectorAll('.field-box-input[type="date"]')
+    .forEach(syncDateMirror);
 
   document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.trip === "oneway");

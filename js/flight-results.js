@@ -808,9 +808,24 @@
   function buildCardTop(itinerary, selectedPackage, options = {}) {
     const totalLegs = itinerary.legs.length;
     const savings = Math.max(0, itinerary.price - selectedPackage.price);
+    const totalFare = money(
+      selectedPackage.price + itinerary.taxes + itinerary.serviceFee,
+    );
 
     return `
       <div class="fr-card-top-rows${totalLegs > 1 ? " is-multi" : ""}">
+        <div class="fr-mobile-fare">
+          ${
+            savings > 0
+              ? `<span class="fr-row-save">Save ${escapeHtml(
+                  money(savings),
+                )} <i class="bi bi-info-circle"></i></span>`
+              : ""
+          }
+          <b class="fr-row-price">${escapeHtml(totalFare)}</b>
+          <small class="fr-row-price-note">Total trip price</small>
+          ${options.collapse || ""}
+        </div>
         ${itinerary.legs
           .map((leg, index) =>
             buildCardTopRow(leg, {
@@ -1491,13 +1506,13 @@
         // the fare package, for instance — rebuilds the card in the same open or
         // shut position instead of snapping back to collapsed.
         state.featuredExpanded = !collapsed;
-        const button = featured.querySelector(".fr-collapse-btn");
+        const buttons = featured.querySelectorAll(".fr-collapse-btn");
         const pill = featured.querySelector(".fr-pill");
-        if (button) {
+        buttons.forEach((button) => {
           button.childNodes[0].nodeValue = collapsed
             ? " Show itinerary & fare details "
             : " Hide itinerary & fare details ";
-        }
+        });
         if (pill)
           pill.textContent = collapsed
             ? "Details collapsed"
