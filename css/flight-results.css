@@ -352,131 +352,213 @@
   overflow: hidden;
 }
 
-/* Card top row */
-.fr-card-top {
+/* Card flags: a slim strip, not its own heading block — the logo cell below
+   already carries the carrier identity, so no separate airline heading. */
+.fr-card-flags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 12px 18px 0;
+}
+
+.fr-card-flags .fr-badge,
+.fr-card-flags .fr-pill {
+  margin-bottom: 0;
+}
+
+.fr-card-flags-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------- Card top: one row per journey leg ----------
+   Mirrors the reference design — operator logo with the carrier code and flight
+   number beneath it on the left, times and stops in the middle, price on the
+   right, split by a vertical rule. */
+.fr-card-top-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.fr-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
-  padding: 20px 22px;
-  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.fr-row + .fr-row {
+  border-top: 1px solid var(--border);
 }
 
 @media (min-width: 768px) {
-  .fr-card-top {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
+  .fr-row {
+    grid-template-columns: 104px minmax(0, 1fr) 230px;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
   }
-  .fr-card-top-right {
-    text-align: right;
-  }
 }
 
-.fr-card-top-left h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 8px 0 2px;
-}
-
-.fr-card-top-left small {
-  color: var(--muted);
-  font-size: 12.5px;
-}
-
-/* Route rows in the featured card stay visible when the card is collapsed, so the
-   whole route, its operators and its times can be read at a glance. One row per
-   journey leg, stacked as columns. */
-.fr-route {
+/* Operator cell: logo, then carrier code, then flight number */
+.fr-row-carrier {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.fr-route-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  background: var(--gray-50);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 9px 12px;
+  text-align: center;
+  gap: 3px;
 }
 
-.fr-route-logos {
+.fr-row-logos {
   display: flex;
   gap: 4px;
-  flex: none;
 }
 
-.fr-route-logos .fr-logo {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  font-size: 9.5px;
+.fr-row-carrier .fr-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
-.fr-route-line b,
-.fr-route-time b {
-  display: block;
-  font-size: 13.5px;
+.fr-row-code {
+  font-size: 11.5px;
   font-weight: 700;
 }
 
-.fr-route-line small,
-.fr-route-time small {
-  display: block;
+.fr-row-flightno {
   color: var(--muted);
   font-size: 11.5px;
-  margin-top: 1px;
 }
 
-.fr-route-time {
+/* Times and stops */
+.fr-row-main {
+  min-width: 0;
+}
+
+.fr-row-times {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fr-row-time {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.fr-row-duration {
+  background: var(--gray-100);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-700);
+  white-space: nowrap;
+}
+
+.fr-row-route {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--gray-900);
+}
+
+.fr-row-dash {
+  color: var(--muted);
+}
+
+.fr-row-stops {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.fr-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.fr-row-meta i {
+  margin-right: -2px;
+}
+
+/* Fare cell, on the first row only */
+.fr-row-fare {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
   text-align: right;
 }
 
-.fr-route-foot {
-  display: block;
-  color: var(--muted);
-  font-size: 11.5px;
-  margin-top: 6px;
-}
-
-@media (max-width: 575px) {
-  .fr-route-row {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .fr-route-time {
-    grid-column: 1 / -1;
-    text-align: left;
+@media (min-width: 768px) {
+  .fr-row-fare {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: stretch;
+    border-left: 1px solid var(--border);
+    justify-content: center;
+    padding-left: 24px;
   }
 }
 
-.fr-card-top-right b {
-  font-size: 30px;
-  font-weight: 700;
-  display: block;
-  line-height: 1.1;
+.fr-logo img {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  border-radius: inherit;
+  background: #fff;
+  object-fit: contain;
 }
 
-.fr-card-top-right small {
-  display: block;
-  color: var(--muted);
+.fr-row-save {
+  background: var(--green-light);
+  color: var(--accent-teal-dark);
+  border-radius: 999px;
+  padding: 4px 12px;
   font-size: 12px;
-  margin-top: 2px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.fr-fare-link {
-  display: inline-block;
-  margin-top: 6px;
+.fr-row-save i {
+  margin-left: 3px;
+}
+
+.fr-row-price {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+  background: var(--primary);
+  color: var(--white);
+  border-radius: 8px;
+  padding: 11px 18px;
+  white-space: nowrap;
+}
+
+.fr-row-price-note {
+  color: var(--muted);
   font-size: 12.5px;
-  font-weight: 600;
-  color: var(--primary);
-  text-decoration: none;
 }
 
-.fr-fare-link:hover {
-  text-decoration: underline;
+.fr-compact-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 12px 18px 16px;
 }
 
 /* Badges and pills */
@@ -544,53 +626,6 @@
   font-size: 12px;
 }
 
-/* Itinerary overview */
-.fr-overview {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.fr-overview-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-  background: var(--gray-50);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-@media (min-width: 640px) {
-  .fr-overview-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 16px;
-  }
-}
-
-.fr-overview-left b,
-.fr-overview-right b {
-  display: block;
-  font-size: 14px;
-}
-
-.fr-overview-left small,
-.fr-overview-right small {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.fr-overview-right {
-  text-align: left;
-}
-
-@media (min-width: 640px) {
-  .fr-overview-right {
-    text-align: right;
-  }
-}
-
 .fr-eyebrow {
   display: block;
   font-size: 10.5px;
@@ -603,13 +638,6 @@
 
 .fr-eyebrow-blue {
   color: var(--primary);
-}
-
-.fr-disclaimer {
-  color: var(--muted);
-  font-size: 11.5px;
-  margin-top: 12px;
-  line-height: 1.5;
 }
 
 /* Journey legs */
@@ -757,48 +785,53 @@
 
 .fr-track {
   text-align: center;
+  width: 100%;
 }
 
 .fr-track-time {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  margin-bottom: 4px;
+  margin-bottom: 9px;
 }
 
 .fr-track-line {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  justify-content: center;
+  justify-content: space-between;
+  min-height: 22px;
 }
 
 .fr-track-dot {
-  width: 5px;
-  height: 5px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--primary);
   flex: none;
+  z-index: 1;
 }
 
 .fr-track-plane {
   color: var(--primary);
-  font-size: 15px;
-  /* the line between the two dots */
-  position: relative;
-  flex: none;
+  font-size: 21px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 6px;
+  background: var(--white);
+  z-index: 1;
 }
 
 .fr-track-line::before {
   content: "";
-  flex: 1;
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
   height: 2px;
-  background-image: linear-gradient(
-    to right,
-    var(--primary-pale) 50%,
-    transparent 50%
-  );
-  background-size: 6px 2px;
+  transform: translateY(-50%);
+  background: var(--primary-pale);
 }
 
 .fr-baggage-line {
@@ -870,10 +903,11 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* The heading is the active tab's label, so only the "selected" badge remains
+   here and it sits at the start rather than pushed to the far edge. */
 .fr-fare-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   padding: 18px 22px 0;
 }
@@ -986,11 +1020,12 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* No heading above it any more, so the disclaimer starts flush. */
 .fr-packages-head p {
   color: var(--muted);
   font-size: 11.5px;
   line-height: 1.5;
-  margin: -4px 0 16px;
+  margin: 0 0 16px;
 }
 
 .fr-package-grid {
@@ -1012,6 +1047,21 @@
   display: flex;
   flex-direction: column;
   background: var(--white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.fr-package:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.fr-package:focus-visible {
+  outline: 3px solid var(--primary-pale);
+  outline-offset: 2px;
 }
 
 .fr-package.selected {
@@ -1141,14 +1191,57 @@
   flex: none;
 }
 
+/* ---------- Detail tabs ----------
+   The expanded card shows one of three detail sections at a time. The tab row sits
+   at the top of the detail area, above the section it controls, and is hidden
+   along with the rest of the details when the card is collapsed. */
+.fr-detail-panel[hidden] {
+  display: none;
+}
+
+.fr-detail-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 20px 22px 0;
+  padding: 4px;
+  background: var(--gray-100);
+  border-radius: 12px;
+}
+
+.fr-detail-tab {
+  border: 0;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.fr-detail-tab:hover {
+  color: var(--primary-blue);
+}
+
+.fr-detail-tab.active {
+  background: var(--white);
+  color: var(--primary-blue-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.fr-card-featured.collapsed .fr-detail-tabs {
+  display: none;
+}
+
+/* Sits in the fare cell under "Total trip price", not as a full-width bar. */
 .fr-collapse-btn {
-  width: 100%;
   border: 0;
   background: none;
   color: var(--primary);
   font-weight: 600;
   font-size: 13px;
-  padding: 14px;
+  padding: 8px 0 0;
 }
 
 .fr-collapse-btn i {
@@ -1181,50 +1274,15 @@
   margin-top: 14px;
 }
 
+/* Padding lives on the children now, so the card itself must not add any. */
 .fr-card-compact {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  padding: 16px 18px;
+  display: block;
+  overflow: hidden;
   transition: all 0.2s ease;
-}
-
-@media (min-width: 768px) {
-  .fr-card-compact {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-  }
-  .fr-compact-right {
-    text-align: right;
-  }
 }
 
 .fr-card-compact:hover {
   box-shadow: var(--shadow-lg);
-}
-
-.fr-compact-left h3 {
-  font-size: 15px;
-  font-weight: 700;
-  margin: 4px 0 6px;
-}
-
-.fr-compact-legs {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 6px;
-}
-
-.fr-compact-legs small {
-  color: var(--gray-700);
-  font-size: 12.5px;
-}
-
-.fr-compact-meta {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
 }
 
 .fr-link-btn {
@@ -1240,22 +1298,7 @@
   margin-left: 4px;
 }
 
-.fr-compact-right b {
-  font-size: 22px;
-  font-weight: 700;
-  display: block;
-  line-height: 1.1;
-}
-
-.fr-compact-right small {
-  display: block;
-  color: var(--muted);
-  font-size: 11.5px;
-  margin-top: 2px;
-}
-
 .fr-select-btn {
-  margin-top: 10px;
   font-size: 13px;
 }
 

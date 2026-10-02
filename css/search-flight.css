@@ -2109,6 +2109,14 @@ small {
   padding-top: 50px;
 }
 
+/* Long addresses and phone numbers are the widest things in the footer, so let
+   them break rather than push the column wider than the viewport. */
+.footer-about,
+.contact-info p,
+.footer-bottom p {
+  overflow-wrap: anywhere;
+}
+
 .footer-top {
   max-width: 1920px;
   margin: 0 auto;
@@ -2340,17 +2348,26 @@ small {
     font-size: 28px;
   }
 
+  /* Tablet: two columns with the brand block spanning the full width. The 2fr
+     track keeps the link columns from stretching as wide as the brand block. */
   .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 28px;
   }
 
   .footer-col-large {
     grid-column: 1 / -1;
+    max-width: 100%;
   }
 
   .footer-bottom {
     flex-direction: row;
     justify-content: space-between;
+    gap: 18px;
+  }
+
+  .footer-badges {
+    justify-content: flex-end;
   }
 
   .multi-city-fields {
@@ -2388,6 +2405,53 @@ small {
     border-color: var(--primary-blue);
     transform: translateX(-50%) rotate(90deg);
   }
+
+  /* Mobile: single column, tighter vertical rhythm than the tablet layout. */
+  .footer {
+    padding-top: 36px;
+  }
+
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .footer-col-large {
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-about {
+    margin-bottom: 16px;
+  }
+
+  .footer-col h4 {
+    margin-bottom: 12px;
+  }
+
+  .footer-col ul li {
+    margin-bottom: 8px;
+  }
+
+  .footer-top {
+    padding-bottom: 24px;
+  }
+
+  .footer-bottom {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    gap: 12px;
+  }
+
+  /* Badges read better full-width and evenly spaced than left-hugging. */
+  .footer-badges {
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .badge-item {
+    padding: 5px 10px;
+  }
 }
 /* ========================================== RESPONSIVE - TABLET (768px+) END ========================================== */
 
@@ -2409,8 +2473,11 @@ small {
     display: none;
   }
 
+  /* Desktop: five columns. minmax(0, 1fr) stops a long link or email address from
+     forcing its track wider than the others. */
   .footer-grid {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
+    gap: 28px 24px;
   }
 
   .footer-col-large {

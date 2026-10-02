@@ -29,6 +29,10 @@
     // back off the DOM, because renderList() rebuilds the card on every package
     // change and would otherwise snap it shut again.
     featuredExpanded: false,
+    // Which of the three detail sections the open card is showing. Held in state
+    // for the same reason as featuredExpanded, so changing fare package rebuilds
+    // the card on the tab the traveller was already reading.
+    detailTab: "itinerary",
     selectedPackageName: "Sample Standard",
     cabinBaggage: "1 × 8 kg",
     checkedBaggage: "1 × 23 kg",
@@ -126,12 +130,27 @@
 
   function airlineLogo(carrierCode) {
     const airline = FlightData.AIRLINE_BY_CODE[carrierCode];
+    const websites = {
+      EK: "emirates.com",
+      FZ: "flydubai.com",
+      QR: "qatarairways.com",
+      SV: "saudia.com",
+      TK: "turkishairlines.com",
+      PC: "flypgs.com",
+      PK: "piac.com.pk",
+      AZ: "ita-airways.com",
+      GF: "gulfair.com",
+    };
     const style = airline
       ? `background:${airline.colour};color:${airline.dark ? "#1a1a1a" : "#fff"};`
       : "background:#64748b;color:#fff;";
-    return `<span class="fr-logo" style="${style}">${escapeHtml(
-      carrierCode,
-    )}</span>`;
+    const name = airline?.name || carrierCode;
+    const logo = websites[carrierCode]
+      ? `<img src="https://www.google.com/s2/favicons?domain=${websites[carrierCode]}&amp;sz=128" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
+      : "";
+    return `<span class="fr-logo" style="${style}" role="img" aria-label="${escapeHtml(name)}">${logo}<span${
+      logo ? " hidden" : ""
+    }>${escapeHtml(carrierCode)}</span></span>`;
   }
 
   function carrierNames(itinerary) {
@@ -679,44 +698,145 @@
     return chips;
   }
 
+  // Bag strings read "1 × 23 kg"; the reference design shows a single combined
+  // "Total: 30kg", so add the pieces up rather than printing both strings.
+  function totalBagKg(cabin) {
+    const sum = (label) => {
+      const match = /(\d+)\s*×\s*(\d+)\s*kg/i.exec(label || "");
+      return match ? Number(match[1]) * Number(match[2]) : 0;
+    };
+    return sum(cabin.cabinBag) + sum(cabin.checkedBag);
+  }
+
+  // One leg as a horizontal strip: operator logo on the left with the carrier
+  // code and flight number beneath it, times and stops in the middle, and the
+  // fare on the right behind a vertical rule. Multi-leg itineraries stack one of
+  // these per journey leg; the fare cell rides on the first row only, since a
+  // trip is priced once however many legs it has.
+  function buildCardTopRow(leg, options) {
+    const { totalLegs, showFare, itinerary, selectedPackage } = options;
+
+    const stopText =
+      leg.stops === 0
+        ? "Nonstop"
+        : `${leg.stops} stop${leg.stops > 1 ? "s" : ""}`;
+
+    // Later legs are tagged with their day offset, so a round trip's return row
+    // is distinguishable from its outbound without needing the journey-leg bar.
+    const offset = Math.round((leg.date - options.firstLegDate) / 86400000);
+    const dayTag = totalLegs > 1 && offset > 0 ? `${offset}d · ` : "";
+
+    // Operators on this leg only, so a multi-city card doesn't repeat one
+    // airline across rows that a different carrier flies.
+    const carriers = [...new Set(leg.segments.map((s) => s.carrier))];
+    const flightNumbers = leg.segments
+      .map((segment) => segment.flightNumber.replace(/ /g, "-"))
+      .join(" · ");
+
+    return `
+      <div class="fr-row">
+        <div class="fr-row-carrier">
+          <div class="fr-row-logos">
+            ${carriers.map((code) => airlineLogo(code)).join("")}
+          </div>
+          <b class="fr-row-code">${escapeHtml(
+            carriers
+              .map(
+                (code) => (FlightData.AIRLINE_BY_CODE[code] || {}).name || code,
+              )
+              .join(" + "),
+          )}</b>
+          <small class="fr-row-flightno">${escapeHtml(flightNumbers)}</small>
+        </div>
+
+        <div class="fr-row-main">
+          <div class="fr-row-times">
+            <b class="fr-row-time">${escapeHtml(minutesToClock(leg.departAt))}</b>
+            <span class="fr-row-duration">${escapeHtml(
+              formatDuration(leg.totalMin),
+            )}</span>
+            <b class="fr-row-time">${escapeHtml(minutesToClock(leg.arriveAt))}</b>
+          </div>
+          <div class="fr-row-route">
+            <span>${escapeHtml(leg.origin.city)} (${escapeHtml(
+              leg.origin.code,
+            )})</span>
+            <span class="fr-row-dash">–</span>
+            <span class="fr-row-stops">${escapeHtml(stopText)}</span>
+            <span class="fr-row-dash">–</span>
+            <span>${escapeHtml(leg.destination.city)} (${escapeHtml(
+              leg.destination.code,
+            )})</span>
+          </div>
+          <small class="fr-row-meta">
+            ${escapeHtml(dayTag)}<i class="bi bi-luggage"></i> Total: ${escapeHtml(
+              totalBagKg(itinerary.cabin),
+            )}kg
+            <i class="bi bi-cup-hot"></i> Meal
+          </small>
+        </div>
+
+        ${
+          showFare
+            ? `<div class="fr-row-fare">
+                 ${
+                   options.savings > 0
+                     ? `<span class="fr-row-save">Save ${escapeHtml(
+                         money(options.savings),
+                       )} <i class="bi bi-info-circle"></i></span>`
+                     : ""
+                 }
+                 <b class="fr-row-price">${escapeHtml(
+                   money(
+                     selectedPackage.price +
+                       itinerary.taxes +
+                       itinerary.serviceFee,
+                   ),
+                 )}</b>
+                 <small class="fr-row-price-note">Total trip price</small>
+                 ${options.collapse || ""}
+               </div>`
+            : ""
+        }
+      </div>`;
+  }
+
+  // All legs of an itinerary as card-top rows. The fare column rides on the
+  // first row; the rest are left empty so the price aligns with row one.
+  // `options.collapse` is the featured card's show/hide control, tucked under
+  // the fare so the bottom of the card carries nothing but the details.
+  function buildCardTop(itinerary, selectedPackage, options = {}) {
+    const totalLegs = itinerary.legs.length;
+    const savings = Math.max(0, itinerary.price - selectedPackage.price);
+
+    return `
+      <div class="fr-card-top-rows${totalLegs > 1 ? " is-multi" : ""}">
+        ${itinerary.legs
+          .map((leg, index) =>
+            buildCardTopRow(leg, {
+              totalLegs,
+              showFare: index === 0,
+              itinerary,
+              selectedPackage,
+              firstLegDate: itinerary.legs[0].date,
+              savings,
+              collapse: options.collapse,
+            }),
+          )
+          .join("")}
+      </div>`;
+  }
+
   // ---------- 7. Card building ---------------------------------------------
 
-  // Journey-leg summary strip at the top of the featured card
-  function buildItineraryOverview(itinerary) {
-    return itinerary.legs
-      .map((leg) => {
-        const total = itinerary.legs.length;
-        const stopText =
-          leg.stops === 0
-            ? "Nonstop"
-            : `${leg.stops} stop${leg.stops > 1 ? "s" : ""} · ${leg.segments
-                .slice(1)
-                .map((segment) => segment.to.code)
-                .join(", ")}`;
-
-        return `
-        <div class="fr-overview-row">
-          <div class="fr-overview-left">
-            <span class="fr-eyebrow">${escapeHtml(legName(leg.legIndex, total))}</span>
-            <b>${escapeHtml(leg.origin.city)} → ${escapeHtml(
-              leg.destination.city,
-            )}</b>
-            <small>${escapeHtml(leg.dateLabel)}</small>
-          </div>
-          <div class="fr-overview-right">
-            <b>${minutesToClock(leg.departAt)} ${escapeHtml(
-              leg.origin.code,
-            )} → ${minutesToClock(leg.arriveAt)} ${escapeHtml(
-              leg.destination.code,
-            )}</b>
-            <small>${formatDuration(leg.totalMin)} total · ${escapeHtml(
-              stopText,
-            )}</small>
-          </div>
-        </div>`;
-      })
-      .join("");
-  }
+  // The three detail sections the featured card switches between once expanded.
+  // Each label doubles as the heading for its panel, so the panels themselves
+  // carry no duplicate h4.
+  const DETAIL_TABS = [
+    { id: "itinerary", label: "Flight itinerary" },
+    { id: "fare", label: "Fare summary" },
+    { id: "package", label: "Fare package" },
+  ];
 
   function buildConnectionNote(connection) {
     const icon =
@@ -783,7 +903,7 @@
             )}</span>
             <div class="fr-track-line">
               <i class="fr-track-dot"></i>
-              <i class="bi bi-airplane-fill fr-track-plane"></i>
+              <i class="bi bi-airplane fr-track-plane"></i>
               <i class="fr-track-dot"></i>
             </div>
           </div>
@@ -854,7 +974,6 @@
     return `
       <div class="fr-fare-summary">
         <div class="fr-fare-head">
-          <h4>Fare summary</h4>
           <span class="fr-selected-label">${escapeHtml(
             selectedPackage.name,
           )} selected</span>
@@ -924,7 +1043,9 @@
     ];
 
     return `
-      <div class="fr-package ${selected ? "selected" : ""}">
+       <div class="fr-package ${selected ? "selected" : ""}"
+         data-package-card role="group" tabindex="0"
+         aria-label="Select ${escapeHtml(pkg.name)} fare package">
         <label class="fr-package-radio">
           <input type="radio" name="frPackage" value="${escapeHtml(pkg.id)}"
                  data-itinerary="${escapeHtml(itinerary.id)}"
@@ -959,7 +1080,6 @@
     return `
       <div class="fr-packages">
         <div class="fr-packages-head">
-          <h4>Choose your fare package</h4>
           <p>Illustrative comparison only — these are not verified company fare
              names, prices or rules. Benefits apply to all segments and
              ${escapeHtml(
@@ -986,58 +1106,6 @@
       </div>`;
   }
 
-  // Route rows for the collapsed summary: one per journey leg, each with the
-  // operating airline's logo, the city pair and the local departure/arrival times.
-  // Round trip and multi-city show one row per leg so the whole chain is visible
-  // without expanding the card.
-  function buildFeaturedRouteRows(itinerary) {
-    const totalLegs = itinerary.legs.length;
-
-    return `
-      <div class="fr-route">
-        ${itinerary.legs
-          .map((leg) => {
-            const stopText =
-              leg.stops === 0
-                ? "Nonstop"
-                : `${leg.stops} stop${leg.stops > 1 ? "s" : ""}`;
-
-            // The operators actually flying this leg, not the whole itinerary, so a
-            // multi-city card does not repeat one airline's logo on every row.
-            const carriers = [...new Set(leg.segments.map((s) => s.carrier))];
-
-            return `
-              <div class="fr-route-row">
-                <div class="fr-route-logos">
-                  ${carriers.map((code) => airlineLogo(code)).join("")}
-                </div>
-                <div class="fr-route-line">
-                  <b>${escapeHtml(leg.origin.code)} → ${escapeHtml(
-                    leg.destination.code,
-                  )}</b>
-                  <small>${escapeHtml(leg.origin.city)} → ${escapeHtml(
-                    leg.destination.city,
-                  )}</small>
-                </div>
-                <div class="fr-route-time">
-                  <b>${escapeHtml(minutesToClock(leg.departAt))} – ${escapeHtml(
-                    minutesToClock(leg.arriveAt),
-                  )}${dayOffset(leg)}</b>
-                  <small>${escapeHtml(shortDate(leg.date))} · ${escapeHtml(
-                    formatDuration(leg.totalMin),
-                  )} · ${escapeHtml(stopText)}</small>
-                </div>
-              </div>`;
-          })
-          .join("")}
-      </div>
-      <small class="fr-route-foot">${totalLegs} journey leg${
-        totalLegs > 1 ? "s" : ""
-      } · ${itinerary.segments.length} flight segment${
-        itinerary.segments.length > 1 ? "s" : ""
-      } · ${escapeHtml(itinerary.cabin.label)}</small>`;
-  }
-
   function buildFeaturedCard(itinerary, selectedPackage) {
     const totalLegs = itinerary.legs.length;
     const expanded = state.featuredExpanded;
@@ -1045,106 +1113,80 @@
       ? "Hide itinerary &amp; fare details"
       : "Show itinerary &amp; fare details";
     const pillText = expanded ? "Details expanded" : "Details collapsed";
+    const activeTab = state.detailTab;
+
+    // One panel per tab. Only the active one is rendered visible, so the section
+    // a tab names is exactly the markup it had when every section was stacked.
+    const panel = (id, content) => `
+        <div class="fr-detail-panel" role="tabpanel" id="frPanel-${id}"
+             aria-labelledby="frTab-${id}" data-detail="${id}"${
+               activeTab === id ? "" : " hidden"
+             }>${content}</div>`;
 
     return `
       <article class="fr-card fr-card-featured${
         expanded ? "" : " collapsed"
       }" data-id="${escapeHtml(itinerary.id)}">
-        <div class="fr-card-top">
-          <div class="fr-card-top-left">
-            <span class="fr-badge fr-badge-green">Recommended</span>
-            <span class="fr-pill">${pillText}</span>
-            <h3>${escapeHtml(carrierNames(itinerary))}</h3>
-            ${buildFeaturedRouteRows(itinerary)}
-          </div>
-          <div class="fr-card-top-right">
-            <b>${money(
-              selectedPackage.price + itinerary.taxes + itinerary.serviceFee,
-            )}</b>
-            <small>${escapeHtml(paxLabel(state.search.passengers))} · all legs included</small>
-            <small>${money(itinerary.price)} fare · ${money(
-              itinerary.taxes,
-            )} taxes</small>
-            <a href="#" class="fr-fare-link">${escapeHtml(
-              selectedPackage.name,
-            )} fare</a>
-          </div>
+        <div class="fr-card-flags">
+          <span class="fr-badge fr-badge-green">Recommended</span>
+          <span class="fr-pill">${pillText}</span>
+          <small class="fr-card-flags-meta">${escapeHtml(
+            paxLabel(state.search.passengers),
+          )} · ${escapeHtml(selectedPackage.name)} · ${escapeHtml(
+            itinerary.cabin.label,
+          )}</small>
         </div>
 
-        <div class="fr-block">
-          <h4>Itinerary overview</h4>
-          <div class="fr-overview">${buildItineraryOverview(itinerary)}</div>
-          <p class="fr-disclaimer">Each journey leg connects two cities. A flight
-             segment is one aircraft flight. All times are local; +1 means
-             arrival on the next calendar day.</p>
+        ${buildCardTop(itinerary, selectedPackage, {
+          collapse: `<button type="button" class="fr-collapse-btn" data-collapse>
+              ${collapseLabel} <i class="bi bi-chevron-down"></i>
+            </button>`,
+        })}
+
+        <div class="fr-detail-tabs" role="tablist" aria-label="Flight details">
+          ${DETAIL_TABS.map(
+            (tab) => `
+            <button type="button" role="tab" class="fr-detail-tab${
+              tab.id === activeTab ? " active" : ""
+            }" id="frTab-${tab.id}" aria-controls="frPanel-${tab.id}"
+                    aria-selected="${tab.id === activeTab}"
+                    data-detail-tab="${tab.id}">${escapeHtml(tab.label)}</button>`,
+          ).join("")}
         </div>
 
+        ${panel(
+          "itinerary",
+          `
         <div class="fr-block">
           <div class="fr-block-head">
-            <h4>Flight itinerary</h4>
             <small>All journey legs expanded · local airport times</small>
           </div>
           ${itinerary.legs
             .map((leg) => buildJourneyLeg(leg, totalLegs))
             .join("")}
-        </div>
+        </div>`,
+        )}
 
-        ${buildFareSummary(itinerary, selectedPackage)}
-        ${buildPackages(itinerary, selectedPackage)}
-
-        <button type="button" class="fr-collapse-btn" data-collapse>
-          ${collapseLabel} <i class="bi bi-chevron-down"></i>
-        </button>
+        ${panel("fare", buildFareSummary(itinerary, selectedPackage))}
+        ${panel("package", buildPackages(itinerary, selectedPackage))}
       </article>`;
   }
 
-  function buildCompactCard(itinerary, tag) {
-    const totalLegs = itinerary.legs.length;
+  function buildCompactCard(itinerary, tag, selectedPackage) {
+    const packageForRow =
+      selectedPackage ||
+      itinerary.packages.find((pkg) => pkg.id === "standard") ||
+      itinerary.packages[1];
     return `
       <article class="fr-card fr-card-compact" data-id="${escapeHtml(itinerary.id)}">
-        <div class="fr-compact-left">
-          ${tag ? `<span class="fr-badge">${escapeHtml(tag)}</span>` : ""}
-          <h3>${escapeHtml(carrierNames(itinerary))}</h3>
-          <div class="fr-compact-legs">
-            ${itinerary.legs
-              .map((leg) => {
-                const stopText =
-                  leg.stops === 0
-                    ? "Nonstop"
-                    : `${leg.stops} stop${leg.stops > 1 ? "s" : ""}`;
-                const offset = Math.round(
-                  (leg.date - itinerary.legs[0].date) / 86400000,
-                );
-                const prefix =
-                  totalLegs > 1 && offset > 0
-                    ? `+${offset}d `
-                    : `${shortDate(leg.date)} · `;
-                return `<small>${escapeHtml(prefix)}${minutesToClock(
-                  leg.departAt,
-                )} ${escapeHtml(leg.origin.code)} → ${minutesToClock(
-                  leg.arriveAt,
-                )} ${escapeHtml(leg.destination.code)}${dayOffset(
-                  leg,
-                )} · ${formatDuration(leg.totalMin)} · ${escapeHtml(
-                  stopText,
-                )}</small>`;
-              })
-              .join("")}
-          </div>
-          <small class="fr-compact-meta">${escapeHtml(
-            itinerary.cabin.label,
-          )} · Cabin ${escapeHtml(
-            itinerary.cabin.cabinBag,
-          )} + checked ${escapeHtml(itinerary.cabin.checkedBag)}</small>
+        ${tag ? `<div class="fr-card-flags"><span class="fr-badge">${escapeHtml(tag)}</span></div>` : ""}
+
+        ${buildCardTop(itinerary, packageForRow)}
+
+        <div class="fr-compact-actions">
           <button type="button" class="fr-link-btn" data-expand="${escapeHtml(
             itinerary.id,
-          )}">Show itinerary &amp; fare details <i class="bi bi-chevron-down"></i></button>
-        </div>
-        <div class="fr-compact-right">
-          <b>${money(itinerary.price)}</b>
-          <small>${escapeHtml(
-            paxCount(state.search.passengers),
-          )} adult · total incl. taxes &amp; fee</small>
+          )}">Show details <i class="bi bi-chevron-down"></i></button>
           <button type="button" class="fr-select-btn" data-featured="${escapeHtml(
             itinerary.id,
           )}">Select itinerary <i class="bi bi-arrow-right"></i></button>
@@ -1352,6 +1394,7 @@
     state.featuredId = null;
     // A fresh search starts from the collapsed card again, as in the design.
     state.featuredExpanded = false;
+    state.detailTab = "itinerary";
 
     // Slider bounds come from the generated set
     const prices = state.itineraries.map((itinerary) => itinerary.price);
@@ -1384,6 +1427,26 @@
       return;
     }
 
+    // Switch the open card's detail section
+    const detailTab = target.closest("[data-detail-tab]");
+    if (detailTab) {
+      state.detailTab = detailTab.dataset.detailTab;
+      const featured = getEl("frList").querySelector(".fr-card-featured");
+      if (featured) {
+        // Swap the panel in place instead of re-rendering: a re-render would
+        // rebuild the card under the pointer and jump the scroll position.
+        featured.querySelectorAll("[data-detail-tab]").forEach((button) => {
+          const active = button.dataset.detailTab === state.detailTab;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+        });
+        featured.querySelectorAll(".fr-detail-panel").forEach((panel) => {
+          panel.hidden = panel.dataset.detail !== state.detailTab;
+        });
+      }
+      return;
+    }
+
     // Remove an active filter chip
     const chip = target.closest(".chip[data-chip]");
     if (chip) {
@@ -1412,6 +1475,13 @@
       return;
     }
 
+    const packageCard = target.closest("[data-package-card]");
+    if (packageCard && !target.closest("input, label")) {
+      const radio = packageCard.querySelector("input[type=radio]");
+      if (!radio.checked) radio.click();
+      return;
+    }
+
     // Collapse the featured card's details
     if (target.closest("[data-collapse]")) {
       const featured = getEl("frList").querySelector(".fr-card-featured");
@@ -1428,7 +1498,10 @@
             ? " Show itinerary & fare details "
             : " Hide itinerary & fare details ";
         }
-        if (pill) pill.textContent = collapsed ? "Details collapsed" : "Details expanded";
+        if (pill)
+          pill.textContent = collapsed
+            ? "Details collapsed"
+            : "Details expanded";
       }
       return;
     }
@@ -1455,6 +1528,20 @@
   });
 
   // Package radios are inside a label, so keep state in sync on change too
+  document.addEventListener("keydown", (event) => {
+    const packageCard = event.target.closest("[data-package-card]");
+    if (
+      !packageCard ||
+      event.target !== packageCard ||
+      (event.key !== "Enter" && event.key !== " ")
+    ) {
+      return;
+    }
+    event.preventDefault();
+    const radio = packageCard.querySelector("input[type=radio]");
+    if (!radio.checked) radio.click();
+  });
+
   document.addEventListener("change", (event) => {
     if (event.target.name === "frPackage") {
       state.packageId = event.target.value;

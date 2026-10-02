@@ -95,8 +95,13 @@
 
   window.setTripType = function (type, button) {
     selectedTripType = type;
+    // The form buttons are driven from the results tabs too, which pass only a
+    // type, so fall back to whichever button carries that type.
+    const target =
+      button ||
+      document.querySelector(`.trip-type-btn[data-type="${type}"]`);
     document.querySelectorAll(".trip-type-btn").forEach((item) => {
-      item.classList.toggle("active", item === button);
+      item.classList.toggle("active", item === target);
     });
     const returnColumn = getElement("returnCol");
     if (returnColumn)
@@ -110,13 +115,11 @@
     }
     closeDropdowns();
 
-    // Keep the results tabs in step and re-run with whatever is filled in
+    // Keep the results tabs in step. The search itself is not re-run here: it
+    // waits for the traveller to press Search, which uses selectedTripType.
     document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.dataset.trip === type);
     });
-    if (runSearch(type, true)) {
-      getElement("frResults")?.scrollIntoView({ behavior: "smooth" });
-    }
   };
 
   window.toggleCabinMenu = function () {
@@ -293,11 +296,14 @@
     if (retDate && !retDate.value) retDate.value = isoDateIn(21);
   }
 
+  // Switching trip type only re-marks the tabs and the search form. Results are
+  // left exactly as they were until Search is pressed, so the traveller can pick
+  // a different trip type without the list changing underneath them.
   window.setResultsTripType = function (tripType) {
     document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.dataset.trip === tripType);
     });
-    runSearch(tripType, true);
+    window.setTripType(tripType);
   };
 
   function runSearch(tripType, silent) {
