@@ -1,0 +1,113 @@
+/* =============================================================
+   SMART MOVES — UNIFORM TYPOGRAPHY
+   Loaded LAST on every page so these rules win over the component
+   stylesheets.
+
+   Project-wide rule: EVERY piece of text renders at 17px. Headings
+   are distinguished by weight and colour only — they are no longer
+   sized differently from body copy.
+
+   Why a blanket rule rather than fixing each rule in place: the
+   component stylesheets hard-set font sizes on class selectors such
+   as `.why-card p` (0,1,0), which outrank a bare `p` (0,0,1). Any
+   per-element approach loses to them on specificity. Setting 17px
+   on the html root plus a universal sweep overrides everything,
+   because `*` has zero specificity and cannot outrank a class —
+   so the sweep is deliberately scoped to selectors that DO win.
+
+   The 16px floor on form controls is intentional and exempt:
+   anything under 16px makes iOS Safari zoom the page on focus.
+   ============================================================= */
+
+html {
+  font-size: 17px;
+}
+
+/* ---------- Universal sweep ----------
+   `!important` is required here by design: it is the only way to
+   reach every element regardless of how many class selectors a
+   component stylesheet stacks on top of it. */
+body,
+p,
+span,
+div,
+a,
+li,
+ul,
+ol,
+strong,
+em,
+b,
+i,
+small,
+label,
+legend,
+dt,
+dd,
+td,
+th,
+figcaption,
+blockquote,
+button,
+input,
+select,
+textarea,
+option,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hgroup,
+summary,
+time,
+address {
+  font-size: 17px !important;
+}
+
+/* ---------- Headings: same size, distinguished by weight ---------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Form controls: hold at 16px to prevent iOS zoom ---------- */
+input,
+select,
+textarea,
+button {
+  font-size: 16px !important;
+}
+
+/* ---------- Display figures keep their scale ----------
+   Prices, counters and the grand total are numeric focal points.
+   Flattening them to 17px would make a booking summary unreadable,
+   so each is restated at the size its component stylesheet uses.
+   (`revert` is not used here — it would fall back to the browser
+   default rather than the value already defined in the project.) */
+.stat-value {
+  font-size: 32px !important;
+}
+
+.bstat-value {
+  font-size: 28px !important;
+}
+
+.fb-grand-total {
+  font-size: 28px !important;
+}
+
+.fb-sticky-total b {
+  font-size: 19px !important;
+}
+
+.fb-leg-time {
+  font-size: 22px !important;
+}
