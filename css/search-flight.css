@@ -479,6 +479,7 @@ small {
   padding: 20px;
   background: #fff;
   border-radius: 0 0 18px 18px;
+  width: 100vw;
 }
 .search-panel {
   display: none;
