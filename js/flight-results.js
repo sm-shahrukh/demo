@@ -103,6 +103,7 @@
     return date.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
+      year: "numeric",
       timeZone: "UTC",
     });
   }
@@ -546,11 +547,17 @@
 
         <div class="fr-row-main">
           <div class="fr-row-times">
-            <b class="fr-row-time">${escapeHtml(minutesToClock(leg.departAt))}</b>
+            <div class="fr-row-time-group">
+              <b class="fr-row-time">${escapeHtml(minutesToClock(leg.departAt))}</b>
+              <small class="fr-row-date">Departs ${escapeHtml(shortDate(leg.date))}</small>
+            </div>
             <span class="fr-row-duration">${escapeHtml(
               formatDuration(leg.totalMin),
             )}</span>
-            <b class="fr-row-time">${escapeHtml(minutesToClock(leg.arriveAt))}</b>
+            <div class="fr-row-time-group fr-row-time-arrival">
+              <b class="fr-row-time">${escapeHtml(minutesToClock(leg.arriveAt))}</b>
+              <small class="fr-row-date">Arrives ${escapeHtml(shortDate(leg.arrivalDate))}</small>
+            </div>
           </div>
           <div class="fr-row-route">
             <span>${escapeHtml(leg.origin.city)} (${escapeHtml(
@@ -1207,7 +1214,21 @@
       return;
     }
 
-    // Book buttons
+    // Continue to the traveller-details page for the selected itinerary.
+    const continueButton = target.closest(".fr-continue-btn");
+    if (continueButton) {
+      const itinerary = state.itineraries.find(
+        (item) => item.id === continueButton.dataset.book,
+      );
+      if (!itinerary) return;
+      const departure = FlightData.toISODate(itinerary.legs[0].date);
+      window.location.href = `/flight-booking.html?departure=${encodeURIComponent(
+        departure,
+      )}`;
+      return;
+    }
+
+    // Other book buttons show the selected itinerary notice.
     if (target.closest("[data-book]")) {
       event.preventDefault();
       const itinerary = state.itineraries.find(

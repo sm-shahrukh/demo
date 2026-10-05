@@ -1,8 +1,4 @@
-/* =============================================================
-   SMART MOVES — FINAL FLIGHT BOOKING PAGE
-   Renders the itinerary, traveller accordions and live fare summary,
-   then validates everything before handing off to the review step.
-   ============================================================= */
+
 
 (function () {
   "use strict";
@@ -57,6 +53,61 @@
       },
     ],
   };
+
+  function selectedDepartureDateLabel() {
+    var departure = new URLSearchParams(window.location.search).get("departure");
+    if (departure === null) return null;
+
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(departure);
+    if (!match) {
+      console.error("Ignoring invalid flight departure date in booking URL.");
+      return null;
+    }
+
+    var date = new Date(Date.UTC(
+      Number(match[1]),
+      Number(match[2]) - 1,
+      Number(match[3])
+    ));
+    if (
+      date.getUTCFullYear() !== Number(match[1]) ||
+      date.getUTCMonth() !== Number(match[2]) - 1 ||
+      date.getUTCDate() !== Number(match[3])
+    ) {
+      console.error("Ignoring invalid flight departure date in booking URL.");
+      return null;
+    }
+
+    return date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  }
+
+  FLIGHT.dateLabel = selectedDepartureDateLabel() || FLIGHT.dateLabel;
+
+  /* The travel date, kept as a real Date so the calendar, the age check and
+     the passport-validity check all measure against the same day. Falls back
+     to the default 16 Nov 2026 when the URL has no usable departure date. */
+  var FLIGHT_DATE = (function () {
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(
+      new URLSearchParams(window.location.search).get("departure") || ""
+    );
+    if (!match) return new Date(2026, 10, 16);
+
+    var d = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    if (d.getMonth() !== Number(match[2]) - 1 || d.getDate() !== Number(match[3])) {
+      return new Date(2026, 10, 16);
+    }
+    return d;
+  })();
+
+  var FLIGHT_DATE_ISO = FLIGHT_DATE.getFullYear() + "-" +
+    ("0" + (FLIGHT_DATE.getMonth() + 1)).slice(-2) + "-" +
+    ("0" + FLIGHT_DATE.getDate()).slice(-2);
 
   /* Per-traveller-type pricing. Child fares carry a discount off the
      adult base; infants are a flat seat-occupancy fee. */
@@ -160,14 +211,16 @@
           '<div class="fb-leg-route">' +
           '<div class="fb-leg-end">' +
           '<div class="fb-leg-time">' + esc(leg.depart) + "</div>" +
+          '<div class="fb-leg-date">Departs ' + esc(FLIGHT.dateLabel) + "</div>" +
           '<div class="fb-leg-airport">' + esc(leg.from.code) + "</div>" +
           '<div class="fb-leg-city">' + esc(leg.from.city) + "</div>" +
           "</div>" +
           '<div class="fb-leg-mid">' +
-          '<div class="fb-leg-line"><i></i><span class="fb-leg-plane">✈</span><i></i></div>' +
+          '<div class="fb-leg-line"><i></i><span class="fb-leg-plane" >✈</span><i></i></div>' +
           "</div>" +
           '<div class="fb-leg-end right">' +
           '<div class="fb-leg-time">' + esc(leg.arrive) + "</div>" +
+          '<div class="fb-leg-date">Arrives ' + esc(FLIGHT.dateLabel) + "</div>" +
           '<div class="fb-leg-airport">' + esc(leg.to.code) + "</div>" +
           '<div class="fb-leg-city">' + esc(leg.to.city) + "</div>" +
           "</div>" +
@@ -248,12 +301,40 @@
           options(cfg.values || [], cfg.value || "") +
           "</select>"
         : cfg.type === "date"
-        ? '<div class="fb-date">' +
+        ? '<div class="fb-date" data-max="' + esc(cfg.max || "") + '"' +
+          (cfg.minYear ? ' data-min-year="' + cfg.minYear + '"' : "") + ">" +
           '<input class="fb-input" type="text" id="' + cfg.id + '" name="' + cfg.name + '"' +
           ' placeholder="DD / MM / YYYY" inputmode="numeric" autocomplete="off"' +
           (cfg.required ? " required" : "") +
           (cfg.readonly ? ' readonly tabindex="-1"' : "") + " />" +
-          ICON_CAL +
+          '<button type="button" class="fb-date-btn" aria-label="Open date picker"' +
+          ' tabindex="-1" aria-expanded="false">' + ICON_CAL +
+          "</button>" +
+          '<div class="fb-cal" role="dialog" aria-label="Choose a date" hidden>' +
+          '<div class="fb-cal-head">' +
+          '<button type="button" class="fb-cal-nav" data-cal="prev" aria-label="Previous month">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<polyline points="15 18 9 12 15 6"/></svg></button>' +
+          '<div class="fb-cal-picks">' +
+          '<select class="fb-cal-month" aria-label="Month"></select>' +
+          '<select class="fb-cal-year" aria-label="Year"></select>' +
+          "</div>" +
+          '<button type="button" class="fb-cal-nav" data-cal="next" aria-label="Next month">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<polyline points="9 18 15 12 9 6"/></svg></button>' +
+          "</div>" +
+          '<div class="fb-cal-dows" aria-hidden="true">' +
+          ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+            .map(function (d) {
+              return "<span>" + d + "</span>";
+            })
+            .join("") +
+          "</div>" +
+          '<div class="fb-cal-grid" role="grid"></div>' +
+          '<div class="fb-cal-foot">' +
+          '<button type="button" class="fb-cal-clear" data-cal="clear">Clear</button>' +
+          "</div>" +
+          "</div>" +
           "</div>"
         : '<input class="fb-input" type="' + (cfg.type || "text") + '" id="' + cfg.id +
           '" name="' + cfg.name + '" placeholder="' + esc(cfg.placeholder || "") + '"' +
@@ -274,7 +355,7 @@
       fieldHtml({ id: p + "Given", name: "given", label: "Given names", required: true, placeholder: "First and middle names" }),
       fieldHtml({ id: p + "Surname", name: "surname", label: "Surname", required: true, placeholder: "Family name" }),
       fieldHtml({ id: p + "Nationality", name: "nationality", label: "Nationality", required: true, type: "select", values: COUNTRIES }),
-      fieldHtml({ id: p + "Dob", name: "dob", label: "Date of birth", required: true, type: "date" }),
+      fieldHtml({ id: p + "Dob", name: "dob", label: "Date of birth", required: true, type: "date", max: FLIGHT_DATE_ISO, minYear: 1900 }),
     ].join("");
 
     var guardian = t.needsGuardian
@@ -301,7 +382,7 @@
         values: ["Passport", "National ID", "Travel document"],
       }),
       fieldHtml({ id: p + "DocNo", name: "docno", label: "Document number", required: true, placeholder: "Passport or ID number" }),
-      fieldHtml({ id: p + "DocExp", name: "docexp", label: "Document expiry date", required: true, type: "date" }),
+      fieldHtml({ id: p + "DocExp", name: "docexp", label: "Document expiry date", required: true, type: "date", minYear: FLIGHT_DATE.getFullYear() }),
     ].join("");
 
     var prefs = [
@@ -396,6 +477,235 @@
   }
 
   /* =============================================================
+     Date picker
+     A month grid driven by the input's value. Closes on outside click
+     and Escape; the typed mask keeps working so both paths agree.
+     ============================================================= */
+  var MONTHS = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  var openCalendar = null;
+
+  function today() {
+    var d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  /* Parse the field into a Date, or null when the value is not a real date. */
+  function readDate(input) {
+    var m = DATE_RE.exec((input.value || "").trim());
+    if (!m) return null;
+    var d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    if (d.getMonth() !== Number(m[2]) - 1 || d.getDate() !== Number(m[1])) return null;
+    return d;
+  }
+
+  function writeDate(input, d) {
+    input.value =
+      ("0" + d.getDate()).slice(-2) + " / " +
+      ("0" + (d.getMonth() + 1)).slice(-2) + " / " + d.getFullYear();
+  }
+
+  /* Shared rules for what a given date field may hold. */
+  function dateLimits(wrap) {
+    var maxRaw = wrap.getAttribute("data-max");
+    var max = /^\d{4}-\d{2}-\d{2}$/.test(maxRaw || "")
+      ? (function () {
+          var p = maxRaw.split("-");
+          return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        })()
+      : null;
+    var minYear = Number(wrap.getAttribute("data-min-year")) || 1900;
+    var min = max ? new Date(minYear, max.getMonth(), max.getDate()) : new Date(minYear, 0, 1);
+    return { min: min, max: max, minYear: minYear, hasMax: !!max };
+  }
+
+  /* The month/year dropdowns are how a user jumps across decades, so they
+     span every year the field accepts rather than only the visible month. */
+  function syncCalPicks(wrap, cursor, limits) {
+    var monthSel = wrap.querySelector(".fb-cal-month");
+    var yearSel = wrap.querySelector(".fb-cal-year");
+    if (!monthSel || !yearSel) return;
+
+    var firstYear = limits.min.getFullYear();
+    var lastYear = limits.hasMax
+      ? limits.max.getFullYear()
+      : Math.max(today().getFullYear() + 15, firstYear);
+
+    if (!monthSel.options.length) {
+      monthSel.innerHTML = MONTHS.map(function (name, index) {
+        return '<option value="' + index + '">' + name.slice(0, 3) + "</option>";
+      }).join("");
+    }
+    if (yearSel.options.length !== lastYear - firstYear + 1) {
+      var years = [];
+      for (var y = firstYear; y <= lastYear; y++) years.push(y);
+      yearSel.innerHTML = years
+        .map(function (y) {
+          return '<option value="' + y + '">' + y + "</option>";
+        })
+        .join("");
+    }
+
+    monthSel.value = String(cursor.getMonth());
+    yearSel.value = String(cursor.getFullYear());
+  }
+
+  function paintCalendar(wrap) {
+    var input = wrap.querySelector("input");
+    var grid = wrap.querySelector(".fb-cal-grid");
+    var cal = wrap.querySelector(".fb-cal");
+    var limits = dateLimits(wrap);
+
+    var selected = readDate(input);
+    var cursor;
+    if (selected) {
+      cursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
+    } else if (cal.dataset.y !== undefined) {
+      cursor = new Date(Number(cal.dataset.y), Number(cal.dataset.m), 1);
+    } else {
+      /* No value yet: for a DOB show the month before travel, otherwise today. */
+      var base = limits.hasMax ? new Date(limits.max.getFullYear(), limits.max.getMonth(), 1) : today();
+      cursor = new Date(base.getFullYear(), base.getMonth(), 1);
+    }
+
+    /* Keep navigation inside the years the field actually accepts. */
+    if (cursor.getFullYear() < limits.minYear) {
+      cursor = new Date(limits.minYear, 0, 1);
+    }
+    if (limits.hasMax && cursor.getFullYear() > limits.max.getFullYear()) {
+      cursor = new Date(limits.max.getFullYear(), limits.max.getMonth(), 1);
+    }
+    if (limits.hasMax && cursor.getFullYear() === limits.max.getFullYear() &&
+        cursor.getMonth() > limits.max.getMonth()) {
+      cursor = new Date(limits.max.getFullYear(), limits.max.getMonth(), 1);
+    }
+
+    cal.dataset.y = String(cursor.getFullYear());
+    cal.dataset.m = String(cursor.getMonth());
+    syncCalPicks(wrap, cursor, limits);
+
+    /* Monday-first grid, padded with the neighbouring months' days. */
+    var first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+    var lead = (first.getDay() + 6) % 7;
+    var start = new Date(first);
+    start.setDate(1 - lead);
+
+    var cells = [];
+    for (var i = 0; i < 42; i++) {
+      var day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      var outside = day.getMonth() !== cursor.getMonth();
+
+      var disabled = day < limits.min;
+      if (limits.hasMax && day > limits.max) disabled = true;
+
+      var classes = ["fb-cal-day"];
+      if (outside) classes.push("outside");
+      if (selected &&
+          day.getFullYear() === selected.getFullYear() &&
+          day.getMonth() === selected.getMonth() &&
+          day.getDate() === selected.getDate()) {
+        classes.push("selected");
+      }
+      if (today().getTime() === day.getTime() && !outside) classes.push("today");
+
+      cells.push(
+        '<button type="button" class="' + classes.join(" ") + '" role="gridcell"' +
+        ' data-d="' + day.getDate() + '"' +
+        ' data-m="' + (day.getMonth() + 1) + '"' +
+        ' data-y="' + day.getFullYear() + '"' +
+        ' aria-label="' + day.getDate() + " " + MONTHS[day.getMonth()] + " " + day.getFullYear() + '"' +
+        (selected && classes.indexOf("selected") > -1 ? ' aria-selected="true"' : "") +
+        (disabled ? " disabled" : "") + ">" + day.getDate() + "</button>"
+      );
+      /* Stop after a full final week so short months do not render a dead row. */
+      if (!outside && day.getDay() === 0 && i >= 27) break;
+    }
+
+    grid.innerHTML = cells.join("");
+
+    var atMin = cursor.getFullYear() === limits.min.getFullYear() &&
+      cursor.getMonth() === limits.min.getMonth();
+    var atMax = limits.hasMax &&
+      cursor.getFullYear() === limits.max.getFullYear() &&
+      cursor.getMonth() === limits.max.getMonth();
+
+    wrap.querySelector('[data-cal="prev"]').disabled = atMin;
+    wrap.querySelector('[data-cal="next"]').disabled = atMax;
+  }
+
+  /* The popup is position:fixed, so it needs real coordinates. Prefer the space
+     below the field, flip above when that is too tight, and keep it inside
+     the viewport horizontally. */
+  function placeCalendar(wrap) {
+    var cal = wrap.querySelector(".fb-cal");
+    if (!cal) return;
+
+    var anchor = wrap.getBoundingClientRect();
+    var gap = 6;
+    var height = cal.offsetHeight;
+    var width = cal.offsetWidth;
+    var vh = window.innerHeight;
+    var vw = window.innerWidth;
+
+    var below = vh - anchor.bottom - gap;
+    var above = anchor.top - gap;
+    var flip = height > below && above > below;
+
+    var top = flip ? anchor.top - height - gap : anchor.bottom + gap;
+    /* If neither side fully fits, pin it to whichever edge has more room. */
+    if (height > below && height > above) {
+      top = Math.max(gap, Math.min(anchor.bottom + gap, vh - height - gap));
+    }
+
+    var left = anchor.left;
+    if (left + width > vw - gap) left = vw - width - gap;
+    if (left < gap) left = gap;
+
+    cal.style.top = Math.round(Math.max(gap, top)) + "px";
+    cal.style.left = Math.round(left) + "px";
+  }
+
+  function closeCalendar() {
+    if (!openCalendar) return;
+    var wrap = openCalendar;
+    var cal = wrap.querySelector(".fb-cal");
+    var btn = wrap.querySelector(".fb-date-btn");
+    cal.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+    wrap.classList.remove("open");
+    openCalendar = null;
+  }
+
+  function openCalFor(wrap) {
+    if (openCalendar && openCalendar !== wrap) closeCalendar();
+    if (openCalendar === wrap) return;
+
+    openCalendar = wrap;
+    var cal = wrap.querySelector(".fb-cal");
+    cal.hidden = false;
+    cal.removeAttribute("data-y");
+    cal.removeAttribute("data-m");
+    var btn = wrap.querySelector(".fb-date-btn");
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    wrap.classList.add("open");
+    paintCalendar(wrap);
+    placeCalendar(wrap);
+
+    var day = cal.querySelector(".fb-cal-day.selected") ||
+      cal.querySelector(".fb-cal-day:not(.outside):not([disabled])");
+    if (day) day.focus();
+  }
+
+  function closeAndSettle(input) {
+    var card = input.closest(".fb-pax");
+    var ok = validateInput(input);
+    if (card) updateTravellerState(card);
+    return ok;
+  }
+
+  /* =============================================================
      Validation
      ============================================================= */
   var NAME_RE = /^[A-Za-z][A-Za-z\s'.-]*$/;
@@ -432,7 +742,7 @@
     if (month < 1 || month > 12 || day < 1 || day > 31) return null;
     var dob = new Date(year, month - 1, day);
     if (dob.getMonth() !== month - 1 || dob.getDate() !== day) return null;
-    var flightDate = new Date(2026, 10, 16); // Mon 16 Nov 2026
+    var flightDate = FLIGHT_DATE;
     var age = flightDate.getFullYear() - year;
     if (
       flightDate.getMonth() < month - 1 ||
@@ -469,7 +779,7 @@
       }
       var m = DATE_RE.exec(value);
       var exp = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
-      var flight = new Date(2026, 10, 16);
+      var flight = FLIGHT_DATE;
       var monthsLeft =
         (exp.getFullYear() - flight.getFullYear()) * 12 +
         (exp.getMonth() - flight.getMonth());
@@ -501,10 +811,17 @@
     return clearError(input);
   }
 
+  /* Calendar controls live inside the traveller card but are not part of the
+     form, so every selector that walks the fields has to step over them. */
+  function isFormField(el) {
+    return !el.closest(".fb-cal");
+  }
+
   function validateTraveller(card) {
     var ok = true;
     card.querySelectorAll(".fb-pax-body input, .fb-pax-body select").forEach(
       function (input) {
+        if (!isFormField(input)) return;
         if (!input.required && !input.value.trim()) {
           clearError(input);
           return;
@@ -689,6 +1006,12 @@
     var sentinel = document.getElementById("fbContinue");
     new IntersectionObserver(
       function (entries) {
+        /* The review screen hides the form, so the sentinel reports
+           "not intersecting" there; the bar must stay down regardless. */
+        if (review && review.classList.contains("show")) {
+          stickyBar.classList.remove("show");
+          return;
+        }
         entries.forEach(function (entry) {
           /* Hide the sticky bar while the real button is on screen */
           stickyBar.classList.toggle("show", !entry.isIntersecting);
@@ -719,6 +1042,11 @@
     var input = e.target;
     if (!input.matches('input[name="dob"], input[name="docexp"]')) return;
 
+    /* Remember where the caret sat, measured in digits, so the added
+       separators do not drag it out of position. */
+    var before = input.value.slice(0, input.selectionStart || 0);
+    var caretDigits = before.replace(/\D/g, "").length;
+
     var digits = input.value.replace(/\D/g, "").slice(0, 8);
     var out = digits;
     if (digits.length > 4) {
@@ -727,6 +1055,159 @@
       out = digits.slice(0, 2) + " / " + digits.slice(2);
     }
     input.value = out;
+
+    /* Put the caret after the same digit it was on. */
+    var seen = 0;
+    var pos = out.length;
+    for (var i = 0; i < out.length; i++) {
+      if (/\d/.test(out[i])) {
+        seen += 1;
+        if (seen > caretDigits) {
+          pos = i;
+          break;
+        }
+      }
+    }
+    input.setSelectionRange(pos, pos);
+
+    /* Refresh the grid so it tracks what is being typed. */
+    if (openCalendar === input.closest(".fb-date")) paintCalendar(openCalendar);
+  });
+
+  /* Enter in a date field commits the value and closes the grid. */
+  paxHost.addEventListener("keydown", function (e) {
+    var input = e.target;
+    if (!input.matches('input[name="dob"], input[name="docexp"]')) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      closeAndSettle(input);
+      closeCalendar();
+    }
+  });
+
+  /* ---------------- Calendar: open, navigate, pick ---------------- */
+  paxHost.addEventListener("change", function (e) {
+    var pick = e.target.closest(".fb-cal-month, .fb-cal-year");
+    if (!pick) return;
+    var wrap = pick.closest(".fb-date");
+    var cal = wrap.querySelector(".fb-cal");
+    var year = pick.classList.contains("fb-cal-year")
+      ? Number(pick.value)
+      : Number(cal.dataset.y);
+    var month = pick.classList.contains("fb-cal-month")
+      ? Number(pick.value)
+      : Number(cal.dataset.m);
+    cal.dataset.y = String(year);
+    cal.dataset.m = String(month);
+    paintCalendar(wrap);
+    placeCalendar(wrap);
+  });
+
+  paxHost.addEventListener("click", function (e) {
+    var btn = e.target.closest(".fb-date-btn");
+    if (btn) {
+      var wrap = btn.closest(".fb-date");
+      if (openCalendar === wrap) {
+        closeCalendar();
+      } else {
+        openCalFor(wrap);
+      }
+      return;
+    }
+
+    var nav = e.target.closest(".fb-cal-nav");
+    if (nav) {
+      var navWrap = nav.closest(".fb-date");
+      var cal = navWrap.querySelector(".fb-cal");
+      var y = Number(cal.dataset.y);
+      var m = Number(cal.dataset.m) + (nav.dataset.cal === "next" ? 1 : -1);
+      var shifted = new Date(y, m, 1);
+      cal.dataset.y = String(shifted.getFullYear());
+      cal.dataset.m = String(shifted.getMonth());
+      paintCalendar(navWrap);
+      placeCalendar(navWrap);
+      /* Keep focus inside the grid after the month rolls over. */
+      var landed = navWrap.querySelector(
+        '[data-cal="' + nav.dataset.cal + '"]:not([disabled])'
+      ) || nav;
+      landed.focus();
+      return;
+    }
+
+    var clear = e.target.closest('[data-cal="clear"]');
+    if (clear) {
+      var clearWrap = clear.closest(".fb-date");
+      var clearInput = clearWrap.querySelector("input");
+      clearInput.value = "";
+      clearError(clearInput);
+      updateTravellerState(clearInput.closest(".fb-pax"));
+      paintCalendar(clearWrap);
+      clearInput.focus();
+      return;
+    }
+
+    var day = e.target.closest(".fb-cal-day");
+    if (day && !day.disabled) {
+      var dayWrap = day.closest(".fb-date");
+      var dayInput = dayWrap.querySelector("input");
+      writeDate(
+        dayInput,
+        new Date(Number(day.dataset.y), Number(day.dataset.m) - 1, Number(day.dataset.d))
+      );
+      closeCalendar();
+      dayInput.focus();
+      closeAndSettle(dayInput);
+    }
+  });
+
+  /* Arrow keys page through the grid when a day has focus. */
+  paxHost.addEventListener("keydown", function (e) {
+    var day = e.target.closest(".fb-cal-day");
+    if (!day) return;
+
+    var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+    if (step === undefined) {
+      if (e.key === "Escape") {
+        var owner = openCalendar && openCalendar.querySelector("input");
+        closeCalendar();
+        if (owner) owner.focus();
+      }
+      return;
+    }
+
+    e.preventDefault();
+    var grid = day.parentElement;
+    var all = Array.prototype.slice.call(grid.querySelectorAll(".fb-cal-day"));
+    var index = all.indexOf(day);
+    var next = all[index + step];
+    if (next && !next.disabled) {
+      next.focus();
+    }
+  });
+
+  /* Close on outside click and on Escape. */
+  document.addEventListener("click", function (e) {
+    if (openCalendar && !openCalendar.contains(e.target)) closeCalendar();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && openCalendar) {
+      closeCalendar();
+    }
+  });
+
+  /* A collapsed accordion must not leave its calendar hanging open. */
+  paxHost.addEventListener("click", function (e) {
+    var head = e.target.closest(".fb-pax-head");
+    if (!head) return;
+    var closing = head.parentElement.classList.contains("open");
+    if (closing && openCalendar && head.parentElement.contains(openCalendar)) {
+      closeCalendar();
+    }
+  });
+
+  /* Scroll or resize can strand the popup; close rather than misplace it. */
+  window.addEventListener("resize", function () {
+    if (openCalendar) closeCalendar();
   });
 
   /* ---------------- Copy a saved traveller ---------------- */
@@ -770,6 +1251,7 @@
   function onFieldEvent(e) {
     var input = e.target;
     if (!input.matches("input, select")) return;
+    if (!isFormField(input)) return;
 
     if (input.matches(".fb-pax-body input, .fb-pax-body select")) {
       if (input.classList.contains("is-invalid") || e.type === "blur") {
@@ -821,8 +1303,6 @@
   });
 
   /* ---------------- Confirm ---------------- */
-  var confirmed = document.getElementById("fbConfirmBox");
-
   function collectTravellers() {
     return TRAVELLERS.map(function (t) {
       var card = document.getElementById("pax" + t.id);
@@ -856,21 +1336,153 @@
     });
   }
 
-  function showReview(list, fare) {
-    var names = list
-      .map(function (p) {
-        return p.fullName || p.label;
+  /* ---------------- Review & pay ---------------- */
+  var review = document.getElementById("fbReview");
+  var reviewBody = document.getElementById("fbReviewBody");
+  var reviewTotal = document.getElementById("fbReviewTotal");
+  var reviewTerms = document.getElementById("fbReviewTerms");
+  var payNow = document.getElementById("fbPayNow");
+
+  /* One line per traveller, grouped so a mismatch is easy to spot. */
+  function reviewTravellerHtml(p) {
+    var ageLine = p.age === null ? "" : " · " + p.age + " yrs";
+    return (
+      '<div class="fb-rev-pax">' +
+      '<div class="fb-rev-pax-head">' +
+      '<span class="fb-rev-avatar">' + p.id + "</span>" +
+      "<div>" +
+      '<div class="fb-rev-name">' + esc(p.fullName || p.label) + "</div>" +
+      '<div class="fb-rev-sub">' + esc(p.type) + esc(ageLine) + "</div>" +
+      "</div>" +
+      '<button type="button" class="fb-rev-edit" data-edit-pax="' + p.id + '">Edit</button>' +
+      "</div>" +
+      '<dl class="fb-rev-grid">' +
+      row("Date of birth", p.dob || "—") +
+      row("Gender", p.gender || "—") +
+      row("Nationality", p.nationality || "—") +
+      row("Travel document", p.docType || "—") +
+      row("Document number", p.docNo || "—") +
+      row("Document expiry", p.docExp || "—") +
+      (p.guardian ? row("Accompanying adult", p.guardian) : "") +
+      (p.meal && p.meal.indexOf("Select") !== 0 ? row("Meal preference", p.meal) : "") +
+      "</dl>" +
+      "</div>"
+    );
+  }
+
+  function row(label, value) {
+    return (
+      "<div><dt>" + esc(label) + "</dt><dd>" + esc(value) + "</dd></div>"
+    );
+  }
+
+  function reviewItineraryHtml() {
+    var legs = FLIGHT.legs
+      .map(function (leg, index) {
+        return (
+          '<div class="fb-rev-leg">' +
+          '<div class="fb-rev-leg-no">' + (index + 1) + "</div>" +
+          "<div>" +
+          '<div class="fb-rev-leg-route">' +
+          esc(leg.from.code) + " → " + esc(leg.to.code) +
+          "</div>" +
+          '<div class="fb-rev-leg-sub">' +
+          esc(leg.from.city) + " → " + esc(leg.to.city) + " · " +
+          esc(leg.depart) + " – " + esc(leg.arrive) +
+          "</div>" +
+          '<div class="fb-rev-leg-sub">' +
+          esc(leg.flightNo) + " · " + esc(leg.airline) +
+          (leg.layover ? " · " + esc(leg.badge) : "") +
+          "</div>" +
+          "</div>" +
+          "</div>"
+        );
       })
-      .join(" · ");
+      .join("");
 
-    document.getElementById("fbDoneChip").innerHTML =
-      "<span>" + esc(names) + "</span><b>" + esc(money(fare.grand)) + "</b>";
-    document.getElementById("fbDoneText").textContent =
-      list.length + " traveller" + (list.length === 1 ? "" : "s") +
-      " ready to review. Next you'll confirm the itinerary and fare before payment.";
+    return (
+      '<section class="fb-card">' +
+      '<div class="fb-card-head">' +
+      '<h2 class="fb-card-title">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>' +
+      "</svg>" +
+      "Your itinerary" +
+      "</h2>" +
+      '<span class="fb-link">' + esc(FLIGHT.tripType) + " · " + esc(FLIGHT.cabin) + "</span>" +
+      "</div>" +
+      '<div class="fb-card-body">' +
+      '<div class="fb-rev-route">' +
+      FLIGHT.legs
+        .map(function (leg) {
+          return esc(leg.from.code);
+        })
+        .concat([esc(FLIGHT.legs[FLIGHT.legs.length - 1].to.code)])
+        .join(' <span aria-hidden="true">→</span> ') +
+      "</div>" +
+      '<p class="fb-rev-when">' + esc(FLIGHT.dateLabel) + " · " +
+      esc(FLIGHT.totalDuration) + " total</p>" +
+      legs +
+      "</div>" +
+      "</section>"
+    );
+  }
 
+  function renderReview(list, fare) {
+    var email = document.getElementById("fbEmail").value.trim();
+
+    reviewBody.innerHTML =
+      '<section class="fb-card">' +
+      '<div class="fb-card-head">' +
+      '<h2 class="fb-card-title">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>' +
+      '<circle cx="9" cy="7" r="4"/>' +
+      '<path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>' +
+      "</svg>" +
+      "Traveller details" +
+      "</h2>" +
+      '<button type="button" class="fb-link" id="fbEditAll">Edit all</button>' +
+      "</div>" +
+      '<div class="fb-card-body">' +
+      '<div class="fb-rev-pax-list">' +
+      list.map(reviewTravellerHtml).join("") +
+      "</div>" +
+      '<div class="fb-rev-contact">' +
+      row("Email", email || "—") +
+      row("Mobile", (document.getElementById("fbPhoneCode").value + " " +
+        document.getElementById("fbPhone").value.trim()).trim() || "—") +
+      "</div>" +
+      "</div>" +
+      "</section>" +
+      reviewItineraryHtml();
+
+    reviewTotal.innerHTML =
+      '<div class="fb-grand">' +
+      '<div class="fb-grand-total">' + money(fare.grand) + "</div>" +
+      '<div class="fb-grand-note">' + fare.totalTravellers +
+      " travellers · taxes and fees included</div>" +
+      "</div>";
+
+    var editAll = document.getElementById("fbEditAll");
+    if (editAll) editAll.addEventListener("click", backToForm);
+  }
+
+  function showReview(list, fare) {
+    closeCalendar();
+    renderReview(list, fare);
     app.style.display = "none";
-    confirmed.classList.add("show");
+    review.classList.add("show");
+    /* The sticky bar belongs to the form step; leaving it up would put a
+       second "Confirm and review" over the review screen. */
+    if (stickyBar) stickyBar.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function backToForm() {
+    closeCalendar();
+    review.classList.remove("show");
+    app.style.display = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -940,12 +1552,135 @@
     });
   }
 
-  /* ---------------- Back from the review state ---------------- */
-  var editBtn = document.getElementById("fbEditAgain");
-  if (editBtn) {
-    editBtn.addEventListener("click", function () {
-      confirmed.classList.remove("show");
-      app.style.display = "";
+  /* ---------------- Back out of the review screen ---------------- */
+  [document.getElementById("fbReviewBack"),
+   document.getElementById("fbReviewEdit")].forEach(function (btn) {
+    if (!btn) return;
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      backToForm();
+    });
+  });
+
+  /* Per-traveller Edit sends the user back and opens that accordion. */
+  review.addEventListener("click", function (e) {
+    var edit = e.target.closest("[data-edit-pax]");
+    if (!edit) return;
+    var id = edit.dataset.editPax;
+    backToForm();
+    var card = document.getElementById("pax" + id);
+    if (card) {
+      card.classList.add("open");
+      card.querySelector(".fb-pax-head").setAttribute("aria-expanded", "true");
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  });
+
+  /* ---------------- Booking held modal ---------------- */
+  var modal = document.getElementById("fbModal");
+  var timerId = null;
+
+  function bookingRef() {
+    var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    var out = "";
+    for (var i = 0; i < 6; i++) {
+      out += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return "SM" + out;
+  }
+
+  function openModal() {
+    document.getElementById("fbModalRef").textContent = bookingRef();
+    document.getElementById("fbModalEmail").textContent =
+      document.getElementById("fbEmail").value.trim() || "you";
+
+    modal.hidden = false;
+    document.body.classList.add("fb-modal-open");
+
+    var back = document.getElementById("fbModalBack");
+    if (back) back.focus();
+
+    /* The fare is held for 20 minutes; count it down from the moment the
+       popup opens so the number the user reads is the real one. */
+    var remaining = 20 * 60;
+    var out = document.getElementById("fbModalTimer");
+    clearInterval(timerId);
+    out.textContent = "20:00";
+    timerId = setInterval(function () {
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(timerId);
+        out.textContent = "Expired";
+        return;
+      }
+      var mm = ("0" + Math.floor(remaining / 60)).slice(-2);
+      var ss = ("0" + (remaining % 60)).slice(-2);
+      out.textContent = mm + ":" + ss;
+    }, 1000);
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.classList.remove("fb-modal-open");
+    clearInterval(timerId);
+    timerId = null;
+    if (payNow) payNow.focus();
+  }
+
+  if (payNow) {
+    payNow.addEventListener("click", function () {
+      var box = reviewTerms.closest(".fb-check").parentElement;
+      var error = box.querySelector(".fb-error");
+      if (!reviewTerms.checked) {
+        if (error) {
+          error.classList.add("show");
+          error.querySelector("span").textContent =
+            "Please accept the fare rules before paying.";
+        }
+        reviewTerms.focus();
+        return;
+      }
+      if (error) error.classList.remove("show");
+      openModal();
+    });
+  }
+
+  /* Backdrop, close button and Escape all dismiss. */
+  modal.addEventListener("click", function (e) {
+    if (e.target.closest("[data-modal-close]")) closeModal();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!modal.hidden) {
+      closeModal();
+      return;
+    }
+    if (openCalendar) closeCalendar();
+  });
+
+  /* Keep the keyboard inside the dialog while it is open. */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || modal.hidden) return;
+    var focusable = modal.querySelectorAll(
+      "a[href], button:not([disabled])"
+    );
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  var modalBack = document.getElementById("fbModalBack");
+  if (modalBack) {
+    modalBack.addEventListener("click", function () {
+      closeModal();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }

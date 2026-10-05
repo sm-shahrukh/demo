@@ -32,70 +32,83 @@
         </div>
 
         <div class="navbar-menu" id="navbarMenu">
-          <a href="/index.html" class="nav-item">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path
-                d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-              />
-            </svg>
-            Destinations
-          </a>
-          <a href="/search-flight.html" class="nav-item">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
-              />
-            </svg>
-            Flights
-          </a>
-          <a href="/index.html" class="nav-item">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            </svg>
-            Umrah
-          </a>
-          <a href="/index.html" class="nav-item">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <rect x="2" y="7" width="20" height="14" rx="2" />
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-            </svg>
-            Hotels
-          </a>
-          <a href="/index.html" class="nav-item">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            Visa
-          </a>
+          <details class="nav-dropdown">
+            <summary class="nav-item nav-dropdown-trigger">
+              Services
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="nav-dropdown-menu">
+              <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path
+                    d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                  />
+                </svg>
+                Destinations
+              </a>
+              <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
+                  />
+                </svg>
+                Flights
+              </a>
+              <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                </svg>
+                Umrah
+              </a>
+              <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+                Hotels
+              </a>
+              <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Visa
+              </a>
+            </div>
+          </details>
+              <a href="/about-us.html" class="nav-item">About Us</a>
+          <a href="/my-bookings.html" class="nav-item">My Bookings</a>
+          <a href="/contact-us.html" class="nav-item">Contact Us</a>
           <div class="navbar-menu-actions">
             <a href="/login.html" class="nav-btn-outline">Sign In</a>
             <a href="/signup.html" class="nav-btn-primary">Get Started</a>
@@ -446,7 +459,7 @@
         <div class="map-embed">
           <div class="map-frame">
             <iframe
-              title="Smart Moves head office — Blue Area, Islamabad"
+              title="Smart Moves head office Blue Area, Islamabad"
               src="https://www.google.com/maps?q=Blue%20Area%2C%20Islamabad%2C%20Pakistan&hl=en&z=14&output=embed"
               width="100%"
               height="100%"
@@ -470,7 +483,7 @@
               </svg>
             </div>
             <p>
-              We're in Blue Area, Islamabad. Walk in during office hours — no
+              We're in Blue Area, Islamabad. Walk in during office hours no
               appointment needed.
             </p>
             <a
