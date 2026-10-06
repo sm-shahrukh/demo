@@ -508,7 +508,7 @@ function describeLayover(
       label: `Self transfer · ${toAirport.city} (${toAirport.code})`,
       duration: formatDuration(layoverMinutes),
       detail: airportChange
-        ? `Airport change! Recheck at ${toAirport.name} (${toTerminal}). Bags are not automatically through-checked — confirm with the operating carrier.`
+        ? `Airport change! Recheck at ${toAirport.name} (${toTerminal}). Bags are not automatically through-checked confirm with the operating carrier.`
         : `Terminal change at ${toAirport.code}. Allow extra time for security and transfer desks.`,
     };
   }

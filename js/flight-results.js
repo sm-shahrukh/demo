@@ -23,6 +23,8 @@
     featuredExpanded: false,
 
     detailTab: "itinerary",
+    // Desktop-only: the wide filter panel starts open, per the reference.
+    wideFiltersOpen: true,
     selectedPackageName: "Sample Standard",
     cabinBaggage: "1 × 8 kg",
     checkedBaggage: "1 × 23 kg",
@@ -31,6 +33,8 @@
       airlines: [],
       baggage: [],
       times: [],
+      arrivalTimes: [],
+      refundable: false,
       maxPrice: 0,
       priceMax: 0,
       priceMin: 0,
@@ -44,10 +48,30 @@
 
   // ---------- 2. Small helpers ---------------------------------------------
 
+  // Descendants that own their own click behaviour. Anything matching here
+  // short-circuits the whole-card click so nested controls keep working.
+  const CLICK_GUARD =
+    "a, button, input, label, select, textarea, summary, [contenteditable], " +
+    "[role='button'], [role='group'], [data-book], [data-featured], " +
+    "[data-expand], [data-collapse], [data-detail-tab], [data-package-card], " +
+    "[data-sort], [data-chip], [data-day], [data-filters-toggle], .chip, " +
+    ".more-btn, .fr-reset, .fr-price-clear, .fr-apply";
+
   const getEl = (id) => document.getElementById(id);
 
   function money(amount) {
     return formatPKR(amount);
+  }
+
+  // Raw PKR amount for <input type="number">, which cannot take "Rs 27,900".
+  // Stored prices are EUR; the filter slider works in EUR and is converted
+  // back on edit, so the box and the slider never disagree.
+  function eurToPkr(amountInEur) {
+    return Math.round(amountInEur * FlightData.CURRENCY.eurToPkr);
+  }
+
+  function pkrToEur(amountInPkr) {
+    return Math.round(amountInPkr / FlightData.CURRENCY.eurToPkr);
   }
 
   function escapeHtml(value) {
@@ -200,6 +224,26 @@
       if (!inside) return false;
     }
 
+    // Arrival window also applies to the first journey leg. arriveAt is
+    // minutes from midnight and can exceed 1440 for overnight arrivals, so
+    // fold it back into the arrival day before taking the hour.
+    if (filters.arrivalTimes.length) {
+      const firstLeg = itinerary.legs[0];
+      const arriveMinutes = firstLeg ? (firstLeg.arriveAt % 1440 + 1440) % 1440 : 0;
+      const hour = Math.floor(arriveMinutes / 60);
+      const inside = filters.arrivalTimes.some((window) => {
+        if (window.to === 24) return hour >= window.from && hour <= 24;
+        return hour >= window.from && hour < window.to;
+      });
+      if (!inside) return false;
+    }
+
+    // Matches when any package on the itinerary is refundable.
+    if (filters.refundable) {
+      const refundable = itinerary.packages.some((pkg) => pkg.refundable);
+      if (!refundable) return false;
+    }
+
     return true;
   }
 
@@ -212,6 +256,10 @@
     if (state.sort === "price") sorted.sort((a, b) => a.price - b.price);
     else if (state.sort === "duration")
       sorted.sort((a, b) => a.totalMin - b.totalMin);
+    else if (state.sort === "departure")
+      sorted.sort((a, b) => a.firstDepartMinutes - b.firstDepartMinutes);
+    else if (state.sort === "arrival")
+      sorted.sort((a, b) => a.arriveAt - b.arriveAt);
     else sorted.sort((a, b) => recommendScore(a) - recommendScore(b));
     return sorted;
   }
@@ -256,12 +304,11 @@
     ).length;
   }
 
-  const FILTER_CONTAINERS = ["frFilters", "frFiltersMobile"];
-
   const view = FlightResultsView.create({
     state,
     escapeHtml,
     money,
+    eurToPkr,
     paxLabel,
     tripLabel,
     formatDuration,
@@ -273,13 +320,25 @@
     buildPackages,
   });
 
+  // The desktop panel (#frFilters) gets its own markup; the mobile offcanvas
+  // (#frFiltersMobile) keeps the original, so the mobile filter UI is
+  // unchanged byte-for-byte.
   function renderFilters() {
-    const markup = view.filterPanelMarkup();
-    FILTER_CONTAINERS.forEach((id) => {
-      const panel = getEl(id);
-      if (panel) panel.innerHTML = markup;
-    });
-    FILTER_CONTAINERS.forEach(bindFilterEvents);
+    const desktop = getEl("frFilters");
+    if (desktop) desktop.innerHTML = view.desktopFilterPanelMarkup();
+
+    const mobile = getEl("frFiltersMobile");
+    if (mobile) mobile.innerHTML = view.filterPanelMarkup();
+
+    syncFiltersToggle();
+    bindFilterEvents("frFilters");
+    bindFilterEvents("frFiltersMobile");
+  }
+
+  function toggleTimeWindow(list, from, to, on) {
+    const index = list.findIndex((w) => w.from === from && w.to === to);
+    if (on && index === -1) list.push({ from, to });
+    if (!on && index !== -1) list.splice(index, 1);
   }
 
   function bindFilterEvents(panelId) {
@@ -296,27 +355,62 @@
           toggleInArray(state.filters.baggage, input.value, input.checked);
         if (input.name === "frConnection")
           state.filters[input.value] = input.checked;
+
+        // Desktop panel: arrival/departure windows and the refundable toggle.
+        if (input.name === "frArrivalTime" || input.name === "frDepartTime") {
+          const list =
+            input.name === "frArrivalTime"
+              ? state.filters.arrivalTimes
+              : state.filters.times;
+          toggleTimeWindow(
+            list,
+            Number(input.dataset.from),
+            Number(input.dataset.to),
+            input.checked,
+          );
+        }
+        if (input.name === "frRefundable")
+          state.filters.refundable = input.checked;
+
         refresh();
       });
     });
 
     panel.querySelectorAll(".time-btn").forEach((button) => {
       button.addEventListener("click", () => {
-        const option = {
-          from: Number(button.dataset.from),
-          to: Number(button.dataset.to),
-        };
-        const exists = state.filters.times.some(
-          (w) => w.from === option.from && w.to === option.to,
+        // These are toggle buttons, not checkboxes — the "on" class is what
+        // marks the current selection, so flip it.
+        toggleTimeWindow(
+          state.filters.times,
+          Number(button.dataset.from),
+          Number(button.dataset.to),
+          !button.classList.contains("on"),
         );
-        if (exists) {
-          state.filters.times = state.filters.times.filter(
-            (w) => !(w.from === option.from && w.to === option.to),
-          );
-        } else {
-          state.filters.times.push(option);
-        }
         refresh();
+      });
+    });
+
+    panel.querySelectorAll("[data-stop-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        toggleInArray(
+          state.filters.stops,
+          button.dataset.stopFilter,
+          !state.filters.stops.includes(button.dataset.stopFilter),
+        );
+        refresh();
+      });
+    });
+
+    panel.querySelectorAll(".fr-sort-select").forEach((select) => {
+      select.addEventListener("change", () => {
+        state.sort = select.value;
+        const selectedLabel = select.selectedOptions[0]?.textContent;
+        const value = select.closest(".fr-sort-select-wrap")?.querySelector(
+          ".fr-sort-value",
+        );
+        if (value && selectedLabel) value.textContent = selectedLabel;
+        renderSort();
+        renderList();
       });
     });
 
@@ -327,6 +421,26 @@
       });
     });
 
+    // Desktop price box holds a PKR amount; filter state is EUR. Values are
+    // clamped to the search bounds so the list can never be filtered to an
+    // unreachable range.
+    panel.querySelectorAll('input[name="frPriceMax"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        const filters = state.filters;
+        const typed = Number(input.value);
+        if (!Number.isFinite(typed)) {
+          input.value = eurToPkr(filters.maxPrice);
+          return;
+        }
+        const minPkr = eurToPkr(filters.priceMin);
+        const maxPkr = eurToPkr(filters.priceMax);
+        const clampedPkr = Math.min(maxPkr, Math.max(minPkr, typed));
+        input.value = clampedPkr;
+        filters.maxPrice = pkrToEur(clampedPkr);
+        refresh();
+      });
+    });
+
     panel.querySelectorAll(".fr-duration-slider").forEach((slider) => {
       slider.addEventListener("input", () => {
         state.filters.maxDuration = Number(slider.value);
@@ -334,10 +448,26 @@
       });
     });
 
+    panel.querySelectorAll(".fr-price-clear").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.filters.maxPrice = state.filters.priceMax;
+        refresh();
+      });
+    });
+
     panel.querySelectorAll(".fr-reset").forEach((button) => {
       button.addEventListener("click", () => {
         resetFilters();
         refresh();
+      });
+    });
+
+    // Inside the re-rendered desktop panel, so this must be bound per render
+    // rather than once at startup.
+    panel.querySelectorAll("[data-filters-toggle]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.wideFiltersOpen = !state.wideFiltersOpen;
+        syncFiltersToggle();
       });
     });
 
@@ -360,6 +490,8 @@
     filters.airlines = [];
     filters.baggage = [];
     filters.times = [];
+    filters.arrivalTimes = [];
+    filters.refundable = false;
     filters.maxPrice = filters.priceMax;
     filters.maxDuration = filters.durationMax;
     filters.hideSelfTransfer = false;
@@ -884,7 +1016,7 @@
     return `
       <div class="fr-packages">
         <div class="fr-packages-head">
-          <p>Illustrative comparison only — these are not verified company fare
+          <p>Illustrative comparison only these are not verified company fare
              names, prices or rules. Benefits apply to all segments and
              ${escapeHtml(
                total,
@@ -933,6 +1065,74 @@
     if (itinerary.stops === 0) return "All legs nonstop";
     if (itinerary.selfTransfer) return "Self transfer";
     return "";
+  }
+
+  // ---------- 8b. Featured-card expansion ---------------------------------
+
+  // Shared by the explicit collapse button and the whole-card click, so the
+  // button label, aria state and pill text can never drift apart.
+  function toggleFeaturedCollapse(forceOpen) {
+    const featured = getEl("frList")?.querySelector(".fr-card-featured");
+    if (!featured) return;
+
+    const willExpand =
+      forceOpen === true ? true : featured.classList.contains("collapsed");
+
+    featured.classList.toggle("collapsed", !willExpand);
+    state.featuredExpanded = willExpand;
+
+    // Opening details always lands on the Fare package tab, per the new design.
+    if (willExpand) {
+      state.detailTab = "package";
+      featured.querySelectorAll(".fr-detail-tab").forEach((button) => {
+        const active = button.dataset.detailTab === "package";
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      featured.querySelectorAll(".fr-detail-panel").forEach((panel) => {
+        panel.hidden = panel.dataset.detail !== "package";
+      });
+    }
+
+    featured.querySelectorAll(".fr-collapse-btn").forEach((button) => {
+      const label = button.querySelector(".fr-collapse-label");
+      if (label)
+        label.textContent = willExpand
+          ? "Hide itinerary & fare details"
+          : "Show itinerary & fare details";
+      button.setAttribute("aria-expanded", String(willExpand));
+    });
+
+    const pill = featured.querySelector(".fr-pill");
+    if (pill)
+      pill.textContent = willExpand ? "Details expanded" : "Details collapsed";
+  }
+
+  // Clicking a featured card body toggles its details. Compact cards have no
+  // detail panels of their own, so clicking one promotes it to the featured
+  // slot and expands it there without duplicating the detail rendering.
+  function openCardFromBody(card) {
+    const id = card.dataset.id;
+    if (!id) return;
+
+    if (card.classList.contains("fr-card-featured")) {
+      toggleFeaturedCollapse(state.featuredExpanded ? false : true);
+      return;
+    }
+
+    state.featuredId = id;
+    state.packageId = "standard";
+    state.featuredExpanded = true;
+    state.detailTab = "itinerary";
+    renderList();
+
+    const promoted = getEl("frList")?.querySelector(".fr-card-featured");
+    if (promoted) {
+      promoted.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      promoted
+        .querySelector(".fr-collapse-btn")
+        ?.focus({ preventScroll: true });
+    }
   }
 
   function renderList() {
@@ -1023,15 +1223,159 @@
       recommended: "Balanced for price, travel time and connections",
       price: "Sorted by lowest total price",
       duration: "Sorted by shortest total travel time",
+      departure: "Sorted by earliest departure",
+      arrival: "Sorted by earliest arrival",
     }[state.sort];
 
     getEl("frSortNote").innerHTML = `<i class="bi bi-stars"></i> ${note}`;
+
+    // Mobile segmented control.
     getEl("frSortTabs")
       .querySelectorAll("[data-sort]")
       .forEach((tab) => {
         tab.classList.toggle("active", tab.dataset.sort === state.sort);
       });
+
+    // Desktop segmented control (the dropdown items keep no active state).
+    getEl("frDeskToolbar")
+      ?.querySelectorAll(".fr-segment")
+      .forEach((tab) => {
+        tab.classList.toggle("is-active", tab.dataset.sort === state.sort);
+      });
+    const desktopSort = getEl("frDeskToolbar")?.querySelector(".fr-sort-select");
+    if (desktopSort) {
+      desktopSort.value = state.sort;
+      const value = desktopSort
+        .closest(".fr-sort-select-wrap")
+        ?.querySelector(".fr-sort-value");
+      const selectedLabel = desktopSort.selectedOptions[0]?.textContent;
+      if (value && selectedLabel) value.textContent = selectedLabel;
+    }
+
     getEl("frSortCount").textContent = `${list.length} shown`;
+  }
+
+  // ---------- 9b. Desktop-only: date strip, filter toggle, share -----------
+
+  // Shifts the first leg's date while keeping every later leg at the same
+  // offset from it, so a round-trip return stays N days after departure.
+  // generateItineraries() calls leg.date.toISOString(), so the shifted date
+  // must stay a real Date, not an ISO string.
+  function cloneSearchWithDate(date) {
+    const source = state.search;
+    const base = source.legs[0].date;
+    return {
+      ...source,
+      legs: source.legs.map((leg, index) => {
+        if (index === 0) return { ...leg, date };
+        const offset = Math.round((leg.date - base) / 86400000);
+        return { ...leg, date: FlightData.addDays(date, offset) };
+      }),
+    };
+  }
+
+  // "Fri, 9 Oct" — short enough for the narrow tiles. Matches the UTC
+  // round-trip used by toISODate/parseISODate so a strip day can never
+  // render one date earlier than the itinerary it prices.
+  function formatStripDate(date) {
+    return date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
+  }
+
+  function renderDateStrip() {
+    const box = getEl("frDateStrip");
+    if (!box) return;
+
+    // Multicity has no single "departure day" framing, so the strip would
+    // be misleading there.
+    if (!state.search || state.search.tripType === "multicity") {
+      box.innerHTML = "";
+      return;
+    }
+
+    const base = state.search.legs[0].date;
+    const selectedKey = FlightData.toISODate(base);
+
+    const cards = [];
+    for (let i = 0; i < 7; i += 1) {
+      const date = FlightData.addDays(base, i);
+      const key = FlightData.toISODate(date);
+      const list = FlightData.generateItineraries(cloneSearchWithDate(date));
+      const cheapest = list.length
+        ? Math.min(...list.map((itinerary) => itinerary.price))
+        : null;
+      const selected = key === selectedKey;
+
+      cards.push(`
+        <button type="button" class="fr-day${selected ? " is-active" : ""}"
+                data-day="${key}" aria-pressed="${selected}">
+          <b>${escapeHtml(formatStripDate(date))}</b>
+          <small>${cheapest == null ? "—" : escapeHtml(money(cheapest))}</small>
+        </button>`);
+    }
+
+    box.innerHTML = cards.join("");
+  }
+
+  // Lives in JS state rather than a DOM class because renderFilters() rewrites
+  // the panel markup on every refresh() and would wipe a class-based toggle.
+  function syncFiltersToggle() {
+    const open = state.wideFiltersOpen;
+    const sidebar = document.querySelector(".fr-filters-wide");
+    if (sidebar) sidebar.classList.toggle("is-collapsed", !open);
+
+    document.querySelectorAll("[data-filters-toggle]").forEach((button) => {
+      button.setAttribute("aria-expanded", String(open));
+      const label = button.querySelector(".fr-toggle-label");
+      if (label) label.textContent = open ? "Less filters" : "More filters";
+      const icon = button.querySelector("i");
+      if (icon) {
+        icon.classList.toggle("bi-x-lg", open);
+        icon.classList.toggle("bi-chevron-up", false);
+        icon.classList.toggle("bi-chevron-down", !open);
+      }
+    });
+  }
+
+  function flashShare(text) {
+    const label = document.querySelector(".fr-share-label");
+    if (!label) return;
+    const original = label.textContent;
+    label.textContent = text;
+    window.setTimeout(() => {
+      label.textContent = original;
+    }, 2000);
+  }
+
+  async function shareSearchResults() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: document.title,
+          text: "Flight search results",
+          url,
+        });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      flashShare("Link copied");
+    } catch (error) {
+      // AbortError means the user dismissed the share sheet — nothing to do.
+      if (error && error.name !== "AbortError")
+        flashShare("Copy the URL from your address bar");
+    }
+  }
+
+  // The share button is the only desktop control in static markup. The
+  // "Less filters" toggle lives inside the JS-rendered panel, so it is bound
+  // by the delegated click handler (see bindFilterEvents) rather than here.
+  function initDeskToolbar() {
+    getEl("frShareBtn")?.addEventListener("click", shareSearchResults);
   }
 
   // ---------- 10. Refresh ---------------------------------------------------
@@ -1052,6 +1396,13 @@
     document.querySelectorAll(".fr-price-slider").forEach((slider) => {
       if (Number(slider.value) !== filters.maxPrice) {
         slider.value = filters.maxPrice;
+      }
+    });
+    // Keep the typed max price box in step with the slider.
+    document.querySelectorAll('input[name="frPriceMax"]').forEach((input) => {
+      const inPkr = eurToPkr(filters.maxPrice);
+      if (Number(input.value) !== inPkr) {
+        input.value = inPkr;
       }
     });
     document.querySelectorAll(".fr-duration-slider").forEach((slider) => {
@@ -1082,17 +1433,10 @@
 
   // ---------- 11. Public API ------------------------------------------------
 
-  function search(options) {
-    const built = buildSearch(options);
-
-    if (!built.legs.length) {
-      getEl("frResults").hidden = true;
-      return { ok: false, itineraries: [] };
-    }
-
-    const results = getEl("frResults");
-    results.hidden = false;
-    results.classList.remove("fr-awaiting-search");
+  // Installs a built search: generates itineraries, derives the price and
+  // duration bounds, clears filters, and repaints. Shared by the initial
+  // search() call and by the date strip's day selection.
+  function adoptSearch(built) {
     state.search = built;
     state.itineraries = generateItineraries(built);
     state.packageId = "standard";
@@ -1105,13 +1449,29 @@
     const durations = state.itineraries.map((itinerary) => itinerary.totalMin);
     state.filters.priceMin = Math.floor(Math.min(...prices) / 10) * 10;
     state.filters.priceMax = Math.ceil(Math.max(...prices) / 10) * 10;
-    state.filters.maxPrice = state.filters.priceMax;
     state.filters.durationFloor = Math.floor(Math.min(...durations) / 15) * 15;
     state.filters.durationMax = Math.ceil(Math.max(...durations) / 15) * 15;
-    state.filters.maxDuration = state.filters.durationMax;
+    // resetFilters() normalises maxPrice/maxDuration to the new bounds.
     resetFilters();
 
     refresh();
+  }
+
+  function search(options) {
+    const built = buildSearch(options);
+
+    if (!built.legs.length) {
+      getEl("frResults").hidden = true;
+      return { ok: false, itineraries: [] };
+    }
+
+    const results = getEl("frResults");
+    results.hidden = false;
+    results.classList.remove("fr-awaiting-search");
+
+    adoptSearch(built);
+    renderDateStrip();
+    syncFiltersToggle();
 
     return { ok: true, itineraries: state.itineraries, search: built };
   }
@@ -1183,23 +1543,7 @@
 
     // Collapse the featured card's details
     if (target.closest("[data-collapse]")) {
-      const featured = getEl("frList").querySelector(".fr-card-featured");
-      if (featured) {
-        const collapsed = featured.classList.toggle("collapsed");
-
-        state.featuredExpanded = !collapsed;
-        const buttons = featured.querySelectorAll(".fr-collapse-btn");
-        const pill = featured.querySelector(".fr-pill");
-        buttons.forEach((button) => {
-          button.childNodes[0].nodeValue = collapsed
-            ? " Show itinerary & fare details "
-            : " Hide itinerary & fare details ";
-        });
-        if (pill)
-          pill.textContent = collapsed
-            ? "Details collapsed"
-            : "Details expanded";
-      }
+      toggleFeaturedCollapse();
       return;
     }
 
@@ -1235,8 +1579,59 @@
         (item) => item.id === target.closest("[data-book]").dataset.book,
       );
       showBookingNotice(itinerary);
+      // Required: without this the fall-through reaches the whole-card
+      // branch below and a "Book" click would also toggle the card.
+      return;
+    }
+
+    // Date strip: pick a departure day and re-run the search.
+    const dayButton = target.closest("[data-day]");
+    if (dayButton) {
+      const picked = FlightData.parseISODate(dayButton.dataset.day);
+      if (picked && state.search) {
+        adoptSearch(cloneSearchWithDate(picked));
+        renderDateStrip();
+      }
+      return;
+    }
+
+    // Whole-card affordance. Deliberately last: every branch above returns
+    // on its own, so this only fires for clicks nothing else claimed.
+    if (target.closest(CLICK_GUARD)) return;
+    const card = target.closest(".fr-card");
+    if (card) {
+      openCardFromBody(card);
+      return;
     }
   });
+
+  // Suppress the card toggle when a press is really the end of a text
+  // selection drag. Runs in the capture phase so stopPropagation() prevents
+  // the click from ever being dispatched.
+  let pointerDownAt = null;
+  document.addEventListener(
+    "pointerdown",
+    (event) => {
+      if (event.target.closest(".fr-card"))
+        pointerDownAt = { x: event.clientX, y: event.clientY };
+    },
+    true,
+  );
+  document.addEventListener(
+    "pointerup",
+    (event) => {
+      if (!pointerDownAt) return;
+      const moved =
+        Math.abs(event.clientX - pointerDownAt.x) +
+        Math.abs(event.clientY - pointerDownAt.y);
+      pointerDownAt = null;
+      if (moved > 6) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    },
+    true,
+  );
 
   document.addEventListener("keydown", (event) => {
     const packageCard = event.target.closest("[data-package-card]");
@@ -1290,6 +1685,10 @@
     getEl("frResults").prepend(notice);
     notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
+
+  // The desktop toolbar lives in static markup, so its listeners are bound
+  // once here rather than re-bound on every refresh().
+  initDeskToolbar();
 
   window.FlightResults = { search, getState: () => state };
 })();

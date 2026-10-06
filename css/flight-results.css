@@ -68,7 +68,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 4px;
-  margin-bottom: 18px;
+  margin-top: 15px;
 }
 
 .fr-header-date {
@@ -117,15 +117,21 @@
 @media (min-width: 768px) {
   .fr-header {
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-items: start;
+  }
+  .fr-header-left {
+    justify-self: start;
+    text-align: left;
   }
   .fr-header-title {
     font-size: 38px;
   }
   .fr-header-right {
+    justify-self: end;
     justify-content: flex-end;
     flex-direction: column;
     align-items: flex-end;
+    text-align: right;
     gap: 2px;
   }
 }

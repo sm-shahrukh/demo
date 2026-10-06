@@ -16,7 +16,9 @@
 
   function closeDropdowns() {
     document
-      .querySelectorAll(".dd-panel.show, .dropdown-panel.show")
+      .querySelectorAll(
+        ".dd-panel.show:not(#paxPanel), .dropdown-panel.show",
+      )
       .forEach((panel) => panel.classList.remove("show"));
     document
       .querySelectorAll(".field-box.open")
@@ -105,7 +107,7 @@
     });
     const returnColumn = getElement("returnCol");
     if (returnColumn)
-      returnColumn.style.display = type === "roundtrip" ? "block" : "none";
+      returnColumn.style.display = type === "roundtrip" ? "flex" : "none";
     getElement("multiCityPanel")?.classList.toggle(
       "show",
       type === "multicity",
@@ -145,7 +147,7 @@
           .map(
             (airport) => `
               <button type="button" class="dd-opt airport-result" onclick="selectAirport('${key}', '${airport.code}', '${airport.city}', '${airport.country}')">
-                <strong>${airport.code}</strong> ${airport.city} — ${airport.name}
+                <strong>${airport.code}</strong> ${airport.city}, ${airport.name}
                 <small>${airport.country}</small>
               </button>`,
           )
@@ -193,11 +195,7 @@
     [fromInput.value, toInput.value] = [toInput.value, fromInput.value];
   };
 
-  // ---------- Calendar ----------
-  // One shared panel drives every date field, styled like the airport and
-  // passenger dropdowns rather than the browser's own picker. It floats
-  // next to whichever field opened it, so the Umrah and Visa date fields —
-  // which sit in a different form entirely — get the picker at their own edge.
+
   const calendar = {
     input: null,
     view: new Date(),
@@ -284,9 +282,7 @@
     grid.innerHTML = cells.join("");
   }
 
-  // Anchor the panel to the field's bottom-left, flipping above the field when
-  // there isn't room below and clamping to the viewport so it never runs off
-  // the right edge on a narrow screen.
+
   function positionDatePanel(panel, trigger) {
     const gap = 6;
     const box = panel.getBoundingClientRect();
@@ -352,9 +348,7 @@
   }
   window.closeDatePicker = closeDatePicker;
 
-  // The native input keeps holding the ISO value every other script reads, but
-  // its own text is hidden under the mirror so the date can be shown in the
-  // format the rest of the form uses rather than the browser's locale guess.
+
   function syncDateMirror(input) {
     const mirror = input?.parentElement?.querySelector(".field-box-input-mirror");
     if (!mirror) return;
@@ -397,8 +391,7 @@
     renderCalendar();
   };
 
-  // Give every date field the mirror span and hide the native control, so all
-  // five fields — flights, Umrah and Visa — behave identically.
+
   function initDateFields() {
     document.querySelectorAll('.field-box-input[type="date"]').forEach((input) => {
       const content = input.parentElement;
@@ -415,20 +408,30 @@
     });
   }
 
-  // Every script writes the ISO value straight onto the input, so mirror it in
-  // one place rather than making each caller remember.
+
   function setDateValue(input, value) {
     if (!input) return;
     input.value = value;
     syncDateMirror(input);
   }
 
-  window.togglePassengerPanel = function () {
+  window.togglePassengerPanel = function (event) {
     const panel = getElement("paxPanel");
     if (!panel) return;
+    // #paxPanel is a DOM child of #paxTrigger, so a click on a stepper or the
+    // ✕ also reaches this handler via bubbling. Those clicks must not toggle
+    // the parent panel; only the ✕ handler closes it.
+    if (event && event.target && event.target.closest) {
+      if (event.target.closest("#paxPanel")) return;
+    }
     const isOpen = panel.classList.contains("show");
     closeDropdowns();
     panel.classList.toggle("show", !isOpen);
+  };
+
+  window.closePassengerPanel = function () {
+    getElement("paxPanel")?.classList.remove("show");
+    closeDropdowns();
   };
 
   window.changePax = function (type, delta) {
@@ -472,11 +475,7 @@
     updateMultiCityCount();
   };
 
-  // Read the multi-city legs the user has filled in, in document order.
-  // Airport picks come from `multiCitySelections` (set by selectAirport), but
-  // the date is read straight off each input so it is correct even if the
-  // change event has not fired yet — and leg ids stay bound to their own input
-  // instead of drifting when a middle leg is removed.
+
   function collectMultiCityLegs() {
     const legs = [];
 
@@ -509,9 +508,7 @@
     return toIso(date);
   }
 
-  // Nothing is pre-selected: the traveller picks the route from the dropdowns, so
-  // the results always match what was actually searched for. Dates still get a
-  // sensible two-week offset so the search form is usable on first open.
+
   function defaultSearch() {
     const depDate = getElement("depDate");
     const retDate = getElement("retDate");
@@ -519,9 +516,7 @@
     if (retDate && !retDate.value) setDateValue(retDate, isoDateIn(21));
   }
 
-  // Switching trip type only re-marks the tabs and the search form. Results are
-  // left exactly as they were until Search is pressed, so the traveller can pick
-  // a different trip type without the list changing underneath them.
+ 
   window.setResultsTripType = function (tripType) {
     document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.dataset.trip === tripType);
@@ -697,8 +692,7 @@
   };
 
   document.addEventListener("click", (event) => {
-    // Day cells live inside the panel, which the guard below treats as "inside
-    // a dropdown" — so the pick has to be handled before the early return.
+
     const day = event.target.closest(".date-cell[data-date]");
     if (day && !day.disabled) {
       selectCalendarDate(day.dataset.date);
@@ -732,8 +726,7 @@
     tab.classList.toggle("active", tab.dataset.trip === "oneway");
   });
 
-  // No search is run on load: with no route chosen there is nothing to show, and
-  // running one would raise a validation error before the user has touched anything.
+
   const emptyState = document.getElementById("frResults");
   if (emptyState) emptyState.classList.add("fr-awaiting-search");
 })();

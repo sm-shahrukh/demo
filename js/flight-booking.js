@@ -422,7 +422,7 @@
       (t.type === "Infant"
         ? "An infant's ticket is tied to an accompanying adult. The date of birth must match the accompanying adult's declaration."
         : t.type === "Child"
-        ? "Not a specific age — this traveller needs a passport and travel preferences completed."
+        ? "Not a specific age this traveller needs a passport and travel preferences completed."
         : "Use names exactly as they appear in the passport, including all given names. Do not use nicknames.") +
       "</p>" +
 

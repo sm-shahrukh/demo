@@ -19,6 +19,10 @@
     <link rel="stylesheet" href="css/search-flight.css" />
     <link rel="stylesheet" href="css/flight-results.css" />
     <link rel="stylesheet" href="/css/typography.css" />
+    <!-- Must load after typography.css: that file pins font sizes with
+         `!important` on bare element selectors, and only a class selector
+         (higher specificity) can override them. -->
+    <link rel="stylesheet" href="css/flight-results-desktop.css" />
     <title>Smart Moves | Your Journey Starts Here</title>
   </head>
   <body>
@@ -140,6 +144,7 @@
 
       <!-- ========================================== HERO + SEARCH START  ========================================== -->
       <section class="hero">
+        <div class="hero-container">
   
     
       
@@ -532,7 +537,7 @@
                           <div
                             class="field-box"
                             id="paxTrigger"
-                            onclick="togglePassengerPanel()"
+                            onclick="togglePassengerPanel(event)"
                           >
                             <span class="field-box-icon">
                               <svg
@@ -574,7 +579,7 @@
                                 <button
                                   type="button"
                                   class="dd-panel-close"
-                                  onclick="togglePassengerPanel()"
+                                  onclick="closePassengerPanel()"
                                 >
                                   ✕
                                 </button>
@@ -840,34 +845,21 @@
                     </form>
                   </div>
                 </div>
-
+          </div>
   
       </section>
       <!-- ========================================== HERO + SEARCH END  ========================================== -->
 
       <!-- ========================================== FILTER + PRODUCT CARD START ========================================== -->
       <div class="fr-page" id="frResults">
-   
 
-        <header class="fr-header">
-          <div>
-            <span class="fr-header-date" id="frDate">—</span>
-            <h1 class="fr-header-title" id="frTitle">—</h1>
-            <p class="fr-header-sub" id="frSub">—</p>
-          </div>
-          <div class="fr-header-right">
-            <b class="fr-header-count" id="frCount">0 itineraries</b>
-            <span class="fr-header-currency">All prices in PKR</span>
-          </div>
-        </header>
-
-        <p class="fr-notice">
+        <!-- <p class="fr-notice">
           <i class="bi bi-info-circle"></i>
           <span
             >Illustrative schedules, fares and package rules. Not live
             availability or verified company offerings.</span
           >
-        </p>
+        </p> -->
 
         <div class="fr-await" id="frAwait">
           <i class="bi bi-search"></i>
@@ -879,10 +871,18 @@
         </div>
 
         <div class="fr-layout">
-          <!-- Filter sidebar (desktop) / offcanvas (mobile) -->
-          <aside class="fr-sidebar d-none d-lg-block">
-            <div class="fr-filter-panel" id="frFilters"></div>
-          </aside>
+          <!-- Date strip (desktop only). Sits above the filters, like the
+               reference. Rendered by JS; prices are per-departure-day. -->
+          <div class="fr-datestrip d-none d-lg-block" id="frDateStrip"></div>
+
+          <!-- Filter panel. On desktop it spans the full grid width above
+               the results and carries its own toolbar row (Suggested /
+               Cheapest + "Less filters"); on mobile it is hidden in favour
+               of the offcanvas below. Both are rendered by JS. -->
+          <div
+            class="fr-filters-wide fr-filter-panel fr-filter-panel-wide d-none d-lg-block"
+            id="frFilters"
+          ></div>
 
           <aside
             class="offcanvas-lg offcanvas-start d-lg-none"
@@ -907,6 +907,18 @@
 
           <!-- Results -->
           <main>
+            <header class="fr-header">
+              <div class="fr-header-left">
+                <span class="fr-header-date" id="frDate">—</span>
+                <h1 class="fr-header-title" id="frTitle">—</h1>
+                <p class="fr-header-sub" id="frSub">—</p>
+              </div>
+              <div class="fr-header-right">
+                <b class="fr-header-count" id="frCount">0 itineraries</b>
+                <span class="fr-header-currency">All prices in PKR</span>
+              </div>
+            </header>
+
             <div class="fr-mobile-chips d-lg-none" id="frMobileChips"></div>
 
             <button
@@ -920,7 +932,7 @@
               ></span>
             </button>
 
-            <div class="fr-toolbar">
+            <div class="fr-toolbar d-lg-none">
               <div class="fr-sort-tabs" id="frSortTabs">
                 <button
                   type="button"
@@ -946,6 +958,73 @@
             <div id="frList"></div>
             <div id="frMoreWrap"></div>
           </main>
+
+          <!-- Right rail: banner support card and share control. Desktop only. -->
+          <aside class="fr-rail d-none d-lg-block" aria-label="Support and offers">
+            <section class="fr-rail-card fr-rail-banner-card">
+              <div
+                id="frSupportBannerCarousel"
+                class="carousel slide fr-promo-banner"
+                data-bs-ride="carousel"
+                data-bs-interval="5000"
+                aria-label="Support and promotional banners"
+              >
+                <div class="carousel-indicators">
+                  <button
+                    type="button"
+                    data-bs-target="#frSupportBannerCarousel"
+                    data-bs-slide-to="0"
+                    class="active"
+                    aria-current="true"
+                    aria-label="Show first banner"
+                  ></button>
+                  <button
+                    type="button"
+                    data-bs-target="#frSupportBannerCarousel"
+                    data-bs-slide-to="1"
+                    aria-label="Show second banner"
+                  ></button>
+                </div>
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <img
+                      src="images/banner_img1.jpg"
+                      alt="Get in shape today - fitness promotion"
+                    />
+                  </div>
+                  <div class="carousel-item">
+                    <img
+                      src="images/banner_img2.jpg"
+                      alt="Shop now - fashion promotion"
+                    />
+                  </div>
+                </div>
+                <button
+                  class="carousel-control-prev"
+                  type="button"
+                  data-bs-target="#frSupportBannerCarousel"
+                  data-bs-slide="prev"
+                  aria-label="Previous banner"
+                >
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button
+                  class="carousel-control-next"
+                  type="button"
+                  data-bs-target="#frSupportBannerCarousel"
+                  data-bs-slide="next"
+                  aria-label="Next banner"
+                >
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+              </div>
+            </section>
+
+            <button type="button" class="fr-share-btn" id="frShareBtn">
+              <i class="bi bi-share"></i>
+              <span class="fr-share-label">Share Search Results</span>
+            </button>
+          </aside>
         </div>
       </div>
       <!-- ========================================== FILTER + PRODUCT CARD END ========================================== -->

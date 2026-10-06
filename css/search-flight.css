@@ -473,13 +473,18 @@ small {
   height: 20px;
   flex-shrink: 0;
 }
-
+.hero-container {
+  background: white;
+  width: 100vw;
+}
 .search-panels {
   position: relative;
   padding: 20px;
   background: #fff;
   border-radius: 0 0 18px 18px;
-  width: 100vw;
+  /* No side inset by default — the 140px desktop inset would leave only
+     ~55px of usable width on a phone, collapsing the date fields. */
+  margin: auto;
 }
 .search-panel {
   display: none;
@@ -718,6 +723,15 @@ small {
   min-width: 0;
   border: none;
   border-radius: 0;
+  /* No chevron sits inside a date half, so the 32px reserved for one on a
+     normal field-box is dead space here — reclaim it for the date text. */
+  padding-right: 12px;
+}
+/* The mirrored date text is the visible value (the real input is transparent),
+   so it must be allowed to fill the half rather than ellipsise. */
+.date-row .date-half .field-box-input-mirror {
+  overflow: visible;
+  text-overflow: clip;
 }
 .date-row .date-half + .date-half {
   border-left: 1px solid var(--border-dark);
@@ -813,10 +827,22 @@ small {
 
 /* Tablet */
 @media (min-width: 768px) {
+  /* Restore the desktop side inset once there is room for it. */
+  .hero-container {
+    width: 100%;
+  }
+  .search-panels {
+    margin: auto 140px;
+  }
   .form-row,
   .form-row.umrah-form-row,
   .form-row.visa-form-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Give the date column a full row of its own below the desktop breakpoint,
+     so departure and return each have room for the whole date. */
+  .form-row > .date-col {
+    grid-column: 1 / -1;
   }
   .form-row > .search-submit {
     grid-column: 1 / -1;
@@ -826,12 +852,17 @@ small {
 /* Desktop */
 @media (min-width: 1024px) {
   .form-row {
+    /* The date column holds two full dates side by side (departure +
+       return), so it needs more room than the single-value columns. */
     grid-template-columns:
-      minmax(0, 1.2fr)
-      minmax(0, 1.2fr)
-      minmax(0, 1.6fr)
-      minmax(0, 1.1fr)
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(0, 1.9fr)
+      minmax(0, 1fr)
       60px;
+  }
+  .form-row > .date-col {
+    grid-column: auto;
   }
   .form-row.umrah-form-row {
     grid-template-columns: repeat(5, minmax(0, 1fr)) 60px;
@@ -910,10 +941,16 @@ small {
   overflow-y: auto;
 }
 .dd-opt {
+  display: block;
+  width: 100%;
   padding: 10px 14px;
   margin: 3px 6px;
+  border: 0;
+  background: none;
   border-radius: 8px;
+  font-family: inherit;
   font-size: 14px;
+  text-align: left;
   color: #344054;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -926,6 +963,23 @@ small {
   background: var(--primary-light);
   color: var(--primary);
   font-weight: 600;
+}
+
+/* Airport options: code + city on the first line, full name / country below,
+   all flush left so the list reads like native <option> rows. */
+.airport-result {
+  display: block;
+  text-align: left;
+  line-height: 1.35;
+}
+.airport-result strong {
+  color: var(--primary-blue);
+}
+.airport-result small {
+  display: block;
+  margin-top: 2px;
+  color: #9ca3af;
+  font-size: 13px;
 }
 
 /* Airport search panels */

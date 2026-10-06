@@ -1,0 +1,541 @@
+
+
+
+
+@media (min-width: 992px) {
+  :root {
+    --container-padding: 140px;
+  }
+
+  .navbar-container,
+  .footer-top,
+  .footer-bottom {
+    max-width: none;
+  }
+
+  .navbar-menu-actions {
+    margin-right: -20px;
+  }
+
+  .search-panels {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .fr-page {
+    width: calc(100% - 280px);
+    max-width: none;
+    margin-left: 140px;
+    margin-right: 140px;
+  }
+
+  /* Keep the dates, filters, and results in the main column; the rail runs
+     alongside them from the top of the desktop results area. */
+  .fr-filters-wide {
+    grid-column: 1;
+    grid-row: 2;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .fr-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 260px);
+    column-gap: 24px;
+    row-gap: 0;
+    align-items: start;
+  }
+
+  .fr-datestrip.d-lg-block {
+    display: flex !important;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .fr-layout > main {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+  }
+
+  /* It is a row now, not a sticky column. */
+  .fr-sidebar {
+    position: static;
+    top: auto;
+  }
+
+  .fr-rail {
+    position: static;
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .fr-rail.d-lg-block {
+    display: flex !important;
+  }
+}
+
+/* ---------- Date strip ---------------------------------------------------- */
+
+.fr-datestrip {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .fr-datestrip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    padding-bottom: 4px;
+  }
+
+  .fr-day {
+    flex: 1 1 0;
+    min-width: 116px;
+    padding: 9px 8px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--card-bg);
+    text-align: center;
+    line-height: 1.35;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .fr-day b {
+    display: block;
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  .fr-day small {
+    display: block;
+    font-size: 13px !important;
+    color: var(--muted);
+  }
+
+  .fr-day:hover {
+    border-color: var(--primary-blue);
+  }
+
+  .fr-day:focus-visible {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+  }
+
+  /* 2px border + 1px less padding keeps the tile the same size when active,
+     so the highlight does not shift the strip. */
+  .fr-day.is-active {
+    border: 2px solid var(--primary-blue);
+    background: var(--primary-light);
+    padding: 8px 7px;
+  }
+
+  .fr-day.is-active b,
+  .fr-day.is-active small {
+    color: var(--primary-blue-dark);
+    font-weight: 700;
+  }
+}
+
+/* ---------- Desktop toolbar row (top row inside the filter panel) -------- */
+
+.fr-desk-toolbar {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .fr-desk-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 22px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Tabs sit flush against the panel edge, as in the reference. */
+  .fr-desk-sort {
+    display: inline-flex;
+    gap: 4px;
+    margin: -14px 0 -14px -22px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--gray-100);
+
+  }
+
+  .fr-segment {
+    border: 0;
+    background: transparent;
+    padding: 9px 18px;
+    border-radius: 9px;
+    font-size: 14px !important;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .fr-segment:hover {
+    color: var(--primary-blue);
+  }
+
+  .fr-segment.is-active {
+    background: var(--white);
+    color: var(--primary-blue-dark);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .fr-quick-stops {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .fr-stop-chip {
+    border: 1px solid var(--border-dark);
+    border-radius: 999px;
+    background: var(--white);
+    padding: 4px 9px;
+    font-size: 12px !important;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .fr-stop-chip:hover,
+  .fr-stop-chip.is-active {
+    border-color: var(--primary-blue);
+    background: var(--primary-light);
+    color: var(--primary-blue-dark);
+  }
+
+  .fr-sort-select-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 205px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--text);
+    font-size: 13px !important;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .fr-sort-select-wrap:hover {
+    border-color: var(--primary-blue);
+  }
+
+  .fr-sort-value {
+    flex: 1;
+    color: var(--primary-blue-dark);
+    font-weight: 600;
+  }
+
+  .fr-sort-select-wrap > span:first-child {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .fr-sort-select {
+    position: absolute;
+    inset: 0;
+    appearance: none;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .fr-sort-select-wrap:focus-within {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .fr-sort-select-wrap .bi {
+    color: var(--muted);
+    font-size: 11px !important;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .fr-desk-toolbar .fr-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fr-desk-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  /* Plain blue text link — no border or fill in the reference. */
+  .fr-toggle-btn {
+    border: 0;
+    background: none;
+    color: var(--primary-blue);
+    padding: 4px 0;
+    font-size: 15px !important;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .fr-toggle-btn:hover {
+    color: var(--primary-blue-dark);
+    text-decoration: underline;
+  }
+
+  .fr-toggle-btn .bi {
+    margin-left: 4px;
+    font-size: 12px !important;
+  }
+
+  .fr-toggle-btn .bi-x-lg {
+    font-size: 11px !important;
+  }
+}
+
+/* ---------- Desktop filter panel ----------------------------------------- */
+
+@media (min-width: 992px) {
+  .fr-filter-panel-wide {
+    background: var(--white);
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .fr-wide-body {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding: 12px 16px 16px;
+  }
+
+  .fr-wide-col {
+    border-top: 0;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  /* Price Range puts "Clear" on the same line as its heading. */
+  .fr-wide-col-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .fr-wide-col-head h3 {
+    margin-bottom: 10px;
+  }
+
+  .fr-wide-col-head .fr-price-clear {
+    margin-bottom: 10px;
+    margin-left: auto;
+  }
+
+  .fr-wide-col h3 {
+    font-size: 16px !important;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .fr-wide-col .ck {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 14px !important;
+    cursor: pointer;
+  }
+
+  .fr-wide-col .ck span {
+    flex: 1;
+  }
+
+  .fr-wide-col .ck em {
+    font-style: normal;
+    color: var(--muted);
+    font-size: 13px !important;
+  }
+
+  .fr-wide-col .form-check-input {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  /* Price range: "PKR 39,900 - [579792]" */
+  .fr-price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+  }
+
+  .fr-price-bound {
+    color: var(--muted);
+    font-size: 14px !important;
+    white-space: nowrap;
+  }
+
+  .fr-price-dash {
+    color: var(--muted);
+    font-size: 14px !important;
+  }
+
+  .fr-price-num {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 14px !important;
+    color: #344054;
+  }
+
+  .fr-price-clear {
+    border: 1px solid var(--primary-blue);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--primary-blue);
+    padding: 5px 14px;
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  .fr-price-clear:hover {
+    background: var(--primary-light);
+  }
+
+  /* Collapsed state driven by the "Less filters" toggle. */
+  .fr-filters-wide.is-collapsed .fr-wide-body {
+    display: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .fr-toolbar-note {
+    display: none;
+  }
+}
+
+/* ---------- Right rail ---------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .fr-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fr-rail-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 0;
+  }
+
+  .fr-share-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--primary-blue);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--primary-blue);
+    font-size: 15px !important;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+
+  .fr-share-btn:hover {
+    background: var(--primary-light);
+  }
+
+  .fr-share-btn i {
+    margin-right: 6px;
+  }
+
+  .fr-rail-banner-card {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .fr-promo-banner {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #1f1f1f;
+  }
+
+  .fr-promo-banner .carousel-item {
+    aspect-ratio: 9 / 16;
+  }
+
+  .fr-promo-banner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .fr-promo-banner .carousel-indicators {
+    margin-bottom: 8px;
+  }
+
+  .fr-promo-banner .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border: 0;
+    border-radius: 50%;
+  }
+
+  .fr-promo-banner .carousel-control-prev,
+  .fr-promo-banner .carousel-control-next {
+    width: 16%;
+  }
+}
+
+/* ---------- Clickable flight card ---------------------------------------- */
+
+@media (min-width: 992px) {
+  .fr-card {
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .fr-card:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Keep the card's body-click affordance keyboard-visible. */
+  .fr-card:focus-visible {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+  }
+}
