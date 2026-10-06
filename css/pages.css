@@ -1520,8 +1520,8 @@ select.form-control-custom {
 }
 
 .bc-line i {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--primary-blue);
   flex: none;
@@ -1533,7 +1533,7 @@ select.form-control-custom {
   left: 50%;
   transform: translateX(-50%);
   color: var(--primary-blue);
-  font-size: 17px !important;
+  font-size: 20px !important;
   background: #fff;
   padding: 0 5px;
   z-index: 1;

@@ -48,8 +48,7 @@
 
   // ---------- 2. Small helpers ---------------------------------------------
 
-  // Descendants that own their own click behaviour. Anything matching here
-  // short-circuits the whole-card click so nested controls keep working.
+  // Nested controls keep their own behavior instead of triggering the card.
   const CLICK_GUARD =
     "a, button, input, label, select, textarea, summary, [contenteditable], " +
     "[role='button'], [role='group'], [data-book], [data-featured], " +
@@ -1077,10 +1076,33 @@
     return "";
   }
 
+  function openCardFromBody(card) {
+    const id = card.dataset.id;
+    if (!id) return;
+
+    if (card.classList.contains("fr-card-featured")) {
+      toggleFeaturedCollapse();
+      return;
+    }
+
+    state.featuredId = id;
+    state.packageId = "standard";
+    state.featuredExpanded = true;
+    state.detailTab = "itinerary";
+    renderList();
+
+    const promoted = getEl("frList")?.querySelector(".fr-card-featured");
+    if (promoted) {
+      promoted.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      promoted
+        .querySelector(".fr-collapse-btn")
+        ?.focus({ preventScroll: true });
+    }
+  }
+
   // ---------- 8b. Featured-card expansion ---------------------------------
 
-  // Shared by the explicit collapse button and the whole-card click, so the
-  // button label, aria state and pill text can never drift apart.
+  // Keep the featured card's collapse labels and aria state in sync.
   function toggleFeaturedCollapse(forceOpen) {
     const featured = getEl("frList")?.querySelector(".fr-card-featured");
     if (!featured) return;
@@ -1116,33 +1138,6 @@
     const pill = featured.querySelector(".fr-pill");
     if (pill)
       pill.textContent = willExpand ? "Details expanded" : "Details collapsed";
-  }
-
-  // Clicking a featured card body toggles its details. Compact cards have no
-  // detail panels of their own, so clicking one promotes it to the featured
-  // slot and expands it there without duplicating the detail rendering.
-  function openCardFromBody(card) {
-    const id = card.dataset.id;
-    if (!id) return;
-
-    if (card.classList.contains("fr-card-featured")) {
-      toggleFeaturedCollapse(state.featuredExpanded ? false : true);
-      return;
-    }
-
-    state.featuredId = id;
-    state.packageId = "standard";
-    state.featuredExpanded = true;
-    state.detailTab = "itinerary";
-    renderList();
-
-    const promoted = getEl("frList")?.querySelector(".fr-card-featured");
-    if (promoted) {
-      promoted.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      promoted
-        .querySelector(".fr-collapse-btn")
-        ?.focus({ preventScroll: true });
-    }
   }
 
   function renderList() {
@@ -1646,8 +1641,6 @@
         (item) => item.id === target.closest("[data-book]").dataset.book,
       );
       showBookingNotice(itinerary);
-      // Required: without this the fall-through reaches the whole-card
-      // branch below and a "Book" click would also toggle the card.
       return;
     }
 
@@ -1662,43 +1655,10 @@
       return;
     }
 
-    // Whole-card affordance. Deliberately last: every branch above returns
-    // on its own, so this only fires for clicks nothing else claimed.
     if (target.closest(CLICK_GUARD)) return;
     const card = target.closest(".fr-card");
-    if (card) {
-      openCardFromBody(card);
-      return;
-    }
+    if (card) openCardFromBody(card);
   });
-
-  // Suppress the card toggle when a press is really the end of a text
-  // selection drag. Runs in the capture phase so stopPropagation() prevents
-  // the click from ever being dispatched.
-  let pointerDownAt = null;
-  document.addEventListener(
-    "pointerdown",
-    (event) => {
-      if (event.target.closest(".fr-card"))
-        pointerDownAt = { x: event.clientX, y: event.clientY };
-    },
-    true,
-  );
-  document.addEventListener(
-    "pointerup",
-    (event) => {
-      if (!pointerDownAt) return;
-      const moved =
-        Math.abs(event.clientX - pointerDownAt.x) +
-        Math.abs(event.clientY - pointerDownAt.y);
-      pointerDownAt = null;
-      if (moved > 6) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    },
-    true,
-  );
 
   document.addEventListener("keydown", (event) => {
     const packageCard = event.target.closest("[data-package-card]");

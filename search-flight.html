@@ -17,12 +17,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/search-flight.css" />
-    <link rel="stylesheet" href="css/flight-results.css" />
     <link rel="stylesheet" href="/css/typography.css" />
     <!-- Must load after typography.css: that file pins font sizes with
          `!important` on bare element selectors, and only a class selector
          (higher specificity) can override them. -->
-    <link rel="stylesheet" href="css/flight-results-desktop.css" />
+    <link rel="stylesheet" href="css/flight-results.css" />
     <title>Smart Moves | Your Journey Starts Here</title>
   </head>
   <body>
@@ -871,14 +870,9 @@
         </div>
 
         <div class="fr-layout">
-          <!-- Date strip (desktop only). Sits above the filters, like the
-               reference. Rendered by JS; prices are per-departure-day. -->
+
           <div class="fr-datestrip d-none d-lg-block" id="frDateStrip"></div>
 
-          <!-- Filter panel. On desktop it spans the full grid width above
-               the results and carries its own toolbar row (Suggested /
-               Cheapest + "Less filters"); on mobile it is hidden in favour
-               of the offcanvas below. Both are rendered by JS. -->
           <div
             class="fr-filters-wide fr-filter-panel fr-filter-panel-wide d-none d-lg-block"
             id="frFilters"
