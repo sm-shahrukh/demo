@@ -70,8 +70,11 @@ button {
   font-size: 32px !important;
 }
 
+/* Matches .bstat-value in the MY BOOKINGS block of pages.css. That block
+   loads first, so this declaration has to agree with it or the later sheet
+   wins and the stat renders at the wrong size. */
 .bstat-value {
-  font-size: 28px !important;
+  font-size: 24px !important;
 }
 
 .fb-grand-total {

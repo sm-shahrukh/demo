@@ -5,6 +5,21 @@
     { id: "package", label: "Fare package" },
   ];
 
+  // Every sort the results page understands, in menu order. The segmented
+  // control shows the first three; the dropdown lists all of them.
+  const SORT_OPTIONS = [
+    { id: "recommended", label: "Recommended" },
+    { id: "price", label: "Cheapest" },
+    { id: "duration", label: "Shortest" },
+    { id: "departure", label: "Departure flight" },
+    { id: "arrival", label: "Arrival flight" },
+  ];
+
+  const SORT_LABELS = SORT_OPTIONS.reduce((labels, option) => {
+    labels[option.id] = option.label;
+    return labels;
+  }, {});
+
   function create(context) {
     const {
       state,
@@ -287,26 +302,38 @@
             .join("")}
         </div>
         <div class="fr-desk-right">
-          <label class="fr-sort-select-wrap">
-            <span>Sort by</span>
-            <span class="fr-sort-value">${
-              {
-                recommended: "Recommended",
-                price: "Cheapest",
-                duration: "Shortest",
-                departure: "Departure flight",
-                arrival: "Arrival flight",
-              }[state.sort]
-            }</span>
-            <select class="fr-sort-select" aria-label="Sort by">
-              <option value="recommended"${state.sort === "recommended" ? " selected" : ""}>Recommended</option>
-              <option value="price"${state.sort === "price" ? " selected" : ""}>Cheapest</option>
-              <option value="duration"${state.sort === "duration" ? " selected" : ""}>Shortest</option>
-              <option value="departure"${state.sort === "departure" ? " selected" : ""}>Departure flight</option>
-              <option value="arrival"${state.sort === "arrival" ? " selected" : ""}>Arrival flight</option>
-            </select>
-            <i class="bi bi-chevron-down" aria-hidden="true"></i>
-          </label>
+          <div class="fr-sort-select-wrap">
+            <span class="fr-sort-prefix" id="frSortPrefix">Sort by</span>
+            <button
+              type="button"
+              class="fr-sort-trigger"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-labelledby="frSortPrefix frSortValue"
+            >
+              <span class="fr-sort-value" id="frSortValue">${
+                SORT_LABELS[state.sort] || SORT_LABELS.recommended
+              }</span>
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <ul class="fr-sort-menu" role="listbox" aria-labelledby="frSortValue" hidden>
+              ${SORT_OPTIONS.map(
+                (option) => `
+              <li role="none">
+                <button
+                  type="button"
+                  class="fr-sort-option${state.sort === option.id ? " is-active" : ""}"
+                  role="option"
+                  aria-selected="${state.sort === option.id}"
+                  data-sort="${option.id}"
+                >
+                  <span>${option.label}</span>
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                </button>
+              </li>`,
+              ).join("")}
+            </ul>
+          </div>
           <button
             type="button"
             class="fr-toggle-btn"

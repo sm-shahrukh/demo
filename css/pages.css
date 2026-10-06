@@ -1181,7 +1181,7 @@ select.form-control-custom {
 }
 
 .bstat-value {
-  font-size: 24px;
+  font-size: 24px !important;
   font-weight: 800;
   color: var(--gray-900);
   line-height: 1.1;
@@ -1189,7 +1189,7 @@ select.form-control-custom {
 }
 
 .bstat-label {
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-600);
 }
@@ -1225,7 +1225,7 @@ select.form-control-custom {
   padding: 13px 15px 13px 44px;
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: 16px !important;
   font-family: inherit;
   color: var(--gray-900);
   transition: all 0.2s;
@@ -1252,7 +1252,7 @@ select.form-control-custom {
   border-radius: var(--radius-sm);
   padding: 11px 6px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-600);
   cursor: pointer;
@@ -1278,7 +1278,7 @@ select.form-control-custom {
   padding: 1px 7px;
   border-radius: 50px;
   background: var(--gray-200);
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 700;
   color: var(--gray-700);
 }
@@ -1289,19 +1289,22 @@ select.form-control-custom {
 }
 
 /* Booking card */
+/* Outer shell matches .fr-rail-card on the search results page: white fill,
+   1px gray border, 8px radius, soft shadow. --card-bg/--border are aliases
+   defined only in search-flight.css, so the underlying tokens are used. */
 .booking-card {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
   margin-bottom: 20px;
   overflow: hidden;
   transition: all 0.3s;
 }
 
+/* The rail card does not lift on hover, so neither does this one. */
 .booking-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--gray-300);
+  border-color: var(--gray-200);
 }
 
 .booking-card.cancelled {
@@ -1324,11 +1327,14 @@ select.form-control-custom {
   border-bottom: 1px solid var(--gray-200);
 }
 
+/* Card heading row. The rail card sets its body text at 15px, so the ref
+   label and its value share that scale — 15px/600 rather than the old
+   14px label against a 15px bold value. */
 .bc-ref {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 14px;
+  font-size: 15px !important;
   color: var(--gray-600);
   min-width: 0;
 }
@@ -1343,7 +1349,7 @@ select.form-control-custom {
 .bc-ref strong {
   font-weight: 700;
   color: var(--gray-900);
-  font-size: 15px;
+  font-size: 15px !important;
   letter-spacing: 0.02em;
 }
 
@@ -1353,7 +1359,7 @@ select.form-control-custom {
   gap: 6px;
   padding: 6px 14px;
   border-radius: 50px;
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1412,21 +1418,21 @@ select.form-control-custom {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 800;
   color: #fff;
   flex: none;
 }
 
 .bc-carrier-name {
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 700;
   color: var(--gray-900);
   line-height: 1.25;
 }
 
 .bc-carrier-meta {
-  font-size: 14px;
+  font-size: 14px !important;
   color: var(--gray-500);
 }
 
@@ -1435,7 +1441,7 @@ select.form-control-custom {
   border-radius: 50px;
   background: var(--gray-100);
   color: var(--gray-700);
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1458,7 +1464,7 @@ select.form-control-custom {
 }
 
 .bc-time {
-  font-size: 22px;
+  font-size: 22px !important;
   font-weight: 800;
   color: var(--gray-900);
   line-height: 1.1;
@@ -1466,14 +1472,14 @@ select.form-control-custom {
 }
 
 .bc-airport {
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 700;
   color: var(--primary-blue);
   margin-top: 3px;
 }
 
 .bc-city {
-  font-size: 14px;
+  font-size: 14px !important;
   color: var(--gray-600);
   margin-top: 2px;
   overflow-wrap: anywhere;
@@ -1488,7 +1494,7 @@ select.form-control-custom {
 }
 
 .bc-duration {
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-600);
   white-space: nowrap;
@@ -1527,7 +1533,7 @@ select.form-control-custom {
   left: 50%;
   transform: translateX(-50%);
   color: var(--primary-blue);
-  font-size: 17px;
+  font-size: 17px !important;
   background: #fff;
   padding: 0 5px;
   z-index: 1;
@@ -1535,7 +1541,7 @@ select.form-control-custom {
 }
 
 .bc-stops {
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--warning);
   white-space: nowrap;
@@ -1563,14 +1569,14 @@ select.form-control-custom {
 }
 
 .bc-detail-label {
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-500);
   margin-bottom: 4px;
 }
 
 .bc-detail-value {
-  font-size: 15px;
+  font-size: 15px !important;
   font-weight: 600;
   color: var(--gray-900);
   overflow-wrap: anywhere;
@@ -1595,7 +1601,7 @@ select.form-control-custom {
 }
 
 .bc-pax-text {
-  font-size: 15px;
+  font-size: 15px !important;
   color: var(--gray-700);
   min-width: 0;
 }
@@ -1621,20 +1627,20 @@ select.form-control-custom {
 }
 
 .bc-fare-label {
-  font-size: 14px;
+  font-size: 14px !important;
   color: var(--gray-500);
   font-weight: 500;
 }
 
 .bc-fare-amount {
-  font-size: 22px;
+  font-size: 22px !important;
   font-weight: 800;
   color: var(--primary-blue);
   line-height: 1.15;
 }
 
 .bc-fare-note {
-  font-size: 14px;
+  font-size: 14px !important;
   color: var(--gray-500);
 }
 
@@ -1644,6 +1650,9 @@ select.form-control-custom {
   gap: 9px;
 }
 
+/* Left at the inherited 16px: typography.css pins every `button` at 16px
+   !important, and this class is shared with the about-us and contact-us CTA
+   bands, so pinning a size here would restyle those pages too. */
 .bc-btn {
   display: inline-flex;
   align-items: center;
@@ -1735,7 +1744,7 @@ select.form-control-custom {
   justify-content: center;
   background: var(--gray-200);
   color: var(--gray-500);
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 700;
   flex: none;
 }
@@ -1771,7 +1780,7 @@ select.form-control-custom {
 }
 
 .bc-step-labels span {
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-500);
   white-space: nowrap;
@@ -1807,14 +1816,14 @@ select.form-control-custom {
 }
 
 .bookings-empty h3 {
-  font-size: 20px;
+  font-size: 20px !important;
   font-weight: 700;
   color: var(--gray-900);
   margin-top: 4px;
 }
 
 .bookings-empty p {
-  font-size: 16px;
+  font-size: 16px !important;
   color: var(--gray-600);
   max-width: 400px;
   line-height: 1.6;
@@ -1883,7 +1892,7 @@ select.form-control-custom {
 }
 
 .bk-modal-title {
-  font-size: 20px;
+  font-size: 20px !important;
   font-weight: 800;
   color: var(--gray-900);
   text-align: center;
@@ -1891,7 +1900,7 @@ select.form-control-custom {
 }
 
 .bk-modal-text {
-  font-size: 16px;
+  font-size: 16px !important;
   color: var(--gray-600);
   text-align: center;
   line-height: 1.6;
@@ -1901,7 +1910,7 @@ select.form-control-custom {
 .bk-modal-ref {
   display: block;
   text-align: center;
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 700;
   color: var(--gray-900);
   margin: -8px 0 18px;
@@ -1937,7 +1946,7 @@ select.form-control-custom {
 }
 
 .ticket-sheet h3 {
-  font-size: 19px;
+  font-size: 19px !important;
   font-weight: 800;
   color: var(--gray-900);
   margin-bottom: 16px;
@@ -1961,7 +1970,7 @@ select.form-control-custom {
 
 .ticket-grid b {
   display: block;
-  font-size: 14px;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-500);
   margin-bottom: 4px;
@@ -1970,7 +1979,7 @@ select.form-control-custom {
 }
 
 .ticket-grid span {
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 700;
   color: var(--gray-900);
   overflow-wrap: anywhere;
@@ -1979,7 +1988,7 @@ select.form-control-custom {
 .ticket-foot {
   margin-top: 16px;
   text-align: center;
-  font-size: 14px;
+  font-size: 14px !important;
   color: var(--gray-500);
 }
 

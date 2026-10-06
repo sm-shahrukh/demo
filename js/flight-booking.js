@@ -876,6 +876,48 @@
   /* =============================================================
      Fare summary
      ============================================================= */
+  function renderBookingSummary() {
+    return (
+      '<section class="fb-card fb-booking-preview" aria-labelledby="fbBookingTitle">' +
+      '<div class="fb-card-body">' +
+      '<h2 class="fb-side-title" id="fbBookingTitle">Your Bookings</h2>' +
+      '<div class="fb-booking-head">' +
+      "<span>Departing</span>" +
+      '<span class="fb-booking-dot" aria-hidden="true">·</span>' +
+      '<span class="fb-booking-date">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">' +
+      '<rect x="3" y="5" width="18" height="16" rx="2"/>' +
+      '<path d="M16 3v4M8 3v4M3 10h18"/>' +
+      "</svg>" +
+      '<time datetime="2026-10-11">11 Oct, 2026</time>' +
+      "</span>" +
+      "</div>" +
+      '<div class="fb-booking-airline">' +
+      '<svg class="fb-booking-logo" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M12.2 1.5 11 10.1 3.1 6.7l6.1 5.1-6.1 5.5 8-3.1 1.1 8.3 1-8.8 7.7 3.3-6-5.2 6-5.3-7.7 3.2z" fill="currentColor"/>' +
+      "</svg>" +
+      '<span class="fb-booking-airline-name">AirSial</span>' +
+      '<span class="fb-booking-flight">PF-785 (standard)</span>' +
+      "</div>" +
+      '<div class="fb-booking-times">' +
+      '<time datetime="16:00">04:00 PM</time>' +
+      '<span class="fb-booking-duration">3h 5m</span>' +
+      '<time datetime="20:05">08:05 PM</time>' +
+      "</div>" +
+      '<div class="fb-booking-route">' +
+      "<span>Dubai (DXB)</span><span>Nonstop</span><span>Islamabad (ISB)</span>" +
+      "</div>" +
+      '<div class="fb-booking-baggage">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M9 3h6v2H9zM7 6h10a2 2 0 0 1 2 2v12H5V8a2 2 0 0 1 2-2zm1 4v7h2v-7zm6 0v7h2v-7z"/>' +
+      "</svg>" +
+      "<span>Total: 20kg Pcs: 1</span>" +
+      "</div>" +
+      "</div>" +
+      "</section>"
+    );
+  }
+
   function renderFare() {
     var counts = { Adult: 0, Child: 0, Infant: 0 };
     TRAVELLERS.forEach(function (t) {
@@ -950,7 +992,11 @@
 
       "</div></div>";
 
-    return { html: summary, grand: grand, totalTravellers: totalTravellers };
+    return {
+      html: renderBookingSummary() + summary,
+      grand: grand,
+      totalTravellers: totalTravellers,
+    };
   }
 
   /* =============================================================

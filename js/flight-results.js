@@ -401,16 +401,26 @@
       });
     });
 
-    panel.querySelectorAll(".fr-sort-select").forEach((select) => {
-      select.addEventListener("change", () => {
-        state.sort = select.value;
-        const selectedLabel = select.selectedOptions[0]?.textContent;
-        const value = select.closest(".fr-sort-select-wrap")?.querySelector(
-          ".fr-sort-value",
-        );
-        if (value && selectedLabel) value.textContent = selectedLabel;
-        renderSort();
-        renderList();
+    // The dropdown lives inside the re-rendered desktop panel, so — like the
+    // other controls here — it is bound per render rather than once at
+    // startup. Option clicks need no handler of their own: they carry
+    // data-sort, which the document-level click listener already resolves.
+    panel.querySelectorAll(".fr-sort-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggleSortMenu(trigger.closest(".fr-sort-select-wrap"));
+      });
+
+      trigger.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const wrap = trigger.closest(".fr-sort-select-wrap");
+          if (wrap.classList.contains("is-open")) {
+            stepSortMenu(wrap, event.key === "ArrowDown" ? 1 : -1);
+          } else {
+            openSortMenu(wrap);
+          }
+        }
       });
     });
 
@@ -1217,6 +1227,50 @@
 
   // ---------- 9. Sort -------------------------------------------------------
 
+  const SORT_LABELS = {
+    recommended: "Recommended",
+    price: "Cheapest",
+    duration: "Shortest",
+    departure: "Departure flight",
+    arrival: "Arrival flight",
+  };
+
+  function openSortMenu(wrap) {
+    if (!wrap) return;
+    const menu = wrap.querySelector(".fr-sort-menu");
+    if (!menu) return;
+    menu.hidden = false;
+    wrap.classList.add("is-open");
+    wrap.querySelector(".fr-sort-trigger")?.setAttribute("aria-expanded", "true");
+    wrap
+      .querySelector(".fr-sort-option.is-active")
+      ?.scrollIntoView({ block: "nearest" });
+  }
+
+  function closeSortMenu(wrap) {
+    if (!wrap) return;
+    const menu = wrap.querySelector(".fr-sort-menu");
+    if (menu) menu.hidden = true;
+    wrap.classList.remove("is-open");
+    wrap.querySelector(".fr-sort-trigger")?.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleSortMenu(wrap) {
+    if (!wrap) return;
+    if (wrap.classList.contains("is-open")) closeSortMenu(wrap);
+    else openSortMenu(wrap);
+  }
+
+  // Moves focus through the open menu, wrapping at both ends. Roving focus
+  // keeps the keyboard path equivalent to the native select this replaces.
+  function stepSortMenu(wrap, delta) {
+    const options = [...wrap.querySelectorAll(".fr-sort-option")];
+    if (!options.length) return;
+    const current = options.findIndex((option) => option === document.activeElement);
+    const next = options[(current + delta + options.length) % options.length];
+    next.focus();
+  }
+
   function renderSort() {
     const list = visibleItineraries();
     const note = {
@@ -1236,20 +1290,26 @@
         tab.classList.toggle("active", tab.dataset.sort === state.sort);
       });
 
-    // Desktop segmented control (the dropdown items keep no active state).
+    // Desktop segmented control.
     getEl("frDeskToolbar")
       ?.querySelectorAll(".fr-segment")
       .forEach((tab) => {
         tab.classList.toggle("is-active", tab.dataset.sort === state.sort);
       });
-    const desktopSort = getEl("frDeskToolbar")?.querySelector(".fr-sort-select");
-    if (desktopSort) {
-      desktopSort.value = state.sort;
-      const value = desktopSort
-        .closest(".fr-sort-select-wrap")
-        ?.querySelector(".fr-sort-value");
-      const selectedLabel = desktopSort.selectedOptions[0]?.textContent;
-      if (value && selectedLabel) value.textContent = selectedLabel;
+
+    // Desktop dropdown: the trigger shows the label, the menu carries the
+    // selected state. Options carry data-sort, so the document-level click
+    // listener has already updated state by the time this runs.
+    const wrap = getEl("frDeskToolbar")?.querySelector(".fr-sort-select-wrap");
+    if (wrap) {
+      const value = wrap.querySelector(".fr-sort-value");
+      const label = SORT_LABELS[state.sort];
+      if (value && label) value.textContent = label;
+      wrap.querySelectorAll(".fr-sort-option").forEach((option) => {
+        const active = option.dataset.sort === state.sort;
+        option.classList.toggle("is-active", active);
+        option.setAttribute("aria-selected", String(active));
+      });
     }
 
     getEl("frSortCount").textContent = `${list.length} shown`;
@@ -1486,6 +1546,13 @@
     if (sortTab) {
       event.preventDefault();
       state.sort = sortTab.dataset.sort;
+      // Picking from the dropdown returns focus to its trigger so the menu
+      // does not reopen on the next Tab.
+      const wrap = sortTab.closest(".fr-sort-select-wrap");
+      if (wrap) {
+        closeSortMenu(wrap);
+        wrap.querySelector(".fr-sort-trigger")?.focus();
+      }
       renderSort();
       renderList();
       return;
@@ -1689,6 +1756,25 @@
   // The desktop toolbar lives in static markup, so its listeners are bound
   // once here rather than re-bound on every refresh().
   initDeskToolbar();
+
+  // The sort menu's trigger is re-bound on every render(), but these two
+  // document-level listeners are registered once for the page's lifetime —
+  // re-registering them per render would stack duplicate handlers.
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".fr-sort-select-wrap")) {
+      document
+        .querySelectorAll(".fr-sort-select-wrap.is-open")
+        .forEach(closeSortMenu);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const wrap = event.target.closest?.(".fr-sort-select-wrap.is-open");
+    if (!wrap) return;
+    closeSortMenu(wrap);
+    wrap.querySelector(".fr-sort-trigger")?.focus();
+  });
 
   window.FlightResults = { search, getState: () => state };
 })();
