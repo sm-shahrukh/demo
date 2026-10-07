@@ -5,10 +5,7 @@
   let selectedTo = null;
   let selectedTripType = "oneway";
   let selectedVisaTravelers = 1;
-  // Multi-city leg ids: leg 1 is the main From/To/Departure row and leg 2 is the
-  // "Flight 2" block already present in the markup, so added legs start at 3.
-  // Ids stay unique across removals and each leg carries its own id in
-  // data-leg-id, so collection never has to guess.
+
   let nextMultiCityId = 3;
   let multiCitySelections = {};
 
@@ -97,8 +94,7 @@
 
   window.setTripType = function (type, button) {
     selectedTripType = type;
-    // The form buttons are driven from the results tabs too, which pass only a
-    // type, so fall back to whichever button carries that type.
+
     const target =
       button ||
       document.querySelector(`.trip-type-btn[data-type="${type}"]`);
@@ -117,8 +113,7 @@
     }
     closeDropdowns();
 
-    // Keep the results tabs in step. The search itself is not re-run here: it
-    // waits for the traveller to press Search, which uses selectedTripType.
+
     document.querySelectorAll(".fr-trip-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.dataset.trip === type);
     });
@@ -221,15 +216,12 @@
     return Number.isNaN(date.getTime()) ? null : date;
   }
 
-  // The markup calls openDatePicker('dep') and ('ret') but the inputs are
-  // #depDate and #retDate, so resolve the short names rather than trusting the
-  // argument to already be an element id.
+
   function resolveDateInput(id) {
     return getElement(id) || getElement(`${id}Date`);
   }
 
-  // Keeps the form valid: nothing books in the past, and a return date cannot
-  // land before the departure it follows.
+
   function calendarMinFor(input) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -418,9 +410,7 @@
   window.togglePassengerPanel = function (event) {
     const panel = getElement("paxPanel");
     if (!panel) return;
-    // #paxPanel is a DOM child of #paxTrigger, so a click on a stepper or the
-    // ✕ also reaches this handler via bubbling. Those clicks must not toggle
-    // the parent panel; only the ✕ handler closes it.
+
     if (event && event.target && event.target.closest) {
       if (event.target.closest("#paxPanel")) return;
     }

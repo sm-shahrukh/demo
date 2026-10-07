@@ -243,7 +243,7 @@ function toRadians(value) {
   return (value * Math.PI) / 180;
 }
 
-// Great-circle distance in km between two airports
+
 function distanceKm(a, b) {
   const dLat = toRadians(b.lat - a.lat);
   const dLon = toRadians(b.lon - a.lon);
@@ -257,7 +257,7 @@ function distanceKm(a, b) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-// Block time in minutes. Cruise at ~840 km/h, plus taxi, climb and descent.
+
 function blockTimeMinutes(a, b) {
   const km = distanceKm(a, b);
   const hours = km / 840 + 0.55;
@@ -273,7 +273,6 @@ function formatDuration(minutes) {
   return `${h}h ${m}m`;
 }
 
-// Duration used for ranking and the "shortest" sort — pure airborne time
 function formatDistanceKm(km) {
   return `${Math.round(km).toLocaleString("en-US")} km`;
 }
@@ -348,7 +347,7 @@ function minutesToClock(minutes) {
 const CURRENCY = {
   code: "PKR",
   symbol: "Rs",
-  // Indicative rate. Illustrative fares only — not a live FX quote.
+ 
   eurToPkr: 310,
 };
 
@@ -655,8 +654,7 @@ function pickCarrier(origin, destination, random, previous) {
 
 // ---------- 10. Itinerary assembly ----------------------------------------
 
-// Per-leg base fare in EUR. Distance carries the fare; each extra segment adds
-// an amount, and long sectors cost proportionally more.
+
 function baseFareFor(segments) {
   let total = 0;
   segments.forEach((segment, index) => {

@@ -5,8 +5,7 @@
     { id: "package", label: "Fare package" },
   ];
 
-  // Every sort the results page understands, in menu order. The segmented
-  // control shows the first three; the dropdown lists all of them.
+  
   const SORT_OPTIONS = [
     { id: "recommended", label: "Recommended" },
     { id: "price", label: "Cheapest" },
@@ -219,8 +218,7 @@
     `;
     }
 
-    // Desktop-only filter panel. Deliberately a separate function from
-    // filterPanelMarkup() so the mobile offcanvas markup stays byte-identical.
+  
     function desktopFilterPanelMarkup() {
       const filters = state.filters;
 
@@ -406,8 +404,7 @@
       const collapseLabel = expanded ? "Hide" : "Show";
       const pillText = expanded ? "Details expanded" : "Details collapsed";
       const activeTab = state.detailTab;
-      // Tab/panel ids are namespaced per itinerary so they stay unique even
-      // if a second featured card is ever rendered alongside the first.
+   
       const idSuffix = (tabId) => `${tabId}-${itinerary.id}`;
 
       const panel = (id, content) => `

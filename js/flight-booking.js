@@ -89,9 +89,7 @@
 
   FLIGHT.dateLabel = selectedDepartureDateLabel() || FLIGHT.dateLabel;
 
-  /* The travel date, kept as a real Date so the calendar, the age check and
-     the passport-validity check all measure against the same day. Falls back
-     to the default 16 Nov 2026 when the URL has no usable departure date. */
+
   var FLIGHT_DATE = (function () {
     var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(
       new URLSearchParams(window.location.search).get("departure") || ""
@@ -109,8 +107,7 @@
     ("0" + (FLIGHT_DATE.getMonth() + 1)).slice(-2) + "-" +
     ("0" + FLIGHT_DATE.getDate()).slice(-2);
 
-  /* Per-traveller-type pricing. Child fares carry a discount off the
-     adult base; infants are a flat seat-occupancy fee. */
+
   var FARE = {
     adult: { base: 106840, tax: 19470 },
     child: { base: 60320, tax: 10980 },
@@ -176,7 +173,7 @@
      Itinerary
      ============================================================= */
   function renderItinerary() {
-    /* Origin once, then every leg's destination: ISB → AUH → LHR */
+
     var origin = FLIGHT.legs[0].from;
     var cities = [origin.code]
       .concat(
@@ -521,8 +518,7 @@
     return { min: min, max: max, minYear: minYear, hasMax: !!max };
   }
 
-  /* The month/year dropdowns are how a user jumps across decades, so they
-     span every year the field accepts rather than only the visible month. */
+ 
   function syncCalPicks(wrap, cursor, limits) {
     var monthSel = wrap.querySelector(".fb-cal-month");
     var yearSel = wrap.querySelector(".fb-cal-year");
@@ -565,12 +561,12 @@
     } else if (cal.dataset.y !== undefined) {
       cursor = new Date(Number(cal.dataset.y), Number(cal.dataset.m), 1);
     } else {
-      /* No value yet: for a DOB show the month before travel, otherwise today. */
+
       var base = limits.hasMax ? new Date(limits.max.getFullYear(), limits.max.getMonth(), 1) : today();
       cursor = new Date(base.getFullYear(), base.getMonth(), 1);
     }
 
-    /* Keep navigation inside the years the field actually accepts. */
+    
     if (cursor.getFullYear() < limits.minYear) {
       cursor = new Date(limits.minYear, 0, 1);
     }
@@ -586,7 +582,7 @@
     cal.dataset.m = String(cursor.getMonth());
     syncCalPicks(wrap, cursor, limits);
 
-    /* Monday-first grid, padded with the neighbouring months' days. */
+
     var first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
     var lead = (first.getDay() + 6) % 7;
     var start = new Date(first);
@@ -619,7 +615,7 @@
         (selected && classes.indexOf("selected") > -1 ? ' aria-selected="true"' : "") +
         (disabled ? " disabled" : "") + ">" + day.getDate() + "</button>"
       );
-      /* Stop after a full final week so short months do not render a dead row. */
+  
       if (!outside && day.getDay() === 0 && i >= 27) break;
     }
 
@@ -635,9 +631,7 @@
     wrap.querySelector('[data-cal="next"]').disabled = atMax;
   }
 
-  /* The popup is position:fixed, so it needs real coordinates. Prefer the space
-     below the field, flip above when that is too tight, and keep it inside
-     the viewport horizontally. */
+
   function placeCalendar(wrap) {
     var cal = wrap.querySelector(".fb-cal");
     if (!cal) return;
@@ -654,7 +648,7 @@
     var flip = height > below && above > below;
 
     var top = flip ? anchor.top - height - gap : anchor.bottom + gap;
-    /* If neither side fully fits, pin it to whichever edge has more room. */
+
     if (height > below && height > above) {
       top = Math.max(gap, Math.min(anchor.bottom + gap, vh - height - gap));
     }
@@ -811,8 +805,7 @@
     return clearError(input);
   }
 
-  /* Calendar controls live inside the traveller card but are not part of the
-     form, so every selector that walks the fields has to step over them. */
+
   function isFormField(el) {
     return !el.closest(".fb-cal");
   }
@@ -1046,20 +1039,19 @@
 
   paintFare();
 
-  /* Sticky bar appears once the continue card scrolls into view */
+
   var stickyBar = document.getElementById("fbSticky");
   if (stickyBar && "IntersectionObserver" in window) {
     var sentinel = document.getElementById("fbContinue");
     new IntersectionObserver(
       function (entries) {
-        /* The review screen hides the form, so the sentinel reports
-           "not intersecting" there; the bar must stay down regardless. */
+        
         if (review && review.classList.contains("show")) {
           stickyBar.classList.remove("show");
           return;
         }
         entries.forEach(function (entry) {
-          /* Hide the sticky bar while the real button is on screen */
+      
           stickyBar.classList.toggle("show", !entry.isIntersecting);
         });
       },
@@ -1102,7 +1094,7 @@
     }
     input.value = out;
 
-    /* Put the caret after the same digit it was on. */
+
     var seen = 0;
     var pos = out.length;
     for (var i = 0; i < out.length; i++) {
@@ -1116,11 +1108,11 @@
     }
     input.setSelectionRange(pos, pos);
 
-    /* Refresh the grid so it tracks what is being typed. */
+
     if (openCalendar === input.closest(".fb-date")) paintCalendar(openCalendar);
   });
 
-  /* Enter in a date field commits the value and closes the grid. */
+  
   paxHost.addEventListener("keydown", function (e) {
     var input = e.target;
     if (!input.matches('input[name="dob"], input[name="docexp"]')) return;
@@ -1172,7 +1164,7 @@
       cal.dataset.m = String(shifted.getMonth());
       paintCalendar(navWrap);
       placeCalendar(navWrap);
-      /* Keep focus inside the grid after the month rolls over. */
+
       var landed = navWrap.querySelector(
         '[data-cal="' + nav.dataset.cal + '"]:not([disabled])'
       ) || nav;
@@ -1206,7 +1198,7 @@
     }
   });
 
-  /* Arrow keys page through the grid when a day has focus. */
+
   paxHost.addEventListener("keydown", function (e) {
     var day = e.target.closest(".fb-cal-day");
     if (!day) return;
@@ -1251,7 +1243,7 @@
     }
   });
 
-  /* Scroll or resize can strand the popup; close rather than misplace it. */
+
   window.addEventListener("resize", function () {
     if (openCalendar) closeCalendar();
   });
@@ -1519,8 +1511,7 @@
     renderReview(list, fare);
     app.style.display = "none";
     review.classList.add("show");
-    /* The sticky bar belongs to the form step; leaving it up would put a
-       second "Confirm and review" over the review screen. */
+
     if (stickyBar) stickyBar.classList.remove("show");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1532,15 +1523,14 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  /* Delegated on document: #fbStickyConfirm lives outside #fbApp */
+
   document.addEventListener("click", function (e) {
     var button = e.target.closest("#fbConfirm, #fbStickyConfirm");
     if (!button) return;
 
     var firstBad = null;
 
-    /* Validate every traveller so all errors show at once, then jump
-       to the first thing that needs attention. */
+
     collectTravellers().forEach(function (p) {
       var ok = validateTraveller(p.card);
       var complete = updateTravellerState(p.card);
@@ -1646,8 +1636,7 @@
     var back = document.getElementById("fbModalBack");
     if (back) back.focus();
 
-    /* The fare is held for 20 minutes; count it down from the moment the
-       popup opens so the number the user reads is the real one. */
+ 
     var remaining = 20 * 60;
     var out = document.getElementById("fbModalTimer");
     clearInterval(timerId);
@@ -1691,7 +1680,6 @@
     });
   }
 
-  /* Backdrop, close button and Escape all dismiss. */
   modal.addEventListener("click", function (e) {
     if (e.target.closest("[data-modal-close]")) closeModal();
   });
@@ -1705,7 +1693,7 @@
     if (openCalendar) closeCalendar();
   });
 
-  /* Keep the keyboard inside the dialog while it is open. */
+
   document.addEventListener("keydown", function (e) {
     if (e.key !== "Tab" || modal.hidden) return;
     var focusable = modal.querySelectorAll(

@@ -131,7 +131,7 @@ const BOOKINGS = [
   },
 ];
 
-/* Cancelled bookings live here too, so a cancellation survives a reload. */
+
 const BOOKING_OVERRIDES_KEY = "sm_booking_overrides";
 
 function readOverrides() {
@@ -146,11 +146,11 @@ function writeOverrides(overrides) {
   try {
     localStorage.setItem(BOOKING_OVERRIDES_KEY, JSON.stringify(overrides));
   } catch (err) {
-    /* private browsing — overrides simply don't persist */
+
   }
 }
 
-/* Returns BOOKINGS with any locally saved status changes merged in. */
+
 function getBookings() {
   const overrides = readOverrides();
   return BOOKINGS.map((b) => Object.assign({}, b, overrides[b.ref] || {}));

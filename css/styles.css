@@ -185,6 +185,7 @@ body {
   border: 1.5px solid var(--gray-300);
   background: transparent;
   border-radius: var(--radius-md);
+  font-family: inherit;
   font-size: 15px;
   font-weight: 500;
   color: var(--gray-700);
@@ -206,6 +207,7 @@ body {
   border: none;
   background: linear-gradient(135deg, var(--primary-blue), var(--accent-teal));
   border-radius: var(--radius-md);
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
   color: white;
@@ -1062,11 +1064,18 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 24px;
+
 }
 
 .section-head.centered {
   flex-direction: column;
   align-items: flex-start;
+}
+
+.section-head > .link-arrow,
+.section-head > .filter-tabs,
+.section-head > .blog-nav {
+  align-self: flex-end;
 }
 
 .section-badge {
@@ -2074,6 +2083,7 @@ body {
   .blog-head {
     padding: 0 16px;
     margin-bottom: 24px;
+    
   }
   .blog-viewport {
     padding-left: 16px;
@@ -2438,6 +2448,7 @@ body {
   .section-head {
     flex-direction: row;
     align-items: flex-end;
+    
   }
 
   .section-title {

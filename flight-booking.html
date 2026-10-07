@@ -13,6 +13,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/styles.css" />
+    <!-- pages.css carries the shared auth-modal styles. -->
+    <link rel="stylesheet" href="/css/pages.css" />
     <link rel="stylesheet" href="/css/flight-booking.css" />
     <link rel="stylesheet" href="/css/typography.css" />
     <title>Flight booking | Smart Moves</title>
@@ -110,8 +112,8 @@
           <a href="/my-bookings.html" class="nav-item">My Bookings</a>
           <a href="/contact-us.html" class="nav-item">Contact Us</a>
           <div class="navbar-menu-actions">
-            <a href="/login.html" class="nav-btn-outline">Sign In</a>
-            <a href="/signup.html" class="nav-btn-primary">Get Started</a>
+            <button type="button" class="nav-btn-outline" data-auth="login">Sign In</button>
+            <button type="button" class="nav-btn-primary" data-auth="signup">Get Started</button>
           </div>
         </div>
 
@@ -803,5 +805,6 @@
 
     <script src="/js/pages.js"></script>
     <script src="/js/flight-booking.js"></script>
+    <script src="/js/auth-modal.js"></script>
   </body>
 </html>

@@ -13,6 +13,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/pages.css" />
     <link rel="stylesheet" href="/css/typography.css" />
     <title>Smart Moves | Your Journey Starts Here</title>
   </head>
@@ -110,8 +111,8 @@
           <a href="/my-bookings.html" class="nav-item">My Bookings</a>
           <a href="/contact-us.html" class="nav-item">Contact Us</a>
             <div class="navbar-menu-actions">
-              <a href="/login.html" class="nav-btn-outline">Sign In</a>
-              <a href="/signup.html" class="nav-btn-primary">Get Started</a>
+              <button type="button" class="nav-btn-outline" data-auth="login">Sign In</button>
+              <button type="button" class="nav-btn-primary" data-auth="signup">Get Started</button>
             </div>
           </div>
 
@@ -1683,5 +1684,6 @@
       </button>
     </div>
     <script src="/js/scripts.js"></script>
+    <script src="/js/auth-modal.js"></script>
   </body>
 </html>

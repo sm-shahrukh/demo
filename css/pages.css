@@ -506,6 +506,161 @@ select.form-control-custom {
   text-decoration: underline;
 }
 
+/* The register / sign-in switch is a button, so match the link styling */
+.auth-foot button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+}
+
+.auth-foot button:hover {
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------------------
+   AUTH MODAL — shared login / signup popup (js/auth-modal.js)
+   ------------------------------------------------------------- */
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.auth-modal.show {
+  display: flex;
+}
+
+.auth-modal-box {
+  position: relative;
+  width: 100%;
+  max-width: 470px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  animation: authPop 0.22s ease;
+}
+
+.auth-modal-box.wide {
+  max-width: 640px;
+}
+
+@keyframes authPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Long forms scroll inside the card; the page behind stays put */
+.auth-modal-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 30px 24px;
+}
+
+/* The card supplies the chrome, so drop its own frame here */
+.auth-modal-scroll .auth-card {
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Room for the cross button, and keep it clear of the sticky header */
+.auth-head {
+  padding-right: 34px;
+}
+
+.auth-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-close svg {
+  width: 17px;
+  height: 17px;
+}
+
+.auth-close:hover {
+  background: var(--gray-200);
+  color: var(--gray-900);
+  transform: rotate(90deg);
+}
+
+/* typography.css pins font-size with !important on bare element
+   selectors, and it loads after this file — so these would otherwise be
+   forced back to 16px. Restated here with the sizes the auth block
+   intends. Scoped to the modal so no existing page element changes. */
+.auth-modal-scroll h1.auth-title {
+  font-size: 24px !important;
+}
+
+.auth-modal-scroll .auth-foot {
+  font-size: 16px !important;
+}
+
+.auth-modal-scroll .form-label {
+  font-size: 14px !important;
+}
+
+.auth-modal-scroll .social-btn {
+  font-size: 16px !important;
+}
+
+.auth-modal-scroll .check-inline {
+  font-size: 14px !important;
+}
+
+.auth-modal-scroll .link-soft {
+  font-size: 14px !important;
+}
+
+.auth-modal-scroll .terms-check {
+  font-size: 14px !important;
+}
+
+.auth-modal-scroll .field-error {
+  font-size: 14px !important;
+}
+
+.auth-modal-scroll .pw-meter-text {
+  font-size: 14px !important;
+}
+
 /* Password strength meter */
 .pw-meter {
   margin-top: 9px;
@@ -2024,7 +2179,7 @@ select.form-control-custom {
 }
 
 /* ---------- Section headings (about / contact) ---------- */
-.section-head {
+.page-section .section-head {
   text-align: center;
   max-width: 640px;
   margin: 0 auto 30px;

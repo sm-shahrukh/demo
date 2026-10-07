@@ -739,8 +739,7 @@ const umrahPackages = [
     image: "images/feature_img10.jpg",
   },
 ];
-// Optional per package: desc: "text", url: "/packages/slug", rating: 7.0, reviews: 350
-// (the blue rating box only shows when `rating` is set)
+
 
 (function () {
   const LABEL = { economy: "Economy", "3star": "3 Star", "5star": "5 Star" };

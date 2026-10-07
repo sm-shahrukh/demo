@@ -111,8 +111,8 @@
           <a href="/contact-us.html" class="nav-item">Contact Us</a>
      
           <div class="navbar-menu-actions">
-            <a href="/login.html" class="nav-btn-outline">Sign In</a>
-            <a href="/signup.html" class="nav-btn-primary">Get Started</a>
+            <button type="button" class="nav-btn-outline" data-auth="login">Sign In</button>
+            <button type="button" class="nav-btn-primary" data-auth="signup">Get Started</button>
           </div>
         </div>
 
@@ -580,7 +580,7 @@
             </p>
           </div>
           <div class="cta-band-actions">
-            <a href="/signup.html" class="bc-btn primary">Create Account</a>
+            <button type="button" class="bc-btn primary" data-auth="signup">Create Account</button>
             <a href="/contact-us.html" class="bc-btn">Contact Us</a>
           </div>
         </div>
@@ -707,5 +707,6 @@
     </button>
 
     <script src="/js/pages.js"></script>
+    <script src="/js/auth-modal.js"></script>
   </body>
 </html>

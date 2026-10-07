@@ -62,9 +62,7 @@
     return formatPKR(amount);
   }
 
-  // Raw PKR amount for <input type="number">, which cannot take "Rs 27,900".
-  // Stored prices are EUR; the filter slider works in EUR and is converted
-  // back on edit, so the box and the slider never disagree.
+
   function eurToPkr(amountInEur) {
     return Math.round(amountInEur * FlightData.CURRENCY.eurToPkr);
   }
@@ -223,9 +221,7 @@
       if (!inside) return false;
     }
 
-    // Arrival window also applies to the first journey leg. arriveAt is
-    // minutes from midnight and can exceed 1440 for overnight arrivals, so
-    // fold it back into the arrival day before taking the hour.
+    
     if (filters.arrivalTimes.length) {
       const firstLeg = itinerary.legs[0];
       const arriveMinutes = firstLeg ? (firstLeg.arriveAt % 1440 + 1440) % 1440 : 0;
@@ -319,9 +315,7 @@
     buildPackages,
   });
 
-  // The desktop panel (#frFilters) gets its own markup; the mobile offcanvas
-  // (#frFiltersMobile) keeps the original, so the mobile filter UI is
-  // unchanged byte-for-byte.
+  
   function renderFilters() {
     const desktop = getEl("frFilters");
     if (desktop) desktop.innerHTML = view.desktopFilterPanelMarkup();
@@ -377,8 +371,7 @@
 
     panel.querySelectorAll(".time-btn").forEach((button) => {
       button.addEventListener("click", () => {
-        // These are toggle buttons, not checkboxes — the "on" class is what
-        // marks the current selection, so flip it.
+      
         toggleTimeWindow(
           state.filters.times,
           Number(button.dataset.from),
@@ -400,10 +393,7 @@
       });
     });
 
-    // The dropdown lives inside the re-rendered desktop panel, so — like the
-    // other controls here — it is bound per render rather than once at
-    // startup. Option clicks need no handler of their own: they carry
-    // data-sort, which the document-level click listener already resolves.
+
     panel.querySelectorAll(".fr-sort-trigger").forEach((trigger) => {
       trigger.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -430,9 +420,6 @@
       });
     });
 
-    // Desktop price box holds a PKR amount; filter state is EUR. Values are
-    // clamped to the search bounds so the list can never be filtered to an
-    // unreachable range.
     panel.querySelectorAll('input[name="frPriceMax"]').forEach((input) => {
       input.addEventListener("change", () => {
         const filters = state.filters;
@@ -471,8 +458,7 @@
       });
     });
 
-    // Inside the re-rendered desktop panel, so this must be bound per render
-    // rather than once at startup.
+ 
     panel.querySelectorAll("[data-filters-toggle]").forEach((button) => {
       button.addEventListener("click", () => {
         state.wideFiltersOpen = !state.wideFiltersOpen;
@@ -1209,8 +1195,7 @@
     syncPackageContext(featured, selectedPackage);
   }
 
-  // Stash the selected package + baggage allowance on state so the segment
-  // builders can show the right wording.
+
   function syncPackageContext(itinerary, selectedPackage) {
     state.selectedPackageName = selectedPackage.name;
     state.cabinBaggage = itinerary.cabin.cabinBag;
@@ -1256,8 +1241,7 @@
     else openSortMenu(wrap);
   }
 
-  // Moves focus through the open menu, wrapping at both ends. Roving focus
-  // keeps the keyboard path equivalent to the native select this replaces.
+
   function stepSortMenu(wrap, delta) {
     const options = [...wrap.querySelectorAll(".fr-sort-option")];
     if (!options.length) return;
@@ -1292,9 +1276,6 @@
         tab.classList.toggle("is-active", tab.dataset.sort === state.sort);
       });
 
-    // Desktop dropdown: the trigger shows the label, the menu carries the
-    // selected state. Options carry data-sort, so the document-level click
-    // listener has already updated state by the time this runs.
     const wrap = getEl("frDeskToolbar")?.querySelector(".fr-sort-select-wrap");
     if (wrap) {
       const value = wrap.querySelector(".fr-sort-value");
@@ -1312,10 +1293,7 @@
 
   // ---------- 9b. Desktop-only: date strip, filter toggle, share -----------
 
-  // Shifts the first leg's date while keeping every later leg at the same
-  // offset from it, so a round-trip return stays N days after departure.
-  // generateItineraries() calls leg.date.toISOString(), so the shifted date
-  // must stay a real Date, not an ISO string.
+
   function cloneSearchWithDate(date) {
     const source = state.search;
     const base = source.legs[0].date;
@@ -1329,9 +1307,6 @@
     };
   }
 
-  // "Fri, 9 Oct" — short enough for the narrow tiles. Matches the UTC
-  // round-trip used by toISODate/parseISODate so a strip day can never
-  // render one date earlier than the itinerary it prices.
   function formatStripDate(date) {
     return date.toLocaleDateString("en-GB", {
       weekday: "short",
@@ -1345,8 +1320,7 @@
     const box = getEl("frDateStrip");
     if (!box) return;
 
-    // Multicity has no single "departure day" framing, so the strip would
-    // be misleading there.
+
     if (!state.search || state.search.tripType === "multicity") {
       box.innerHTML = "";
       return;
@@ -1376,8 +1350,7 @@
     box.innerHTML = cards.join("");
   }
 
-  // Lives in JS state rather than a DOM class because renderFilters() rewrites
-  // the panel markup on every refresh() and would wipe a class-based toggle.
+
   function syncFiltersToggle() {
     const open = state.wideFiltersOpen;
     const sidebar = document.querySelector(".fr-filters-wide");
@@ -1426,9 +1399,7 @@
     }
   }
 
-  // The share button is the only desktop control in static markup. The
-  // "Less filters" toggle lives inside the JS-rendered panel, so it is bound
-  // by the delegated click handler (see bindFilterEvents) rather than here.
+
   function initDeskToolbar() {
     getEl("frShareBtn")?.addEventListener("click", shareSearchResults);
   }
@@ -1488,9 +1459,7 @@
 
   // ---------- 11. Public API ------------------------------------------------
 
-  // Installs a built search: generates itineraries, derives the price and
-  // duration bounds, clears filters, and repaints. Shared by the initial
-  // search() call and by the date strip's day selection.
+
   function adoptSearch(built) {
     state.search = built;
     state.itineraries = generateItineraries(built);
@@ -1541,8 +1510,7 @@
     if (sortTab) {
       event.preventDefault();
       state.sort = sortTab.dataset.sort;
-      // Picking from the dropdown returns focus to its trigger so the menu
-      // does not reopen on the next Tab.
+  
       const wrap = sortTab.closest(".fr-sort-select-wrap");
       if (wrap) {
         closeSortMenu(wrap);
@@ -1713,13 +1681,9 @@
     notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  // The desktop toolbar lives in static markup, so its listeners are bound
-  // once here rather than re-bound on every refresh().
+
   initDeskToolbar();
 
-  // The sort menu's trigger is re-bound on every render(), but these two
-  // document-level listeners are registered once for the page's lifetime —
-  // re-registering them per render would stack duplicate handlers.
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".fr-sort-select-wrap")) {
       document
