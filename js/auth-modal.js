@@ -1,13 +1,4 @@
-/* =============================================================
-   AUTH MODAL — shared login / signup popup
-   -------------------------------------------------------------
-   Loaded on every page. Any element carrying
-     <button data-auth="login">   or   <button data-auth="signup">
-   opens the matching form in a single overlay shared by the site.
-   The overlay closes on a click outside the form, on the cross
-   button, and on Escape. When the form is taller than the screen
-   the card scrolls while the page behind it stays locked.
-   ============================================================= */
+
 (function () {
   "use strict";
 
@@ -115,18 +106,17 @@
       '<input type="text" id="suName" name="name" class="form-control-custom" placeholder="Ahmed Shah" autocomplete="name" required data-minlength="3" data-msg-required="Please enter your full name." />' +
       errorBlock() +
       "</div>" +
-      /* Email + phone */
-      '<div class="form-row">' +
+      /* Email */
       '<div class="form-field">' +
       '<label class="form-label" for="suEmail">Email address<span class="req">*</span></label>' +
       '<input type="email" id="suEmail" name="email" class="form-control-custom" placeholder="you@gmail.com" autocomplete="email" required data-msg-required="Please enter your email address." />' +
       errorBlock() +
       "</div>" +
+      /* Phone */
       '<div class="form-field">' +
       '<label class="form-label" for="suPhone">Phone number<span class="req">*</span></label>' +
       '<input type="tel" id="suPhone" name="phone" class="form-control-custom" placeholder="+92 300 1234567" autocomplete="tel" required data-msg-required="Please enter your phone number." />' +
       errorBlock() +
-      "</div>" +
       "</div>" +
       /* Password */
       '<div class="form-field">' +
@@ -177,12 +167,6 @@
   }
 
   var FORMS = { login: loginForm, signup: signupForm };
-
-  /* ---------------- validation ----------------
-     These forms live outside pages.js's own [data-validate] handler,
-     so the rules are re-stated here scoped to the overlay. Keeping it
-     local means the popup works on every page, including the ones
-     that never load pages.js. */
 
   function setFieldState(input, message) {
     var wrap = input.closest(".form-field");
@@ -399,8 +383,7 @@
 
   /* ---------------- wiring ---------------- */
 
-  /* Submit. Only [data-auth-form] forms reach this, which keeps
-   pages.js's own [data-validate] handler out of the way. */
+
   document.addEventListener("submit", function (e) {
     var form = e.target;
     if (!form.matches("[data-auth-form]")) return;
@@ -462,8 +445,7 @@
       return;
     }
 
-    /* Password reveal. pages.js has its own copy of this, but the
-       homepage and flight search never load that file. */
+
     var eye = e.target.closest(".password-toggle");
     if (eye) {
       var input = document.getElementById(eye.dataset.target);
