@@ -48,25 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
   requestAnimationFrame(animate);
 });
 
-// ============ CURRENCY PANEL ============
-function toggleCurrency(e) {
-  e.stopPropagation();
-  const panel = document.getElementById("currencyPanel");
-  panel?.classList.toggle("show");
-}
-document.addEventListener("click", (e) => {
-  if (!e.target.closest("#currencyWrap")) {
-    document.getElementById("currencyPanel")?.classList.remove("show");
-  }
-  if (!e.target.closest("#signupWrap")) {
-    document.getElementById("signupMenu")?.classList.remove("show");
-  }
-});
-function toggleSignup(e) {
-  e.stopPropagation();
-  document.getElementById("signupMenu")?.classList.toggle("show");
-}
-
 // ============ TABS ============
 function switchTab(tab) {
   const tabButtons = document.querySelectorAll(".tab-btn, .search-tab");
@@ -1092,10 +1073,10 @@ const umrahPackages = [
       (function (i) {
         var b = document.createElement("button");
         b.setAttribute("aria-label", "Go to slide " + (i + 1));
-        b.onclick = function () {
+        b.addEventListener("click", function () {
           go(i);
           restart();
-        };
+        });
         dotsBox.appendChild(b);
       })(i);
     }
@@ -1110,14 +1091,14 @@ const umrahPackages = [
     }, 4500);
   }
 
-  document.getElementById("blogPrev").onclick = function () {
+  document.getElementById("blogPrev").addEventListener("click", function () {
     go(idx - 1);
     restart();
-  };
-  document.getElementById("blogNext").onclick = function () {
+  });
+  document.getElementById("blogNext").addEventListener("click", function () {
     go(idx + 1);
     restart();
-  };
+  });
 
   // drag / swipe (mouse + touch)
   viewport.addEventListener("pointerdown", function (e) {

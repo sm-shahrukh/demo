@@ -101,10 +101,6 @@
     return parts.join(", ");
   }
 
-  function paxCount(passengers) {
-    return passengers.adults + passengers.children + passengers.infants;
-  }
-
   function tripLabel(tripType) {
     if (tripType === "roundtrip") return "round-trip";
     if (tripType === "multicity") return "multi-city";

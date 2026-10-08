@@ -467,10 +467,6 @@ function formatDuration(minutes) {
   return `${h}h ${m}m`;
 }
 
-function formatDistanceKm(km) {
-  return `${Math.round(km).toLocaleString("en-US")} km`;
-}
-
 // ---------- 5. Date / time utilities ---------------------------------------
 
 function parseISODate(value) {

@@ -310,12 +310,6 @@
     return dir === 0 ? FLIGHT_DATE_LABEL : RETURN_DATE_LABEL;
   }
 
-  function dateIsoFor(dir) {
-    var direction = FLIGHT.directions[dir];
-    if (direction && direction.date) return direction.date;
-    return dir === 0 ? FLIGHT_DATE_ISO : RETURN_DATE_ISO;
-  }
-
   /* Per-type fare, split the way an airline quote does. The totals shown
      everywhere are summed from this, so changing TRAVELLERS keeps the
      arithmetic honest. */
