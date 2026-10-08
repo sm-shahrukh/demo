@@ -1290,12 +1290,36 @@
     );
   }
 
+  function railPromoCard() {
+    return (
+      '<section class="bk-promo-card" aria-label="Travel offers">' +
+      '<div id="bkSupportBannerCarousel" class="carousel slide bk-promo" ' +
+      'data-bs-ride="carousel" data-bs-interval="5000" aria-label="Promotional banners">' +
+      '<div class="carousel-indicators">' +
+      '<button type="button" data-bs-target="#bkSupportBannerCarousel" data-bs-slide-to="0" ' +
+      'class="active" aria-current="true" aria-label="Show first banner"></button>' +
+      '<button type="button" data-bs-target="#bkSupportBannerCarousel" data-bs-slide-to="1" ' +
+      'aria-label="Show second banner"></button></div>' +
+      '<div class="carousel-inner">' +
+      '<div class="carousel-item active"><img src="/images/banner_img1.jpg" ' +
+      'alt="Fitness promotion"></div>' +
+      '<div class="carousel-item"><img src="/images/banner_img2.jpg" ' +
+      'alt="Fashion promotion"></div></div>' +
+      '<button class="carousel-control-prev" type="button" data-bs-target="#bkSupportBannerCarousel" ' +
+      'data-bs-slide="prev" aria-label="Previous banner"><span class="carousel-control-prev-icon" ' +
+      'aria-hidden="true"></span></button>' +
+      '<button class="carousel-control-next" type="button" data-bs-target="#bkSupportBannerCarousel" ' +
+      'data-bs-slide="next" aria-label="Next banner"><span class="carousel-control-next-icon" ' +
+      'aria-hidden="true"></span></button></div></section>'
+    );
+  }
+
   function renderRail() {
     /* The add-ons screens get a running subtotal of what has been picked so
        far, in place of the plain fare summary. */
     var summary = state.screen === "addons" ? addonsRailPanel() : railSummaryCard();
     document.getElementById("bkRail").innerHTML =
-      railFlightCard() + summary + railSupportCard();
+      railFlightCard() + summary + railSupportCard() + railPromoCard();
   }
 
   /* =====================================================================

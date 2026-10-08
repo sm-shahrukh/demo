@@ -214,8 +214,7 @@
 }
 
 .bk-rail {
-  position: sticky;
-  top: 88px;
+  position: static;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -426,6 +425,15 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.bk-advance-slot {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.bk-advance-slot > .bk-btn {
+  width: 100%;
 }
 
 .bk-link {
@@ -2451,6 +2459,7 @@ select.bk-control {
   box-shadow: var(--bk-shadow-pop);
   width: min(880px, 100%);
   max-height: 86vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2504,7 +2513,49 @@ select.bk-control {
 .bk-modal-body {
   padding: 18px 24px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1 1 auto;
+  min-height: 0;
+}
+
+.bk-promo-card {
+  overflow: hidden;
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-radius);
+  background: var(--white);
+  box-shadow: var(--bk-shadow);
+}
+
+.bk-promo {
+  width: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.bk-promo .carousel-item {
+  aspect-ratio: 9 / 16;
+}
+
+.bk-promo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bk-promo .carousel-indicators {
+  margin-bottom: 8px;
+}
+
+.bk-promo .carousel-indicators button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.bk-promo .carousel-control-prev,
+.bk-promo .carousel-control-next {
+  width: 16%;
 }
 
 .bk-modal-foot {
