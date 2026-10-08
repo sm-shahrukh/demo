@@ -5,14 +5,7 @@
 }
 
 body {
-  font-family:
-    "Inter",
-    "system-ui",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: var(--font-family-base);
   background: var(--gray-50);
   color: var(--gray-900);
   line-height: 1.6;
@@ -24,7 +17,7 @@ button,
 input,
 select,
 textarea {
-  font-family: inherit;
+  font-family: var(--font-family-base);
 }
 
 button {
@@ -56,7 +49,7 @@ small {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-rgba-255-255-255-0-95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
@@ -146,7 +139,7 @@ small {
   display: none;
   min-width: 210px;
   padding: 8px;
-  background: white;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -173,7 +166,7 @@ small {
   border: 1.5px solid var(--gray-300);
   background: transparent;
   border-radius: var(--radius-md);
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 15px;
   font-weight: 500;
   color: var(--gray-700);
@@ -192,10 +185,10 @@ small {
   border: none;
   background: var(--brand-gradient);
   border-radius: var(--radius-md);
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: var(--white);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all 0.2s;
@@ -224,7 +217,7 @@ small {
   transition: all 0.3s;
 }
 
-@media (max-width: 1023.98px) {
+@media (max-width: 1199.98px) {
   .navbar-menu.open {
     position: absolute;
     top: 100%;
@@ -235,7 +228,7 @@ small {
     align-items: stretch;
     gap: 4px;
     padding: 12px var(--container-padding);
-    background: white;
+    background: var(--white);
     border-bottom: 1px solid var(--gray-200);
     box-shadow: var(--shadow-md);
   }
@@ -293,7 +286,7 @@ small {
   justify-content: center;
   flex-direction: column;
   padding-bottom: 51px;
-  /* background: #0f172a; */
+  /* background: var(--dark-navy); */
   overflow: visible;
   z-index: 20;
 }
@@ -338,20 +331,20 @@ small {
   padding: 0 16px;
 }
 .hero-text h1 {
-  color: #fff;
+  color: var(--white);
   font-size: 30px;
   font-weight: 800;
   line-height: 1.15;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 8px var(--color-rgba-0-0-0-0-4);
   margin-top: 60px;
   margin-bottom: 12px;
 }
 .hero-text p {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-rgba-255-255-255-0-85);
   font-size: 15px;
   margin: 0 auto;
   max-width: 768px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 4px var(--color-rgba-0-0-0-0-3);
 }
 @media (min-width: 640px) {
   .hero-text h1 {
@@ -374,9 +367,9 @@ small {
 }
 .search-widget {
   width: 100%;
-  background: #fff;
+  background: var(--white);
   border-radius: 18px;
-  border: 1px solid #f2f4f7;
+  border: 1px solid var(--gray-50);
   box-shadow: var(--shadow-xl);
   overflow: visible;
 }
@@ -385,7 +378,7 @@ small {
 .search-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
-  background: #fff;
+  background: var(--white);
   overflow-x: auto;
   scrollbar-width: none;
   min-height: 45px;
@@ -408,7 +401,7 @@ small {
   border-bottom: 2px solid transparent;
   font-size: 14px;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--gray-600);
   background: transparent;
   cursor: pointer;
   white-space: nowrap;
@@ -429,13 +422,13 @@ small {
   flex-shrink: 0;
 }
 .hero-container {
-  background: white;
+  background: var(--white);
   width: 100vw;
 }
 .search-panels {
   position: relative;
   padding: 20px;
-  background: #fff;
+  background: var(--white);
   border-radius: 0 0 18px 18px;
   /* No side inset by default — the 140px desktop inset would leave only
      ~55px of usable width on a phone, collapsing the date fields. */
@@ -481,7 +474,7 @@ small {
   max-width: 100%;
   padding: 4px;
   border-radius: 8px;
-  background: #f2f4f7;
+  background: var(--gray-50);
 }
 .trip-type-btn {
   display: inline-flex;
@@ -491,7 +484,7 @@ small {
   border-radius: 7px;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--gray-700);
   cursor: pointer;
   background: none !important;
   border: none !important;
@@ -502,9 +495,9 @@ small {
   color: var(--primary-blue);
 }
 .trip-type-btn.active {
-  background: #fff !important;
+  background: var(--white) !important;
   color: var(--primary-blue);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05) !important;
+  box-shadow: 0 1px 2px var(--color-rgba-16-24-40-0-05) !important;
 }
 .trip-class-wrap {
   width: 190px;
@@ -521,7 +514,7 @@ small {
   padding-right: 32px;
   border-radius: 9px;
   border: 1px solid var(--border-dark);
-  background: #fff;
+  background: var(--white);
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -532,18 +525,18 @@ small {
   font-weight: 500;
   color: var(--gray-900);
   transition: all 0.2s;
-  background: white;
+  background: var(--white);
 }
 .field-box:hover {
-  background: #f2f4f7;
-  border-color: #98a2b3;
+  background: var(--gray-50);
+  border-color: var(--gray-400);
   border: 1px solid var(--primary-blue);
   box-shadow: var(--shadow-sm);
 }
 .field-box.focused,
 .field-box:focus-within {
   border-color: var(--primary);
-  background: #fff;
+  background: var(--white);
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
@@ -556,7 +549,7 @@ small {
 .field-box-static,
 .field-box-static:hover {
   cursor: default;
-  background: #fff;
+  background: var(--white);
   border-color: var(--border-dark);
 }
 .field-box-icon {
@@ -594,18 +587,18 @@ small {
   background: transparent;
   font-size: 14px;
   font-weight: 500;
-  color: #344054;
+  color: var(--gray-700);
   text-overflow: ellipsis;
 }
 .field-box-input::placeholder {
-  color: #98a2b3;
+  color: var(--gray-400);
   font-weight: 400;
 }
 .field-box-input[readonly] {
   cursor: pointer;
 }
 .field-box-input[type="date"] {
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 14px;
   cursor: pointer;
 }
@@ -621,7 +614,7 @@ small {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--dark-slate);
   cursor: default;
   white-space: nowrap;
   overflow: hidden;
@@ -632,7 +625,7 @@ small {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #667085;
+  color: var(--gray-500);
   pointer-events: none;
 }
 
@@ -670,7 +663,7 @@ small {
   border: 1px solid var(--border-dark);
   border-radius: 9px;
   overflow: hidden;
-  background: #fff;
+  background: var(--white);
 }
 .date-row .date-half {
   flex: 1;
@@ -702,7 +695,7 @@ small {
   width: 34px;
   height: 34px;
   border: 2px solid var(--gray-200);
-  background: white;
+  background: var(--white);
   border-radius: 50%;
   align-items: center;
   justify-content: center;
@@ -732,13 +725,13 @@ small {
   padding: 0;
   border: 1px solid var(--border-dark);
   border-radius: 50%;
-  background: #fff;
-  color: #6b7280;
+  background: var(--white);
+  color: var(--gray-500);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 .from-col .field-box-swap:hover {
-  background: #e4e7ec;
+  background: var(--gray-200);
 }
 
 /* Submit buttons */
@@ -752,7 +745,7 @@ small {
   border: none;
   border-radius: 9px;
   background: var(--brand-gradient);
-  color: #fff;
+  color: var(--white);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -849,7 +842,7 @@ small {
   top: calc(100% + 6px);
   left: 0;
   min-width: 100%;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow-xl);
@@ -870,7 +863,7 @@ small {
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   font-weight: 600;
-  color: #101828;
+  color: var(--dark-navy);
 }
 .dd-panel-close {
   width: 24px;
@@ -881,15 +874,15 @@ small {
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: #f2f4f7;
-  color: #667085;
+  background: var(--gray-50);
+  color: var(--gray-500);
   font-size: 14px;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 .dd-panel-close:hover {
-  background: #e4e7ec;
-  color: #101828;
+  background: var(--gray-200);
+  color: var(--dark-navy);
 }
 .dd-panel-list {
   max-height: 240px;
@@ -903,15 +896,15 @@ small {
   border: 0;
   background: none;
   border-radius: 8px;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 14px;
   text-align: left;
-  color: #344054;
+  color: var(--gray-700);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 .dd-opt:hover {
-  background: #f3f4f6;
+  background: var(--gray-50);
   color: var(--primary);
 }
 .dd-opt.active {
@@ -933,7 +926,7 @@ small {
 .airport-result small {
   display: block;
   margin-top: 2px;
-  color: #9ca3af;
+  color: var(--gray-400);
   font-size: 13px;
 }
 
@@ -950,7 +943,7 @@ small {
   border-bottom: 1px solid var(--border);
   outline: none;
   font-size: 14px;
-  color: #344054;
+  color: var(--gray-700);
 }
 .airport-results {
   max-height: 240px;
@@ -977,7 +970,7 @@ small {
   padding: 10px 14px;
   margin: 0;
   border-radius: 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--gray-50);
 }
 .dd-pax-row:hover {
   background: transparent;
@@ -989,11 +982,11 @@ small {
 .passenger-info .name {
   font-size: 14px;
   font-weight: 500;
-  color: #111827;
+  color: var(--dark-navy);
 }
 .passenger-info .desc {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--gray-500);
 }
 .pax-btns {
   display: flex;
@@ -1009,14 +1002,14 @@ small {
   padding: 0;
   border: 1px solid var(--border-dark);
   border-radius: 6px;
-  background: #fff;
+  background: var(--white);
   font-size: 16px;
-  color: #374151;
+  color: var(--gray-700);
   cursor: pointer;
   transition: background 0.15s ease;
 }
 .pax-btns button:hover {
-  background: #f3f4f6;
+  background: var(--gray-50);
 }
 .pax-btns .count {
   min-width: 20px;
@@ -1049,7 +1042,7 @@ small {
   transition: background 0.15s ease;
 }
 .dd-checkbox-row:hover {
-  background: #f8f9fa;
+  background: var(--gray-50);
 }
 .dd-checkbox-row input[type="checkbox"] {
   width: 16px;
@@ -1064,12 +1057,12 @@ small {
 .dd-checkbox-label strong {
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--dark-slate);
   line-height: 1.2;
 }
 .dd-checkbox-label small {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--gray-500);
   margin-top: 1px;
 }
 
@@ -1091,17 +1084,17 @@ small {
   transition: background 0.15s ease;
 }
 .result-item:hover {
-  background: #f3f4f6;
+  background: var(--gray-50);
 }
 .result-city {
   margin-bottom: 2px;
   font-size: 14px;
   font-weight: 600;
-  color: #101828;
+  color: var(--dark-navy);
 }
 .result-code {
   font-size: 14px;
-  color: #667085;
+  color: var(--gray-500);
 }
 
 /* ---------- ALERT + RESULT ---------- */
@@ -1117,20 +1110,20 @@ small {
   animation: fadeIn 0.2s ease;
 }
 .alert.error {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background: var(--danger-light);
+  color: var(--danger-dark);
+  border: 1px solid var(--color-hex-fecaca);
 }
 .alert.success {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid var(--color-hex-a7f3d0);
 }
 .search-result {
   display: none;
   margin-top: 16px;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--gray-50);
   border: 1px solid var(--border);
   border-radius: 14px;
 }
@@ -1141,12 +1134,12 @@ small {
 .search-result h4 {
   margin: 0 0 8px;
   font-size: 16px;
-  color: #111827;
+  color: var(--dark-navy);
 }
 .search-result p {
   margin: 0;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--gray-600);
 }
 .search-result .summary {
   display: flex;
@@ -1166,8 +1159,8 @@ small {
   margin-top: 10px;
   padding: 9px 12px;
   border-radius: 6px;
-  background: #ecfdf3;
-  color: #027a48;
+  background: var(--success-light);
+  color: var(--success);
   font-size: 14px;
 }
 
@@ -1176,9 +1169,9 @@ small {
   display: none;
   margin-top: 12px;
   padding: 12px;
-  border: 1px solid #eaecf0;
+  border: 1px solid var(--gray-200);
   border-radius: 12px;
-  background: #fcfcfd;
+  background: var(--gray-50);
 }
 .multi-city-panel.show {
   display: block;
@@ -1190,7 +1183,7 @@ small {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
-  color: #344054;
+  color: var(--gray-700);
   font-size: 14px;
   font-weight: 600;
 }
@@ -1202,16 +1195,16 @@ small {
 .multi-city-heading small {
   padding: 4px 8px;
   border-radius: 999px;
-  background: #f2f4f7;
-  color: #667085;
+  background: var(--gray-50);
+  color: var(--gray-500);
   font-size: 14px;
   font-weight: 500;
 }
 .multi-city-leg {
   padding: 10px;
-  border: 1px solid #eaecf0;
+  border: 1px solid var(--gray-200);
   border-radius: 10px;
-  background: #fff;
+  background: var(--white);
 }
 .multi-city-leg + .multi-city-leg,
 #additionalFlightLegs .multi-city-leg {
@@ -1226,22 +1219,22 @@ small {
 }
 .multi-city-leg-heading strong,
 .multi-city-leg > strong {
-  color: #667085;
+  color: var(--gray-500);
   font-size: 14px;
   letter-spacing: 0.04em;
 }
 .remove-flight-btn {
   padding: 4px 10px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid var(--color-rgba-239-68-68-0-3);
   border-radius: 6px;
-  background: #fff;
+  background: var(--white);
   color: var(--danger);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
 .remove-flight-btn:hover {
-  background: rgba(239, 68, 68, 0.08);
+  background: var(--color-rgba-239-68-68-0-08);
 }
 .add-flight-btn {
   padding: 7px 12px;
@@ -1258,7 +1251,7 @@ small {
 }
 .add-flight-btn:hover {
   background: var(--primary);
-  color: #fff;
+  color: var(--white);
 }
 .add-flight-btn:disabled {
   opacity: 0.5;
@@ -1278,7 +1271,7 @@ small {
   gap: 4px;
 }
 .multi-city-fields label > span {
-  color: #667085;
+  color: var(--gray-500);
   font-size: 14px;
   font-weight: 600;
 }
@@ -1290,8 +1283,8 @@ small {
   border: 1px solid var(--border-dark);
   border-radius: 9px;
   outline: none;
-  background: #fff;
-  color: #344054;
+  background: var(--white);
+  color: var(--gray-700);
   font: inherit;
   font-size: 14px;
 }
@@ -1327,7 +1320,7 @@ small {
   min-width: 260px;
   max-height: 300px;
   overflow-y: auto;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow-xl);
@@ -1346,10 +1339,10 @@ small {
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   font-weight: 600;
-  color: #101828;
+  color: var(--dark-navy);
 }
 .multi-city-fields .panel-header span {
-  color: #101828;
+  color: var(--dark-navy);
   font-size: 14px;
   font-weight: 600;
 }
@@ -1362,14 +1355,14 @@ small {
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: #f2f4f7;
-  color: #667085;
+  background: var(--gray-50);
+  color: var(--gray-500);
   font-size: 16px;
   cursor: pointer;
 }
 .dropdown-panel .close-btn:hover {
-  background: #e4e7ec;
-  color: #101828;
+  background: var(--gray-200);
+  color: var(--dark-navy);
 }
 .multi-city-fields .dropdown-panel .search-input,
 .dropdown-panel .search-input {
@@ -1616,7 +1609,7 @@ small {
   }
 
   .toolbar:hover {
-    background: white;
+    background: var(--white);
     box-shadow: var(--shadow-sm);
     transition: all 0.2s ease;
   }
@@ -1687,7 +1680,7 @@ small {
 }
 
 .flight-card:hover {
-  background: white;
+  background: var(--white);
   box-shadow: var(--shadow-lg);
   transition: all 0.2s ease;
 }
@@ -1730,7 +1723,7 @@ small {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  color: #fff;
+  color: var(--white);
   font-weight: 700;
   font-size: 14px;
   display: grid;
@@ -1738,19 +1731,19 @@ small {
   flex: none;
 }
 .logo-pa {
-  background: #1a4fa0;
+  background: var(--color-hex-1a4fa0);
 }
 .logo-pk {
-  background: #1b7a43;
+  background: var(--color-hex-1b7a43);
 }
 .logo-fz {
-  background: #e2551b;
+  background: var(--color-hex-e2551b);
 }
 .logo-ek {
-  background: #c8102e;
+  background: var(--color-hex-c8102e);
 }
 .logo-qr {
-  background: #5c0632;
+  background: var(--color-hex-5c0632);
 }
 
 /* Times + line between them */
@@ -1784,7 +1777,7 @@ small {
   left: 0;
   right: 0;
   top: 50%;
-  border-top: 1.5px dotted #9cc6e3;
+  border-top: 1.5px dotted var(--color-hex-9cc6e3);
 }
 .route-line span,
 .route-line em,
@@ -1976,7 +1969,7 @@ small {
   left: 82px;
   top: 12px;
   bottom: 12px;
-  border-left: 1px solid #b9d6ea;
+  border-left: 1px solid var(--color-hex-b9d6ea);
 } /* vertical line */
 .leg-time {
   font-weight: 600;
@@ -2081,7 +2074,7 @@ small {
   box-shadow: var(--shadow-lg);
 }
 .panel:hover {
-  background: white;
+  background: var(--white);
   box-shadow: var(--shadow-xl);
 }
 
@@ -2133,11 +2126,11 @@ small {
   margin-bottom: 4px;
 }
 .form-range::-webkit-slider-thumb {
-  background: #fff;
+  background: var(--white);
   border: 2px solid var(--primary);
 }
 .form-range::-moz-range-thumb {
-  background: #fff;
+  background: var(--white);
   border: 2px solid var(--primary);
 }
 .form-range::-webkit-slider-runnable-track {
@@ -2224,7 +2217,7 @@ small {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-rgba-255-255-255-0-1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2239,14 +2232,14 @@ small {
 
 .social-links a:hover {
   background: var(--primary-blue);
-  color: white;
+  color: var(--white);
   transform: translateY(-2px);
 }
 
 .footer-col h4 {
   font-size: 15px;
   font-weight: 700;
-  color: white;
+  color: var(--white);
   margin-bottom: 16px;
 }
 
@@ -2280,7 +2273,7 @@ small {
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--color-rgba-255-255-255-0-1);
   padding: 20px var(--container-padding);
   text-align: center;
   display: flex;
@@ -2308,7 +2301,7 @@ small {
   font-size: 14px;
   color: var(--gray-400);
   padding: 5px 11px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-rgba-255-255-255-0-05);
   border-radius: 50px;
 }
 /* ========================================== FOOTER END ========================================== */
@@ -2323,7 +2316,7 @@ small {
   background: var(--brand-gradient);
   border: none;
   border-radius: 50%;
-  color: white;
+  color: var(--white);
   cursor: pointer;
   box-shadow: var(--shadow-xl);
   display: none;
@@ -2456,7 +2449,7 @@ small {
     width: 34px;
     height: 34px;
     border: 2px solid var(--gray-200);
-    background: white;
+    background: var(--white);
     border-radius: 50%;
     align-items: center;
     justify-content: center;
@@ -2485,7 +2478,7 @@ small {
 
   .footer-col-large {
     padding-bottom: 4px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-rgba-255-255-255-0-1);
   }
 
   .footer-about {
@@ -2550,6 +2543,24 @@ small {
 }
 /* ========================================== RESPONSIVE - DESKTOP (1024px+) END ========================================== */
 
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-menu.open {
+    display: flex;
+  }
+
+  .nav-btn-outline {
+    display: none;
+  }
+
+  .mobile-toggle {
+    display: flex;
+  }
+}
+
 /* ========================================== RESPONSIVE - LARGE DESKTOP (1440px+) START ========================================== */
 @media (min-width: 1024px) and (max-width: 1399.98px) {
   .navbar-brand .brand-logo-image {
@@ -2613,7 +2624,7 @@ small {
 .date-nav-label {
   font-size: 14px;
   font-weight: 600;
-  color: #101828;
+  color: var(--dark-navy);
 }
 .date-nav-btn {
   width: 30px;
@@ -2624,8 +2635,8 @@ small {
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #344054;
+  background: var(--white);
+  color: var(--gray-700);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -2634,8 +2645,8 @@ small {
     border-color 0.15s ease;
 }
 .date-nav-btn:hover {
-  background: #f2f4f7;
-  border-color: #98a2b3;
+  background: var(--gray-50);
+  border-color: var(--gray-400);
 }
 
 .date-weekdays,
@@ -2667,8 +2678,8 @@ small {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #101828;
-  font-family: inherit;
+  color: var(--dark-navy);
+  font-family: var(--font-family-base);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -2695,13 +2706,13 @@ small {
 }
 .date-cell.is-selected {
   background: var(--primary);
-  color: #fff;
+  color: var(--white);
   font-weight: 600;
   box-shadow: none;
 }
 .date-cell.is-selected:hover {
   background: var(--primary);
-  color: #fff;
+  color: var(--white);
 }
 
 .date-panel-foot {
@@ -2718,9 +2729,9 @@ small {
   padding: 7px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #344054;
-  font-family: inherit;
+  background: var(--white);
+  color: var(--gray-700);
+  font-family: var(--font-family-base);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -2730,23 +2741,23 @@ small {
 }
 .date-clear:hover,
 .date-today:hover {
-  background: #f2f4f7;
-  border-color: #98a2b3;
+  background: var(--gray-50);
+  border-color: var(--gray-400);
 }
 .date-today {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--white);
 }
 .date-today:hover {
   background: var(--primary-dark);
   border-color: var(--primary-dark);
-  color: #fff;
+  color: var(--white);
 }
 
 .field-box.open {
   border-color: var(--primary-blue);
-  background: #fff;
+  background: var(--white);
   box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
 }
 
@@ -2754,7 +2765,7 @@ small {
   display: block;
   width: 100%;
   font-size: 14px;
-  color: #1f2937;
+  color: var(--dark-slate);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

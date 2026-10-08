@@ -25,7 +25,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><circle cx="200" cy="100" r="150" fill="rgba(255,255,255,0.06)"/><circle cx="900" cy="400" r="200" fill="rgba(255,255,255,0.06)"/></svg>');
+  background-image:
+    radial-gradient(circle 150px at 16.67% 16.67%, var(--color-rgba-255-255-255-0-06) 99%, transparent 100%),
+    radial-gradient(circle 200px at 75% 66.67%, var(--color-rgba-255-255-255-0-06) 99%, transparent 100%);
 }
 
 .page-banner-inner {
@@ -34,7 +36,7 @@
   max-width: 1920px;
   margin: 0 auto;
   text-align: center;
-  color: #fff;
+  color: var(--white);
 }
 
 .page-banner-badge {
@@ -42,9 +44,9 @@
   align-items: center;
   gap: 8px;
   padding: 7px 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-rgba-255-255-255-0-2);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-rgba-255-255-255-0-3);
   border-radius: 50px;
   font-size: 14px;
   font-weight: 500;
@@ -56,7 +58,7 @@
   font-weight: 800;
   line-height: 1.15;
   margin-bottom: 12px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  text-shadow: 0 2px 10px var(--color-rgba-0-0-0-0-12);
 }
 
 .page-banner-text {
@@ -76,18 +78,18 @@
   gap: 8px;
   margin-top: 16px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-rgba-255-255-255-0-9);
 }
 
 .breadcrumb-nav a {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--color-rgba-255-255-255-0-95);
   text-decoration: none;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .breadcrumb-nav a:hover {
-  color: #fff;
+  color: var(--white);
   text-decoration: underline;
 }
 
@@ -183,7 +185,7 @@
 .auth-card {
   width: 100%;
   max-width: 470px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
@@ -246,9 +248,9 @@
   font-size: 16px;
   font-weight: 500;
   color: var(--gray-900);
-  background: #fff;
+  background: var(--white);
   transition: all 0.2s;
-  font-family: inherit;
+  font-family: var(--font-family-base);
 }
 
 .form-control-custom:focus {
@@ -264,11 +266,11 @@
 
 .form-control-custom.is-invalid {
   border-color: var(--danger);
-  background: #fff5f5;
+  background: var(--danger-light);
 }
 
 .form-control-custom.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px var(--color-rgba-239-68-68-0-1);
 }
 
 .form-control-custom.is-valid {
@@ -400,11 +402,11 @@ select.form-control-custom {
   padding: 14px;
   border: none;
   background: var(--brand-gradient);
-  color: #fff;
+  color: var(--white);
   border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 600;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -467,11 +469,11 @@ select.form-control-custom {
   gap: 9px;
   padding: 12px 10px;
   border: 1.5px solid var(--gray-300);
-  background: #fff;
+  background: var(--white);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 600;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   color: var(--gray-700);
   cursor: pointer;
   transition: all 0.2s;
@@ -532,7 +534,7 @@ select.form-control-custom {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(15, 23, 42, 0.55);
+  background: var(--color-rgba-15-23-42-0-55);
   backdrop-filter: blur(3px);
 }
 
@@ -548,7 +550,7 @@ select.form-control-custom {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: var(--white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-2xl);
   animation: authPop 0.22s ease;
@@ -714,15 +716,15 @@ select.form-control-custom {
 }
 
 .auth-alert.error {
-  background: #fee;
+  background: var(--danger-light);
   color: var(--danger);
-  border: 1px solid #fcc;
+  border: 1px solid var(--color-hex-fcc);
 }
 
 .auth-alert.success {
-  background: #efe;
-  color: #047857;
-  border: 1px solid #cec;
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid var(--color-hex-cec);
 }
 
 /* Terms checkbox */
@@ -849,7 +851,7 @@ select.form-control-custom {
 .value-card {
   padding: 28px 24px;
   border-radius: var(--radius-lg);
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   transition: all 0.3s;
 }
@@ -874,7 +876,7 @@ select.form-control-custom {
 .value-icon svg {
   width: 26px;
   height: 26px;
-  color: #fff;
+  color: var(--white);
 }
 
 .value-card h3 {
@@ -923,7 +925,7 @@ select.form-control-custom {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--white);
   border: 3px solid var(--primary-blue);
   display: flex;
   align-items: center;
@@ -979,7 +981,7 @@ select.form-control-custom {
 }
 
 .team-card {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -999,7 +1001,7 @@ select.form-control-custom {
   align-items: center;
   justify-content: center;
   background: var(--brand-gradient);
-  color: #fff;
+  color: var(--white);
 }
 
 .team-photo img {
@@ -1056,7 +1058,7 @@ select.form-control-custom {
 }
 
 .panel-card {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
@@ -1115,7 +1117,7 @@ select.form-control-custom {
 .channel-icon svg {
   width: 21px;
   height: 21px;
-  color: #fff;
+  color: var(--white);
 }
 
 .channel-body {
@@ -1156,7 +1158,7 @@ select.form-control-custom {
 .faq-item {
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
-  background: #fff;
+  background: var(--white);
   overflow: hidden;
 }
 
@@ -1169,7 +1171,7 @@ select.form-control-custom {
   padding: 16px 18px;
   border: none;
   background: transparent;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 16px;
   font-weight: 600;
   color: var(--gray-900);
@@ -1212,7 +1214,7 @@ select.form-control-custom {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  background: #fff;
+  background: var(--white);
 }
 
 .map-frame {
@@ -1262,7 +1264,7 @@ select.form-control-custom {
 .map-pin svg {
   width: 26px;
   height: 26px;
-  color: #fff;
+  color: var(--white);
 }
 
 /* =============================================================
@@ -1290,7 +1292,7 @@ select.form-control-custom {
 }
 
 .bstat {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   padding: 18px 16px;
@@ -1321,13 +1323,13 @@ select.form-control-custom {
 }
 
 .bstat-icon.green {
-  background: rgba(16, 185, 129, 0.1);
+  background: var(--color-rgba-16-185-129-0-1);
   color: var(--success);
 }
 
 .bstat-icon.amber {
-  background: rgba(245, 158, 11, 0.12);
-  color: #b45309;
+  background: var(--color-rgba-245-158-11-0-12);
+  color: var(--warning-dark);
 }
 
 .bstat-icon.gray {
@@ -1351,7 +1353,7 @@ select.form-control-custom {
 
 /* Toolbar: search + tabs */
 .booking-toolbar {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -1381,7 +1383,7 @@ select.form-control-custom {
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-md);
   font-size: 16px !important;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   color: var(--gray-900);
   transition: all 0.2s;
 }
@@ -1406,7 +1408,7 @@ select.form-control-custom {
   background: transparent;
   border-radius: var(--radius-sm);
   padding: 11px 6px;
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 14px !important;
   font-weight: 600;
   color: var(--gray-600);
@@ -1422,7 +1424,7 @@ select.form-control-custom {
 }
 
 .btab.active {
-  background: #fff;
+  background: var(--white);
   color: var(--primary-blue);
   box-shadow: var(--shadow-sm);
 }
@@ -1528,8 +1530,8 @@ select.form-control-custom {
 }
 
 .bc-status.confirmed {
-  background: rgba(16, 185, 129, 0.12);
-  color: #047857;
+  background: var(--color-rgba-16-185-129-0-12);
+  color: var(--success);
 }
 
 .bc-status.upcoming {
@@ -1543,7 +1545,7 @@ select.form-control-custom {
 }
 
 .bc-status.cancelled {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-rgba-239-68-68-0-1);
   color: var(--danger);
 }
 
@@ -1575,7 +1577,7 @@ select.form-control-custom {
   justify-content: center;
   font-size: 14px !important;
   font-weight: 800;
-  color: #fff;
+  color: var(--white);
   flex: none;
 }
 
@@ -1689,7 +1691,7 @@ select.form-control-custom {
   transform: translateX(-50%);
   color: var(--primary-blue);
   font-size: 20px !important;
-  background: #fff;
+  background: var(--white);
   padding: 0 5px;
   z-index: 1;
   line-height: 1;
@@ -1718,7 +1720,7 @@ select.form-control-custom {
 }
 
 .bc-detail {
-  background: #fff;
+  background: var(--white);
   padding: 14px 18px;
   min-width: 0;
 }
@@ -1816,9 +1818,9 @@ select.form-control-custom {
   padding: 10px 16px;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--gray-300);
-  background: #fff;
+  background: var(--white);
   color: var(--gray-700);
-  font-family: inherit;
+  font-family: var(--font-family-base);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -1842,24 +1844,24 @@ select.form-control-custom {
 .bc-btn.primary {
   background: var(--brand-gradient);
   border-color: transparent;
-  color: #fff;
+  color: var(--white);
   box-shadow: var(--shadow-md);
 }
 
 .bc-btn.primary:hover {
-  color: #fff;
+  color: var(--white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
 .bc-btn.danger {
-  border-color: rgba(239, 68, 68, 0.35);
+  border-color: var(--color-rgba-239-68-68-0-35);
   color: var(--danger);
 }
 
 .bc-btn.danger:hover {
   border-color: var(--danger);
-  background: rgba(239, 68, 68, 0.07);
+  background: var(--color-rgba-239-68-68-0-07);
   color: var(--danger);
 }
 
@@ -1906,12 +1908,12 @@ select.form-control-custom {
 
 .bc-step.done .bc-step-dot {
   background: var(--success);
-  color: #fff;
+  color: var(--white);
 }
 
 .bc-step.now .bc-step-dot {
   background: var(--primary-blue);
-  color: #fff;
+  color: var(--white);
   box-shadow: 0 0 0 4px rgb(var(--brand-blue-rgb) / 0.16);
 }
 
@@ -1954,7 +1956,7 @@ select.form-control-custom {
   align-items: center;
   gap: 10px;
   text-align: center;
-  background: #fff;
+  background: var(--white);
   border: 2px dashed var(--gray-300);
   border-radius: var(--radius-lg);
   padding: 54px 24px;
@@ -1993,7 +1995,7 @@ select.form-control-custom {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(15, 23, 42, 0.55);
+  background: var(--color-rgba-15-23-42-0-55);
   backdrop-filter: blur(3px);
 }
 
@@ -2004,7 +2006,7 @@ select.form-control-custom {
 .bk-modal-box {
   width: 100%;
   max-width: 460px;
-  background: #fff;
+  background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-2xl);
   padding: 26px 24px;
@@ -2032,7 +2034,7 @@ select.form-control-custom {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-rgba-239-68-68-0-1);
   color: var(--danger);
 }
 
@@ -2093,7 +2095,7 @@ select.form-control-custom {
 /* Ticket / print sheet */
 .ticket-sheet {
   text-align: left;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   padding: 22px;
@@ -2262,7 +2264,7 @@ select.form-control-custom {
   padding: 32px 26px;
   border-radius: var(--radius-xl);
   background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue) 55%, var(--brand-orange));
-  color: #fff;
+  color: var(--white);
   box-shadow: var(--shadow-xl);
 }
 
@@ -2291,24 +2293,24 @@ select.form-control-custom {
 }
 
 .cta-band-actions .bc-btn {
-  background: #fff;
+  background: var(--white);
   border-color: transparent;
   color: var(--primary-blue-dark);
 }
 
 .cta-band-actions .bc-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--color-rgba-255-255-255-0-9);
   color: var(--primary-blue-dark);
 }
 
 .cta-band-actions .bc-btn.primary {
   background: var(--dark-navy);
-  color: #fff;
+  color: var(--white);
 }
 
 .cta-band-actions .bc-btn.primary:hover {
   background: var(--gray-900);
-  color: #fff;
+  color: var(--white);
 }
 
 @media (min-width: 768px) {

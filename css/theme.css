@@ -1,0 +1,205 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+
+  /* Additional component palette values */
+  --color-hex-0f7a56: #0f7a56;
+  --color-hex-1a4fa0: #1a4fa0;
+  --color-hex-1b4b6b: #1b4b6b;
+  --color-hex-1b7a43: #1b7a43;
+  --color-hex-1f1f1f: #1f1f1f;
+  --color-hex-2b7fae: #2b7fae;
+  --color-hex-5c0632: #5c0632;
+  --color-hex-7c4a06: #7c4a06;
+  --color-hex-92400e: #92400e;
+  --color-hex-9cc6e3: #9cc6e3;
+  --color-hex-9fb0c0: #9fb0c0;
+  --color-hex-9fdcc4: #9fdcc4;
+  --color-hex-a3b1be: #a3b1be;
+  --color-hex-a7f3d0: #a7f3d0;
+  --color-hex-a9d4ee: #a9d4ee;
+  --color-hex-b0bfcc: #b0bfcc;
+  --color-hex-b6c8d8: #b6c8d8;
+  --color-hex-b9cddd: #b9cddd;
+  --color-hex-b9d6ea: #b9d6ea;
+  --color-hex-bcdcf1: #bcdcf1;
+  --color-hex-bfdcef: #bfdcef;
+  --color-hex-c3d3e0: #c3d3e0;
+  --color-hex-c3d6e5: #c3d6e5;
+  --color-hex-c8102e: #c8102e;
+  --color-hex-ccd9e5: #ccd9e5;
+  --color-hex-cec: #cec;
+  --color-hex-cfdae3: #cfdae3;
+  --color-hex-cfe6f7: #cfe6f7;
+  --color-hex-d5dde5: #d5dde5;
+  --color-hex-d5e9f7: #d5e9f7;
+  --color-hex-d6e9f7: #d6e9f7;
+  --color-hex-dcecf8: #dcecf8;
+  --color-hex-ddeefc: #ddeefc;
+  --color-hex-e2551b: #e2551b;
+  --color-hex-e2f1fb: #e2f1fb;
+  --color-hex-e6ebf0: #e6ebf0;
+  --color-hex-e8eef5: #e8eef5;
+  --color-hex-f2fbf7: #f2fbf7;
+  --color-hex-f4e0b6: #f4e0b6;
+  --color-hex-f6cfcf: #f6cfcf;
+  --color-hex-fcc: #fcc;
+  --color-hex-fecaca: #fecaca;
+  --color-rgba-0-0-0-0-08: rgba(0, 0, 0, 0.08);
+  --color-rgba-0-0-0-0-1: rgba(0, 0, 0, 0.1);
+  --color-rgba-0-0-0-0-12: rgba(0, 0, 0, 0.12);
+  --color-rgba-0-0-0-0-13: rgba(0, 0, 0, 0.13);
+  --color-rgba-0-0-0-0-3: rgba(0, 0, 0, 0.3);
+  --color-rgba-0-0-0-0-4: rgba(0, 0, 0, 0.4);
+  --color-rgba-15-23-42-0-55: rgba(15, 23, 42, 0.55);
+  --color-rgba-15-23-42-0-82: rgba(15, 23, 42, 0.82);
+  --color-rgba-16-185-129-0-1: rgba(16, 185, 129, 0.1);
+  --color-rgba-16-185-129-0-12: rgba(16, 185, 129, 0.12);
+  --color-rgba-16-185-129-0-25: rgba(16, 185, 129, 0.25);
+  --color-rgba-16-185-129-0-3: rgba(16, 185, 129, 0.3);
+  --color-rgba-16-24-40-0-05: rgba(16, 24, 40, 0.05);
+  --color-rgba-239-68-68-0-07: rgba(239, 68, 68, 0.07);
+  --color-rgba-239-68-68-0-08: rgba(239, 68, 68, 0.08);
+  --color-rgba-239-68-68-0-1: rgba(239, 68, 68, 0.1);
+  --color-rgba-239-68-68-0-3: rgba(239, 68, 68, 0.3);
+  --color-rgba-239-68-68-0-35: rgba(239, 68, 68, 0.35);
+  --color-rgba-245-158-11-0-12: rgba(245, 158, 11, 0.12);
+  --color-rgba-245-158-11-0-3: rgba(245, 158, 11, 0.3);
+  --color-rgba-255-255-255-0-05: rgba(255, 255, 255, 0.05);
+  --color-rgba-255-255-255-0-06: rgba(255, 255, 255, 0.06);
+  --color-rgba-255-255-255-0-1: rgba(255, 255, 255, 0.1);
+  --color-rgba-255-255-255-0-15: rgba(255, 255, 255, 0.15);
+  --color-rgba-255-255-255-0-2: rgba(255, 255, 255, 0.2);
+  --color-rgba-255-255-255-0-25: rgba(255, 255, 255, 0.25);
+  --color-rgba-255-255-255-0-3: rgba(255, 255, 255, 0.3);
+  --color-rgba-255-255-255-0-85: rgba(255, 255, 255, 0.85);
+  --color-rgba-255-255-255-0-9: rgba(255, 255, 255, 0.9);
+  --color-rgba-255-255-255-0-95: rgba(255, 255, 255, 0.95);
+  --color-rgba-8-10-16-0-55: rgba(8, 10, 16, 0.55);
+  --color-rgba-8-10-16-0-95: rgba(8, 10, 16, 0.95);
+  /* Brand palette */
+  --brand-blue: #1e458f;
+  --brand-blue-dark: #17366f;
+  --brand-blue-rgb: 30 69 143;
+  --brand-orange: #f86b20;
+  --brand-orange-dark: #df5712;
+  --brand-orange-deep: #b64712;
+  --brand-orange-rgb: 248 107 32;
+  --brand-gradient: linear-gradient(120deg, var(--brand-orange-deep) 0%, var(--brand-orange) 40%, var(--brand-blue) 100%);
+  --primary-blue: var(--brand-blue);
+  --primary-blue-dark: var(--brand-blue-dark);
+  --primary: var(--primary-blue);
+  --primary-dark: var(--primary-blue-dark);
+  --primary-light: rgb(var(--brand-blue-rgb) / 0.08);
+  --primary-pale: rgb(var(--brand-blue-rgb) / 0.2);
+  --accent-teal: var(--brand-orange);
+  --accent-teal-dark: var(--brand-orange-dark);
+
+  /* Neutrals and semantic colors */
+  --dark-navy: #0f172a;
+  --dark-slate: #1e293b;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-900: #0f172a;
+  --white: #ffffff;
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;
+  --warning-dark: #b45309;
+  --warning-light: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-light: #fdf0f0;
+
+  /* Surface and text aliases */
+  --booking-page: #eef4f9;
+  --booking-band: #dceefb;
+  --booking-soft: #f6f9fc;
+  --booking-line: #dfe7ef;
+  --border: var(--gray-200);
+  --border-dark: var(--gray-300);
+  --muted: var(--gray-600);
+  --muted-dark: var(--gray-500);
+  --card-bg: var(--white);
+  --text: var(--gray-900);
+  --soft: var(--gray-50);
+  --green: var(--success);
+  --green-light: var(--success-light);
+  --amber: var(--warning);
+  --amber-light: var(--warning-light);
+
+  /* Booking flow tokens */
+  --bk-page: var(--booking-page);
+  --bk-band: var(--booking-band);
+  --bk-ink: var(--dark-navy);
+  --bk-muted: var(--gray-500);
+  --bk-line: var(--booking-line);
+  --bk-soft: var(--booking-soft);
+  --bk-blue: var(--primary-blue);
+  --bk-blue-dark: var(--primary-blue-dark);
+  --bk-blue-tint: var(--primary-light);
+  --bk-teal: var(--accent-teal);
+  --bk-green: var(--success);
+  --bk-amber: var(--warning-dark);
+  --bk-amber-bg: var(--warning-light);
+  --bk-red: var(--danger-dark);
+  --bk-red-bg: var(--danger-light);
+  --bk-radius: 14px;
+  --bk-radius-sm: 10px;
+  --bk-rail: 372px;
+  --bk-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --bk-shadow-pop: 0 12px 28px -10px rgba(15, 23, 42, 0.18);
+
+  /* Shape, elevation, and layout */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --container-padding: 20px;
+  --font-family-base: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-body: 17px;
+  --font-size-heading: 18px;
+}
+
+@media (min-width: 768px) {
+  body { --container-padding: 32px; }
+}
+
+@media (min-width: 1200px) {
+  body { --container-padding: 140px; }
+}
+
+/* Shared typography defaults; this stylesheet loads after page styles. */
+#app,
+#app :not(svg):not(path):not(i):not([class*="bi-"]) {
+  font-family: var(--font-family-base) !important;
+  font-size: var(--font-size-body) !important;
+}
+
+#app h1:not(svg):not(path):not(i):not([class*="bi-"]),
+#app h2:not(svg):not(path):not(i):not([class*="bi-"]),
+#app h3:not(svg):not(path):not(i):not([class*="bi-"]),
+#app h4:not(svg):not(path):not(i):not([class*="bi-"]),
+#app h5:not(svg):not(path):not(i):not([class*="bi-"]),
+#app h6:not(svg):not(path):not(i):not([class*="bi-"]) {
+  font-size: var(--font-size-heading) !important;
+}
+
+/* Small reusable presentation helpers */
+.u-icon-12 { width: 12px; height: 12px; }
+.u-icon-16 { width: 16px; height: 16px; }
+.u-icon-17 { width: 17px; height: 17px; }
+.u-mt-8 { margin-top: 8px; }
+.u-borderless { border: 0; }
+.u-hidden { display: none; }

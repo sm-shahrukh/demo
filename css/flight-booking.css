@@ -6,32 +6,8 @@
    right-hand rail, so the shell lives here and each screen only adds its own
    block further down.
 
-   Typography starts from css/typography.css and component classes set the
-   smaller booking-specific hierarchy where the flow needs it.
+   Typography defaults are centralized in css/theme.css.
    ========================================================================== */
-
-:root {
-  --bk-page: var(--booking-page);
-  --bk-band: var(--booking-band);
-  --bk-ink: var(--dark-navy);
-  --bk-muted: var(--gray-500);
-  --bk-line: var(--booking-line);
-  --bk-soft: var(--booking-soft);
-  --bk-blue: var(--primary-blue);
-  --bk-blue-dark: var(--primary-blue-dark);
-  --bk-blue-tint: var(--primary-light);
-  --bk-teal: var(--accent-teal);
-  --bk-green: var(--success);
-  --bk-amber: var(--warning-dark);
-  --bk-amber-bg: var(--warning-light);
-  --bk-red: var(--danger-dark);
-  --bk-red-bg: var(--danger-light);
-  --bk-radius: 14px;
-  --bk-radius-sm: 10px;
-  --bk-rail: 372px;
-  --bk-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --bk-shadow-pop: 0 12px 28px -10px rgba(15, 23, 42, 0.18);
-}
 
 .bk-flex-1 {
   flex: 1;
@@ -130,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid rgb(var(--brand-blue-rgb) / 0.25);
   border-radius: 999px;
   padding: 8px 16px;
@@ -180,7 +156,7 @@
   justify-content: center;
   font-size: 13px !important;
   font-weight: 700;
-  background: #fff;
+  background: var(--white);
   border: 1.5px solid var(--bk-line);
   color: var(--bk-muted);
   flex: none;
@@ -199,7 +175,7 @@
 .bk-step.is-active .bk-step-dot {
   background: var(--bk-blue);
   border-color: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-step.is-done {
@@ -209,7 +185,7 @@
 .bk-step.is-done .bk-step-dot {
   background: var(--bk-teal);
   border-color: var(--bk-teal);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-step-line {
@@ -249,7 +225,7 @@
 /* ============================ CARDS ============================ */
 
 .bk-card {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--bk-line);
   border-radius: var(--bk-radius);
   box-shadow: var(--bk-shadow);
@@ -349,8 +325,8 @@
 
 .bk-note-info {
   background: var(--bk-blue-tint);
-  border: 1px solid #cfe6f7;
-  color: #1b4b6b;
+  border: 1px solid var(--color-hex-cfe6f7);
+  color: var(--color-hex-1b4b6b);
 }
 
 .bk-note-info svg {
@@ -359,8 +335,8 @@
 
 .bk-note-warn {
   background: var(--bk-amber-bg);
-  border: 1px solid #f4e0b6;
-  color: #7c4a06;
+  border: 1px solid var(--color-hex-f4e0b6);
+  color: var(--color-hex-7c4a06);
 }
 
 .bk-note-warn svg {
@@ -369,8 +345,8 @@
 
 .bk-note-danger {
   background: var(--bk-red-bg);
-  border: 1px solid #f6cfcf;
-  color: #8c2626;
+  border: 1px solid var(--color-hex-f6cfcf);
+  color: var(--danger-dark);
 }
 
 .bk-note-danger svg {
@@ -410,17 +386,17 @@
 
 .bk-btn-primary {
   background: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-btn-primary:hover {
   background: var(--bk-blue-dark);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-btn-outline {
-  background: #fff;
-  border-color: #c3d3e0;
+  background: var(--white);
+  border-color: var(--color-hex-c3d3e0);
   color: var(--bk-blue);
 }
 
@@ -432,12 +408,12 @@
 
 .bk-btn-quiet {
   background: var(--bk-blue-tint);
-  border-color: #d5e9f7;
+  border-color: var(--color-hex-d5e9f7);
   color: var(--bk-blue-dark);
 }
 
 .bk-btn-quiet:hover {
-  background: #e2f1fb;
+  background: var(--color-hex-e2f1fb);
   color: var(--bk-blue-dark);
 }
 
@@ -473,7 +449,7 @@
 }
 
 .bk-link-danger:hover {
-  color: #b91c1c;
+  color: var(--danger-dark);
 }
 
 /* ============================ CHIPS / BADGES ============================ */
@@ -500,15 +476,15 @@
 }
 
 .bk-badge-done {
-  background: #e6f7f1;
-  color: #0f7a56;
+  background: var(--success-light);
+  color: var(--color-hex-0f7a56);
 }
 
 /* Marks the one add-on the user cannot skip. Deliberately stronger than
    .bk-badge-pending: this is a hard requirement, not a warning. */
 .bk-badge-required {
   background: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 /* ============================ FORM FIELDS ============================ */
@@ -553,9 +529,9 @@
 
 .bk-control {
   width: 100%;
-  border: 1px solid #ccd9e5;
+  border: 1px solid var(--color-hex-ccd9e5);
   border-radius: var(--bk-radius-sm);
-  background: #fff;
+  background: var(--white);
   padding: 10px 12px;
   font-size: 14px !important;
   color: var(--bk-ink);
@@ -569,7 +545,7 @@
 }
 
 .bk-control::placeholder {
-  color: #9fb0c0;
+  color: var(--color-hex-9fb0c0);
 }
 
 select.bk-control {
@@ -585,10 +561,10 @@ select.bk-control {
    partner. Fully editable, tinted just enough to read as connected. */
 .bk-control[data-sync] {
   background-color: var(--bk-blue-tint);
-  border-color: #bcdcf1;
+  border-color: var(--color-hex-bcdcf1);
 }
 .bk-control[data-sync]:focus {
-  background-color: #fff;
+  background-color: var(--white);
 }
 
 .bk-control.is-invalid {
@@ -803,7 +779,7 @@ select.bk-control {
   border-radius: var(--bk-radius-sm);
   margin-bottom: 10px;
   overflow: hidden;
-  background: #fff;
+  background: var(--white);
 }
 
 .bk-pax:last-child {
@@ -811,7 +787,7 @@ select.bk-control {
 }
 
 .bk-pax.is-open {
-  border-color: #bfdcef;
+  border-color: var(--color-hex-bfdcef);
   box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.06);
 }
 
@@ -820,7 +796,7 @@ select.bk-control {
   align-items: center;
   gap: 11px;
   width: 100%;
-  background: #fff;
+  background: var(--white);
   border: none;
   padding: 14px 16px;
   cursor: pointer;
@@ -829,7 +805,7 @@ select.bk-control {
 
 .bk-pax.is-open .bk-pax-head {
   background: var(--bk-blue-tint);
-  border-bottom: 1px solid #dcecf8;
+  border-bottom: 1px solid var(--color-hex-dcecf8);
 }
 
 .bk-pax-head:hover {
@@ -913,7 +889,7 @@ select.bk-control {
 /* passport dropzone */
 
 .bk-drop {
-  border: 1.5px dashed #b9cddd;
+  border: 1.5px dashed var(--color-hex-b9cddd);
   border-radius: var(--bk-radius-sm);
   background: var(--bk-soft);
   padding: 20px 16px;
@@ -935,7 +911,7 @@ select.bk-control {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--bk-line);
   color: var(--bk-blue);
   display: inline-flex;
@@ -965,7 +941,7 @@ select.bk-control {
 .bk-drop.has-file {
   border-style: solid;
   border-color: var(--bk-green);
-  background: #f2fbf7;
+  background: var(--color-hex-f2fbf7);
 }
 
 /* ============================ RIGHT RAIL ============================ */
@@ -1052,7 +1028,7 @@ select.bk-control {
 .bk-leg-line {
   position: relative;
   height: 1.5px;
-  background: #c3d6e5;
+  background: var(--color-hex-c3d6e5);
   margin: 3px 0;
 }
 
@@ -1126,7 +1102,7 @@ select.bk-control {
 
 .bk-total {
   background: var(--bk-blue-tint);
-  border: 1px solid #d6e9f7;
+  border: 1px solid var(--color-hex-d6e9f7);
   border-radius: var(--bk-radius-sm);
   padding: 13px 15px;
   margin-top: 12px;
@@ -1201,7 +1177,7 @@ select.bk-control {
    paid option that happens to be selected. */
 .bk-opt.is-default {
   border-style: dashed;
-  border-color: #b6c8d8;
+  border-color: var(--color-hex-b6c8d8);
   background: var(--bk-soft);
 }
 
@@ -1285,19 +1261,19 @@ select.bk-control {
   width: 13px;
   height: 13px;
   border-radius: 3px;
-  border: 1.5px solid #c3d3e0;
-  background: #fff;
+  border: 1.5px solid var(--color-hex-c3d3e0);
+  background: var(--white);
   flex: none;
 }
 
 .bk-legend i.l-paid {
   background: var(--bk-blue-tint);
-  border-color: #a9d4ee;
+  border-color: var(--color-hex-a9d4ee);
 }
 
 .bk-legend i.l-taken {
-  background: #e6ebf0;
-  border-color: #d5dde5;
+  background: var(--color-hex-e6ebf0);
+  border-color: var(--color-hex-d5dde5);
 }
 
 .bk-legend i.l-pick {
@@ -1323,15 +1299,15 @@ select.bk-control {
 
 .bk-seat-rownum {
   font-size: 12px !important;
-  color: #b0bfcc;
+  color: var(--color-hex-b0bfcc);
   text-align: center;
 }
 
 .bk-seat {
   height: 32px;
   border-radius: 7px;
-  border: 1.5px solid #c3d3e0;
-  background: #fff;
+  border: 1.5px solid var(--color-hex-c3d3e0);
+  background: var(--white);
   font-size: 12px !important;
   font-weight: 600;
   color: var(--bk-muted);
@@ -1350,25 +1326,25 @@ select.bk-control {
 
 .bk-seat.is-paid {
   background: var(--bk-blue-tint);
-  border-color: #a9d4ee;
-  color: #2b7fae;
+  border-color: var(--color-hex-a9d4ee);
+  color: var(--color-hex-2b7fae);
 }
 
 .bk-seat.is-paid:hover {
-  background: #ddeefc;
+  background: var(--color-hex-ddeefc);
 }
 
 .bk-seat.is-taken {
-  background: #e6ebf0;
-  border-color: #d5dde5;
-  color: #a3b1be;
+  background: var(--color-hex-e6ebf0);
+  border-color: var(--color-hex-d5dde5);
+  color: var(--color-hex-a3b1be);
   cursor: not-allowed;
 }
 
 .bk-seat.is-pick {
   background: var(--bk-blue);
   border-color: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-seat-exit {
@@ -1402,7 +1378,7 @@ select.bk-control {
 /* selection panel */
 
 .bk-picked {
-  border: 1px solid #bfdcef;
+  border: 1px solid var(--color-hex-bfdcef);
   background: var(--bk-blue-tint);
   border-radius: var(--bk-radius-sm);
   padding: 14px 16px;
@@ -1445,11 +1421,11 @@ select.bk-control {
   gap: 16px;
   margin-top: 11px;
   padding-top: 11px;
-  border-top: 1px solid #d6e9f7;
+  border-top: 1px solid var(--color-hex-d6e9f7);
 }
 
 .bk-empty {
-  border: 1px dashed #c3d3e0;
+  border: 1px dashed var(--color-hex-c3d3e0);
   border-radius: var(--bk-radius-sm);
   padding: 18px 16px;
   text-align: center;
@@ -1541,15 +1517,15 @@ select.bk-control {
 }
 
 .bk-cov.is-on {
-  border-color: #9fdcc4;
-  background: #f2fbf7;
+  border-color: var(--color-hex-9fdcc4);
+  background: var(--color-hex-f2fbf7);
 }
 
 .bk-cov-mark {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  border: 1.5px solid #cfdae3;
+  border: 1.5px solid var(--color-hex-cfdae3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1565,7 +1541,7 @@ select.bk-control {
 .bk-cov.is-on .bk-cov-mark {
   background: var(--bk-green);
   border-color: var(--bk-green);
-  color: #fff;
+  color: var(--white);
 }
 
 .bk-cov-txt {
@@ -1688,7 +1664,7 @@ select.bk-control {
   height: 22px;
   border-radius: 50%;
   background: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
   font-size: 12px !important;
   font-weight: 700;
   display: inline-flex;
@@ -1713,12 +1689,12 @@ select.bk-control {
   align-items: center;
   gap: 8px;
   background: var(--bk-amber-bg);
-  border: 1px solid #f4e0b6;
+  border: 1px solid var(--color-hex-f4e0b6);
   border-radius: var(--bk-radius-sm);
   padding: 11px 14px;
   font-size: 14px !important;
   font-weight: 600;
-  color: #7c4a06;
+  color: var(--color-hex-7c4a06);
   width: 100%;
   margin-bottom: 16px;
 }
@@ -1786,7 +1762,7 @@ select.bk-control {
 }
 
 .bk-copy {
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--bk-line);
   border-radius: 8px;
   width: 32px;
@@ -1822,7 +1798,7 @@ select.bk-control {
   padding: 13px;
   cursor: pointer;
   text-align: center;
-  background: #fff;
+  background: var(--white);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -1878,7 +1854,7 @@ select.bk-control {
   height: 40px;
   border: 1px solid var(--bk-line);
   border-radius: var(--bk-radius-sm);
-  background: #fff;
+  background: var(--white);
   color: var(--bk-ink);
   font-size: 14px !important;
   font-weight: 600;
@@ -1895,7 +1871,7 @@ select.bk-control {
 .bk-rate.is-on {
   background: var(--bk-blue);
   border-color: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 /* ============================ TOAST ============================ */
@@ -1907,7 +1883,7 @@ select.bk-control {
   transform: translateX(-50%);
   z-index: 1500;
   background: var(--bk-ink);
-  color: #fff;
+  color: var(--white);
   border-radius: 999px;
   padding: 11px 20px;
   font-size: 14px !important;
@@ -2038,7 +2014,7 @@ select.bk-control {
 }
 
 .bk-context-state.is-ok {
-  background: #e7f7f0;
+  background: var(--success-light);
   color: var(--bk-green);
 }
 
@@ -2144,14 +2120,14 @@ select.bk-control {
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #e8eef5;
+  background: var(--color-hex-e8eef5);
   color: var(--bk-muted);
 }
 
 /* The active tab carries the count too, so "done" reads at a glance. */
 .bk-tab.is-on .bk-tab-badge {
   background: var(--bk-blue);
-  color: #fff;
+  color: var(--white);
 }
 
 /* Departing / Returning. Two pills, each with its own date and route. */
@@ -2227,7 +2203,7 @@ select.bk-control {
 .bk-prog-bar {
   height: 6px;
   border-radius: 999px;
-  background: #e8eef5;
+  background: var(--color-hex-e8eef5);
   overflow: hidden;
 }
 
@@ -2322,7 +2298,7 @@ select.bk-control {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(15, 23, 42, 0.55);
+  background: var(--color-rgba-15-23-42-0-55);
 }
 
 .bk-modal.show {
@@ -2330,7 +2306,7 @@ select.bk-control {
 }
 
 .bk-modal-box {
-  background: #fff;
+  background: var(--white);
   border-radius: var(--bk-radius);
   box-shadow: var(--bk-shadow-pop);
   width: min(880px, 100%);
@@ -2370,7 +2346,7 @@ select.bk-control {
   justify-content: center;
   border: 1px solid var(--bk-line);
   border-radius: 50%;
-  background: #fff;
+  background: var(--white);
   color: var(--bk-muted);
   cursor: pointer;
 }
@@ -2524,9 +2500,7 @@ select.bk-control {
 /* ============================ RESPONSIVE ============================ */
 
 @media (max-width: 1199.98px) {
-  :root {
-    --bk-rail: 320px;
-  }
+  .bk-layout { --bk-rail: 320px; }
 }
 
 @media (max-width: 991.98px) {

@@ -14,7 +14,7 @@
     }
 
     const link = event.target.closest("#navbarMenu a");
-    if (!link || window.innerWidth > 991) return;
+    if (!link || window.innerWidth > 1199) return;
 
     const menu = document.getElementById("navbarMenu");
     const menuToggle = document.querySelector("[data-nav-toggle]");
