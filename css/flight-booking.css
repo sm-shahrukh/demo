@@ -1709,6 +1709,44 @@ select.bk-control {
   font-variant-numeric: tabular-nums;
 }
 
+.bk-thanks {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.bk-thanks-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--success-light);
+  color: var(--bk-green);
+}
+
+.bk-thanks-mark svg {
+  width: 23px;
+  height: 23px;
+}
+
+.bk-thanks h2 {
+  margin: 0 0 4px;
+  color: var(--bk-ink);
+  font-size: 20px !important;
+  font-weight: 700;
+}
+
+.bk-thanks p {
+  margin: 0;
+  color: var(--bk-muted);
+  font-size: 14px !important;
+  line-height: 1.55;
+}
+
 .bk-promo {
   display: flex;
   gap: 9px;
@@ -2051,10 +2089,12 @@ select.bk-control {
 /* One button per traveler. The n/6 badge is the whole point — with three
    travelers across two flights there is no other way to see who is done. */
 .bk-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 10px;
   margin-top: 16px;
+  padding: 2px 2px 8px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .bk-tab {
@@ -2067,7 +2107,8 @@ select.bk-control {
   background: var(--bk-soft);
   cursor: pointer;
   text-align: left;
-  min-width: 0;
+  flex: 1 0 170px;
+  min-width: 150px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
@@ -2133,9 +2174,108 @@ select.bk-control {
 /* Departing / Returning. Two pills, each with its own date and route. */
 .bk-seg {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
   margin-top: 12px;
+}
+
+.bk-addon-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.bk-addon-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-radius-sm);
+  background: var(--white);
+  color: var(--bk-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bk-addon-tab:hover,
+.bk-addon-tab.is-on {
+  border-color: var(--bk-blue);
+  background: var(--bk-blue-tint);
+}
+
+.bk-addon-tab:focus-visible {
+  outline: 3px solid rgb(var(--brand-blue-rgb) / 0.22);
+  outline-offset: 2px;
+}
+
+.bk-addon-tab.is-on {
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.08);
+}
+
+.bk-addon-tab-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--bk-blue);
+}
+
+.bk-addon-tab-icon svg,
+.bk-addon-tab-mark svg {
+  width: 19px;
+  height: 19px;
+}
+
+.bk-addon-tab-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bk-addon-tab-copy b {
+  font-size: 14px !important;
+  color: var(--bk-ink);
+}
+
+.bk-addon-tab-copy small {
+  font-size: 12px !important;
+  color: var(--bk-muted);
+}
+
+.bk-addon-tab.is-required .bk-addon-tab-copy small {
+  color: var(--bk-amber);
+  font-weight: 600;
+}
+
+.bk-addon-tab-mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--bk-green);
+}
+
+.bk-addon-tab.is-required .bk-addon-tab-mark {
+  color: var(--bk-amber);
+}
+
+.bk-addon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  gap: 12px;
+}
+
+.bk-addon-grid .bk-opt {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  margin: 0;
+}
+
+.bk-addon-grid .bk-opt-top {
+  flex: 1 1 auto;
 }
 
 .bk-seg-btn {
@@ -2602,14 +2742,37 @@ select.bk-control {
     margin-left: auto;
   }
 
-  /* One column of tabs on a phone: three side-by-side flags with names do not
-     fit under ~360px without truncating every label. */
   .bk-tabs {
-    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .bk-tab {
+    flex-basis: min(78vw, 230px);
+    padding: 10px 12px;
   }
 
   .bk-seg {
     grid-template-columns: 1fr;
+  }
+
+  .bk-addon-tabs {
+    gap: 6px;
+  }
+
+  .bk-addon-tab {
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 5px;
+    text-align: center;
+  }
+
+  .bk-addon-tab-mark {
+    display: none;
+  }
+
+  .bk-addon-tab-copy {
+    align-items: center;
   }
 
   /* Banner stacks: the divider line is meaningless once the rows wrap, and

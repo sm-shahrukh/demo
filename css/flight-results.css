@@ -1955,6 +1955,19 @@
     margin-top: 0;
   }
 
+  .fr-wide-col.fr-stop-filter-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  .fr-stop-filter-row h3 {
+    margin: 0;
+  }
+
   /* Price Range puts "Clear" on the same line as its heading. */
   .fr-wide-col-head {
     display: flex;

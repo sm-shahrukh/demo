@@ -453,7 +453,7 @@
      something they don't want. A seat is NOT: every traveler has to be
      placed, so it stays empty until someone picks one (see SEAT_REQUIRED). */
   var DEFAULT_BAG = "bag0";
-  var DEFAULT_MEAL = "none";
+  var DEFAULT_MEAL = "std";
 
   var PAYMENT_METHODS = [
     {
@@ -553,7 +553,7 @@
     },
     addons: {
       title: "Baggage & seats",
-      sub: "Make the journey yours. Choose flight and flight a seat.",
+      sub: "Choose meals and baggage, then select a seat for each traveler and flight.",
       back: "Back to traveler details",
     },
     review: {
@@ -567,8 +567,8 @@
       back: "Back to review",
     },
     pending: {
-      title: "Order created · Payment pending",
-      sub: "Your order is ready. Complete payment to request ticket issuance.",
+      title: "Thank you!",
+      sub: "Your booking request is saved. Payment is pending and no ticket has been issued.",
       back: "Manage booking",
     },
   };
@@ -594,6 +594,7 @@
     values: {},
     activeDir: 0, // 0 = Departing, 1 = Returning
     activePax: 1,
+    activeAddon: "meal",
     method: "1bill",
     channel: "mobile",
     promo: null,
@@ -715,7 +716,7 @@
   /* Fill [data-role="name"] inside a markup string. Values are trusted HTML
      built by this file, so they are inserted as-is. */
   function fill(html, slots) {
-    return html.replace(/data-role="([\w-]+)"/g, function (whole, name) {
+    return html.replace(/data-role="([\w-]+)"\s*>/g, function (whole, name) {
       if (!Object.prototype.hasOwnProperty.call(slots, name)) return whole;
       return "data-role=\"" + name + "\" data-filled>" + slots[name];
     });
@@ -766,6 +767,12 @@
       if (MEAL_OPTIONS[i].id === id) return MEAL_OPTIONS[i];
     }
     return null;
+  }
+
+  function mealPriceLabel(meal) {
+    if (!meal) return "Not selected";
+    if (meal.id === "none") return "No meal";
+    return meal.free ? "Included" : money(meal.price);
   }
 
   function travById(id) {
@@ -1595,7 +1602,7 @@
       "</div>" +
       '<div class="bk-context-div"></div>' +
       '<div class="bk-context-where">' +
-      "<div><b>" + esc(d.label) + " flight · " + esc(d.from) + " → " + esc(d.to) + "</b>" +
+      "<div><b>" + esc(d.label) + " flight · " + esc(d.from) + " to " + esc(d.to) + "</b>" +
       "<span>" + esc(dateLabelFor(state.activeDir)) + " · " + esc(flightNos(state.activeDir)) +
       "</span></div>" +
       "</div>" +
@@ -1617,12 +1624,12 @@
       '<div class="bk-card-ctx">' +
       '<span class="bk-card-ctx-ico">' + esc(pax.flag) + "</span>" +
       "<span>For <b>" + esc(pax.label) + "</b> on the <b>" + esc(d.label.toLowerCase()) +
-      "</b> flight · " + esc(d.from) + " → " + esc(d.to) + "</span>" +
+      "</b> flight · " + esc(d.from) + " to " + esc(d.to) + "</span>" +
       "</div>"
     );
   }
 
-  /* One tab per traveler, showing how many of their 6 add-on slots are filled.
+  /* One tab per traveler, showing how many per-flight add-ons are selected.
      These are buttons, not inputs — harvest() only reads input/select/textarea,
      so their state lives purely in state.activePax. */
   function paxTabs() {
@@ -1646,6 +1653,57 @@
     );
   }
 
+  function addonTabs() {
+    var key = currentKey();
+    var options = [
+      {
+        id: "meal",
+        label: "Meal",
+        icon: ICON.meal,
+        value: state.meal[key],
+        defaultValue: DEFAULT_MEAL,
+      },
+      {
+        id: "bag",
+        label: "Baggage",
+        icon: ICON.bag,
+        value: state.bag[key],
+        defaultValue: DEFAULT_BAG,
+      },
+      {
+        id: "seat",
+        label: "Seat",
+        icon: ICON.seat,
+        value: state.seat[key],
+      },
+    ];
+
+    return (
+      '<div class="bk-addon-tabs" role="group" aria-label="Choose an add-on">' +
+      options.map(function (option) {
+        var selected = !!option.value;
+        var isDefault = selected && option.value === option.defaultValue;
+        var active = state.activeAddon === option.id;
+        var status = selected
+          ? (option.id === "meal" && option.value === "none"
+            ? "No meal"
+            : isDefault ? "Included" : "Selected")
+          : "Required";
+        return (
+          '<button type="button" class="bk-addon-tab' +
+          (active ? " is-on" : "") + (selected ? " is-done" : " is-required") +
+          '" data-addon-tab="' + option.id + '" aria-pressed="' + active + '">' +
+          '<span class="bk-addon-tab-icon" aria-hidden="true">' + option.icon + "</span>" +
+          '<span class="bk-addon-tab-copy"><b>' + option.label + "</b>" +
+          "<small>" + status + "</small></span>" +
+          '<span class="bk-addon-tab-mark">' + (selected ? ICON.check : ICON.info) + "</span>" +
+          "</button>"
+        );
+      }).join("") +
+      "</div>"
+    );
+  }
+
   /* Outbound / return. Two pills, each carrying its own date and route. */
   function dirToggle() {
     return (
@@ -1657,7 +1715,7 @@
             '<button type="button" class="bk-seg-btn' + (on ? " is-on" : "") + '"' +
             ' aria-pressed="' + (on ? "true" : "false") + '" data-dir="' + i + '">' +
             "<b>" + esc(d.label) + "</b>" +
-            "<span>" + esc(d.from + " → " + d.to) + " · " + esc(dateLabelFor(i)) + "</span>" +
+            "<span>" + esc(d.from + " to " + d.to) + " · " + esc(dateLabelFor(i)) + "</span>" +
             "</button>"
           );
         })
@@ -1706,7 +1764,10 @@
       );
     }).join("");
 
-    return fill(tpl("tplBagCard"), { ctx: cardContextLine(), options: options });
+    return fill(tpl("tplBagCard"), {
+      ctx: cardContextLine(),
+      options: '<div class="bk-addon-grid bk-bag-grid">' + options + "</div>",
+    });
   }
 
   function mealCard() {
@@ -1723,8 +1784,8 @@
         '<div class="bk-opt-top"><div><span class="bk-opt-name">' + esc(opt.name) +
         (isSkip ? '<span class="bk-opt-tag">Already set</span>' : "") + "</span>" +
         '<span class="bk-opt-desc">' + esc(opt.desc) + "</span></div>" +
-        '<span class="bk-picked-p' + (opt.free ? " bk-meal-free" : "") + '">' +
-        (opt.free ? "Included" : money(opt.price)) + "</span></div>" +
+        '<span class="bk-picked-p' + (opt.free && opt.id !== "none" ? " bk-meal-free" : "") + '">' +
+        (opt.id === "none" ? "No meal" : opt.free ? "Included" : money(opt.price)) + "</span></div>" +
         '<button type="button" class="bk-btn ' + (on ? "bk-btn-primary" : "bk-btn-outline") +
         ' bk-btn-sm" data-meal-pick="' + opt.id + '">' +
         (on ? ICON.check + "Selected" : "Choose this meal") +
@@ -1732,7 +1793,10 @@
       );
     }).join("");
 
-    return fill(tpl("tplMealCard"), { ctx: cardContextLine(), options: options });
+    return fill(tpl("tplMealCard"), {
+      ctx: cardContextLine(),
+      options: '<div class="bk-addon-grid bk-meal-grid">' + options + "</div>",
+    });
   }
 
   function seatMap() {
@@ -1753,7 +1817,7 @@
     SEAT_ROWS.forEach(function (row) {
       if (row === EXIT_ROW + 1) {
         rows +=
-          '<div class="bk-seat-exit"><span>← EXIT · extra legroom · EXIT →</span></div>';
+          '<div class="bk-seat-exit"><span>EXIT · extra legroom · EXIT</span></div>';
       }
       var cells = '<div class="bk-seat-rownum">' + row + "</div>";
       SEAT_LETTERS.forEach(function (letter) {
@@ -1831,7 +1895,7 @@
       ctx: cardContextLine(),
       sub:
         esc(pax.label) + " · " + esc(leg.flightNo) + " · " +
-        esc(leg.from.code) + " → " + esc(leg.to.code) + " · " + esc(dateLabelFor(dir)),
+        esc(leg.from.code) + " to " + esc(leg.to.code) + " · " + esc(dateLabelFor(dir)),
       note: note,
       legend: legend,
       grid: head + rows,
@@ -1853,22 +1917,29 @@
     });
 
     var advance;
-    if (nextTraveler != null) {
+    if (!state.seat[currentKey()]) {
+      if (state.activeAddon !== "seat") {
+        advance = '<button type="button" class="bk-btn bk-btn-primary" data-addon-tab="seat">' +
+          "Choose a seat to continue</button>";
+      } else {
+        advance = '<button type="button" class="bk-btn bk-btn-primary" disabled>' +
+          "Select a seat to continue</button>";
+      }
+    } else if (nextTraveler != null) {
       advance = '<button type="button" class="bk-btn bk-btn-primary" data-next-pax="' +
-        nextTraveler + '">Save &amp; next traveler →</button>';
+        nextTraveler + '">Save &amp; next traveler</button>';
     } else if (state.activeDir < FLIGHT.directions.length - 1) {
       advance = '<button type="button" class="bk-btn bk-btn-primary" data-next-dir="' +
         (state.activeDir + 1) + '">' +
-        "Save &amp; next flight →</button>";
+        "Save &amp; next flight</button>";
     } else {
       advance = '<button type="button" class="bk-btn bk-btn-primary" data-go-review="1">' +
         ICON.check + "Finish &amp; review add-ons</button>";
     }
 
     var here = currentKey();
-    var bag = state.bag[here] ? money(bagPrice(here)) : "—";
-    var meal = state.meal[here] ? money(mealPrice(here)) : "—";
-    var seat = state.seat[here] ? money(seatPrice(here)) : "—";
+    var bagOption = findBag(state.bag[here]);
+    var mealOption = findMeal(state.meal[here]);
 
     return fill(tpl("tplAddonsFoot"), {
       flag: travById(state.activePax).flag,
@@ -1876,7 +1947,10 @@
         esc(travById(state.activePax).label) + " · " +
         esc(directionOf(state.activeDir).label) + " · " +
         esc(flightNos(state.activeDir)),
-      meta: "Bag " + bag + " · Meal " + meal + " · Seat " + seat,
+      meta: "Baggage " + (bagOption ?
+        (bagOption.free ? "Included" : money(bagOption.price)) : "Choose one") +
+        " · Meal " + mealPriceLabel(mealOption) +
+        " · Seat " + (state.seat[here] ? money(seatPrice(here)) : "Choose one"),
       prog: tripProgress(),
       advance: advance,
     });
@@ -1910,7 +1984,7 @@
         if (meal) {
           rows += sumRow(
             "Meal " + meal.name + " · " + t.label,
-            meal.free ? "Included" : money(meal.price)
+            mealPriceLabel(meal)
           );
         }
         if (seat) {
@@ -1970,9 +2044,16 @@
       tabs: paxTabs(),
       dirs: dirToggle(),
       ctx: contextBanner(),
+      "addon-tabs": addonTabs(),
     });
 
-    return head + baggageCard() + mealCard() + seatMap() + paxActions();
+    var currentCard = {
+      meal: mealCard,
+      bag: baggageCard,
+      seat: seatMap,
+    }[state.activeAddon] || mealCard;
+
+    return head + currentCard() + paxActions();
   }
 
   /* =====================================================================
@@ -2010,11 +2091,9 @@
           );
         }
         var editBag =
-          '<button type="button" class="bk-link" data-edit-bag="' + key + '">Edit</button>' +
-          '<button type="button" class="bk-link bk-link-danger" data-drop-bag="' + key + '">Remove</button>';
+          '<button type="button" class="bk-link" data-edit-bag="' + key + '">Change</button>';
         var editMeal =
-          '<button type="button" class="bk-link" data-edit-meal="' + key + '">Edit</button>' +
-          '<button type="button" class="bk-link bk-link-danger" data-drop-meal="' + key + '">Remove</button>';
+          '<button type="button" class="bk-link" data-edit-meal="' + key + '">Change</button>';
         var editSeat =
           '<button type="button" class="bk-link" data-edit-seat="' + key + '">Change seat</button>' +
           '<button type="button" class="bk-link bk-link-danger" data-drop-seat="' + key + '">Remove</button>';
@@ -2025,7 +2104,7 @@
         if (meal) {
           items += row(
             ICON.meal, meal.name, t.label + " · " + where,
-            meal.free ? "Included" : money(meal.price), editMeal
+            mealPriceLabel(meal), editMeal
           );
         }
         if (seat) {
@@ -2033,7 +2112,7 @@
           var anchor = anchorLeg(di);
           items += row(
             ICON.seat, "Seat " + seat + " · " + seatType(sm[2]),
-            t.label + " · " + where + " · " + anchor.from.code + " → " + anchor.to.code,
+            t.label + " · " + where + " · " + anchor.from.code + " to " + anchor.to.code,
             money(seatPrice(key)), editSeat
           );
         }
@@ -2333,22 +2412,31 @@
 
   function screenPending() {
     var ids = orderIds();
+    var firstName = state.values.pax1Given || "";
+    var lastName = state.values.pax1Surname || "";
+    var bookingName = (firstName + " " + lastName).trim() || TRAVELLERS[0].label;
+    var routeSummary = FLIGHT.directions.map(function (direction, index) {
+      return direction.label + ": " + direction.from + " to " + direction.to +
+        " on " + dateLabelFor(index);
+    }).join(" · ");
 
     var awaiting =
       '<section class="bk-card">' +
       '<div class="bk-card-body">' +
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">' +
-      '<span class="bk-item-ico" style="background:var(--bk-amber-bg);color:var(--bk-amber)">' + ICON.clock + "</span>" +
-      "<div><h2 class=\"bk-sect-title\" style=\"margin:0\">Awaiting payment</h2>" +
-      '<p class="bk-sect-note" style="margin:2px 0 0">Order created · No payment received</p></div>' +
-      "</div>" +
+      '<div class="bk-thanks">' +
+      '<span class="bk-thanks-mark">' + ICON.check + "</span>" +
+      "<div><h2>Thank you, " + esc(bookingName) + "!</h2>" +
+      "<p>Your booking request has been created for " + esc(routeSummary) + ".</p></div></div>" +
+      '<div class="bk-note bk-note-warn">' + ICON.clock +
+      "<span><b>Payment pending.</b> Your flight is not ticketed until payment is confirmed.</span></div>" +
+      '<div class="bk-deadline">' + ICON.info +
+      "<span>Amount due: <b>" + money(amountDue()) + "</b> · " + TRAVELLERS.length +
+      (TRAVELLERS.length === 1 ? " traveler" : " travelers") + " · " + esc(FLIGHT.tripType) +
+      " · " + esc(FLIGHT.cabin) + "</span></div>" +
       '<div class="bk-deadline">' + ICON.clock +
-      "<span>Pay <b>" + money(amountDue()) + "</b> by <b>07 Oct 2026, 17:30 PKT (UTC+5)</b>. " +
-      "Your flight is not ticketed. This sample order was created at 17:00 PKT.</span></div>" +
-      '<div class="bk-note bk-note-warn">' + ICON.alert +
-      "<span><b>Order created - no payment received.</b> The airline fare is only held while this order is open.</span></div>" +
+      "<span>Continue with the payment instructions below. Contact support if you need help with this request.</span></div>" +
       '<div class="bk-order"><div class="bk-order-txt">' +
-      '<span class="bk-order-lbl">Example SmartMoves order ID</span>' +
+      '<span class="bk-order-lbl">Demo booking reference</span>' +
       '<span class="bk-order-val">' + esc(ids.order) + "</span></div>" +
       '<button type="button" class="bk-copy" data-copy="' + esc(ids.order) + '" aria-label="Copy order ID">' + ICON.copy + "</button></div>" +
       '<div class="bk-order"><div class="bk-order-txt">' +
@@ -2468,7 +2556,7 @@
           hasAny = true;
           var bits = [];
           if (bag) bits.push(bag.name);
-          if (meal) bits.push(meal.name + (meal.free ? " (included)" : ""));
+          if (meal) bits.push(meal.name + (meal.id === "none" ? "" : meal.free ? " (included)" : ""));
           if (seat) bits.push("seat " + seat);
           rows += sumRow(
             t.label + " · " + d.label + ": " + bits.join(", "),
@@ -2586,7 +2674,7 @@
         if (meal) {
           rows += sumLine(
             ICON.meal, meal.name, t.label,
-            meal.free ? "Included" : money(meal.price), key, "meal"
+            mealPriceLabel(meal), key, "meal"
           );
         }
         if (seat) {
@@ -2825,6 +2913,13 @@
       return;
     }
 
+    var addonTab = target.closest("[data-addon-tab]");
+    if (addonTab) {
+      state.activeAddon = addonTab.dataset.addonTab;
+      render();
+      return;
+    }
+
     var dirBtn = target.closest("[data-dir]");
     if (dirBtn) {
       state.activeDir = Math.min(
@@ -2840,18 +2935,8 @@
     if (bagPick) {
       var bagKey = currentKey();
       var id = bagPick.dataset.bagPick;
-      /* Clicking the active option clears it, so a second click removes. */
-      if (state.bag[bagKey] === id) delete state.bag[bagKey];
-      else state.bag[bagKey] = id;
+      state.bag[bagKey] = id;
       render();
-      return;
-    }
-
-    var bagRemove = target.closest("[data-drop-bag]");
-    if (bagRemove) {
-      delete state.bag[bagRemove.dataset.dropBag];
-      render();
-      toast("Baggage removed");
       return;
     }
 
@@ -2861,6 +2946,7 @@
       if (!bagJump) return;
       state.activeDir = bagJump.dir;
       state.activePax = bagJump.pax;
+      state.activeAddon = "bag";
       go("addons");
       var sec = document.getElementById("bkBagSec");
       if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2872,17 +2958,8 @@
     if (mealPick) {
       var mealKey = currentKey();
       var mealId = mealPick.dataset.mealPick;
-      if (state.meal[mealKey] === mealId) delete state.meal[mealKey];
-      else state.meal[mealKey] = mealId;
+      state.meal[mealKey] = mealId;
       render();
-      return;
-    }
-
-    var mealDrop = target.closest("[data-drop-meal]");
-    if (mealDrop) {
-      delete state.meal[mealDrop.dataset.dropMeal];
-      render();
-      toast("Meal removed");
       return;
     }
 
@@ -2892,6 +2969,7 @@
       if (!mealJump) return;
       state.activeDir = mealJump.dir;
       state.activePax = mealJump.pax;
+      state.activeAddon = "meal";
       go("addons");
       var msec = document.getElementById("bkMealSec");
       if (msec) msec.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2904,6 +2982,7 @@
       if (!covJump) return;
       state.activeDir = covJump.dir;
       state.activePax = covJump.pax;
+      state.activeAddon = "meal";
       go("addons");
       return;
     }
@@ -2944,6 +3023,7 @@
       if (!seatJump) return;
       state.activeDir = seatJump.dir;
       state.activePax = seatJump.pax;
+      state.activeAddon = "seat";
       go("addons");
       var map = document.querySelector(".bk-seat-wrap");
       if (map) map.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2989,6 +3069,7 @@
         if (first) {
           state.activeDir = first.dir;
           state.activePax = first.pax;
+          state.activeAddon = "seat";
           render();
         }
         toast(noSeat.length === 1
@@ -3016,6 +3097,7 @@
       if (!to) return;
       state.activeDir = to.dir;
       state.activePax = to.pax;
+      state.activeAddon = kind;
       go("addons", { keepScroll: true });
       var targetSelector = {
         bag: "#bkBagSec",

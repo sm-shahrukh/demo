@@ -282,23 +282,6 @@
             )
             .join("")}
         </div>
-        <div class="fr-quick-stops" aria-label="Filter by stops">
-          ${[
-            { value: "0", label: "Nonstop" },
-            { value: "1", label: "1 Stop" },
-            { value: "2", label: "2+ Stops" },
-          ]
-            .map(
-              (option) => `
-            <button type="button"
-                    class="fr-stop-chip${filters.stops.includes(option.value) ? " is-active" : ""}"
-                    data-stop-filter="${option.value}"
-                    aria-pressed="${filters.stops.includes(option.value)}">
-              ${option.label}
-            </button>`,
-            )
-            .join("")}
-        </div>
         <div class="fr-desk-right">
           <div class="fr-sort-select-wrap">
             <span class="fr-sort-prefix" id="frSortPrefix">Sort by</span>
@@ -393,6 +376,27 @@
                    ${filters.refundable ? "checked" : ""}>
             <span>Refundable</span>
           </label>
+        </section>
+
+        <section class="fr-wide-col fr-stop-filter-row" aria-label="Filter by stops">
+          <h3>Stops</h3>
+          <div class="fr-quick-stops">
+            ${[
+              { value: "0", label: "Nonstop" },
+              { value: "1", label: "1 stop" },
+              { value: "2", label: "2+ stops" },
+            ]
+              .map(
+                (option) => `
+              <button type="button"
+                      class="fr-stop-chip${filters.stops.includes(option.value) ? " is-active" : ""}"
+                      data-stop-filter="${option.value}"
+                      aria-pressed="${filters.stops.includes(option.value)}">
+                ${option.label}
+              </button>`,
+              )
+              .join("")}
+          </div>
         </section>
       </div>
     `;
