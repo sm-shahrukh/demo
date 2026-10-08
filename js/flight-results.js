@@ -1581,7 +1581,7 @@
     }
 
     // Continue to the traveller-details page for the selected itinerary.
-    const continueButton = target.closest(".fr-continue-btn");
+    const continueButton = target.closest(".fr-continue-btn, .fr-book-btn");
     if (continueButton) {
       const itinerary = state.itineraries.find(
         (item) => item.id === continueButton.dataset.book,
