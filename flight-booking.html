@@ -108,7 +108,7 @@
               </a>
             </div>
           </details>
-             <a href="/about-us.html" class="nav-item">About Us</a>
+          <a href="/about-us.html" class="nav-item">About Us</a>
           <a href="/my-bookings.html" class="nav-item">My Bookings</a>
           <a href="/contact-us.html" class="nav-item">Contact Us</a>
           <div class="navbar-menu-actions">
@@ -135,472 +135,60 @@
     </nav>
     <!-- ========================================== NAVIGATION BAR END ========================================== -->
 
-    <main class="fb-main">
-      <div class="fb-wrap">
-        <!-- ================= FORM ================= -->
-        <div id="fbApp">
-          <a class="fb-back" href="/search-flight.html">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to flight results
-          </a>
-
-          <div class="fb-head-row">
+    <main class="bk-main" id="bkApp">
+      <div class="bk-wrap">
+        <!-- Shared header band: back link, title, subtitle, reservation clock -->
+        <div class="bk-band">
+          <div class="bk-band-top">
             <div>
-              <h1 class="fb-title">Flight booking</h1>
-              <p class="fb-sub">
-                Enter every traveller exactly as printed on the travel document.
-                Nothing is charged until you review and pay.
+              <a class="bk-back" id="bkBack" href="/search-flight.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span data-role="back-label">Back to traveler details</span>
+              </a>
+              <h1 class="bk-title" data-role="title">Traveler details</h1>
+              <p class="bk-sub" data-role="sub">
+                Save time, and you&rsquo;re one step closer to London.
               </p>
             </div>
-
-            <div class="fb-wallet">
+            <div class="bk-clock" id="bkClock">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4" />
-                <path d="M4 6v12a2 2 0 0 0 2 2h14v-4" />
-                <path d="M18 12a2 2 0 0 0 0 4h4v-4z" />
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
-              <span class="fb-wallet-text">Wallet balance <b>PKR 0</b></span>
-            </div>
-          </div>
-
-          <ol class="fb-steps" id="fbSteps">
-            <li class="fb-step done" id="fbStep1">
-              <span class="fb-step-num">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              Search flights
-            </li>
-            <li class="fb-step-line done" id="fbLine1"></li>
-            <li class="fb-step active" id="fbStep2">
-              <span class="fb-step-num">2</span>
-              Traveller details
-            </li>
-            <li class="fb-step-line" id="fbLine2"></li>
-            <li class="fb-step" id="fbStep3">
-              <span class="fb-step-num">3</span>
-              Review &amp; pay
-            </li>
-          </ol>
-
-          <div class="fb-layout">
-            <!-- ---------- Main column ---------- -->
-            <div class="fb-col-main">
-        
-              <div id="fbItinerary"></div>
-
-         
-              <section class="fb-card">
-                <div class="fb-card-head">
-                  <h2 class="fb-card-title">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path
-                        d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
-                      />
-                    </svg>
-                    Traveller details
-                  </h2>
-                  <span class="fb-card-sub">4 travellers on this booking</span>
-                </div>
-                <div class="fb-card-body">
-                  <p class="fb-pax-note">
-                    Names must match the passport or travel document exactly,
-                    including all given names. Children and infants each need an
-                    accompanying adult.
-                  </p>
-                  <div id="fbTravellers"></div>
-                </div>
-              </section>
-
-              <!-- ---------- Contact ---------- -->
-              <section class="fb-card">
-                <div class="fb-card-head">
-                  <h2 class="fb-card-title">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M4 4h16v16H4z" />
-                      <path d="M4 8l8 5 8-5" />
-                    </svg>
-                    Contact details
-                  </h2>
-                  <span class="fb-card-sub">E-ticket and flight updates</span>
-                </div>
-                <div class="fb-card-body">
-                  <p class="fb-pax-note">
-                    We send the e-ticket, itinerary changes and any schedule
-                    disruption to these details. Use an address you check
-                    regularly in the weeks before departure.
-                  </p>
-
-                  <div class="fb-grid two">
-                    <div class="fb-field">
-                      <label class="fb-label" for="fbEmail">
-                        Email address<span class="req">*</span>
-                      </label>
-                      <input
-                        class="fb-input"
-                        type="email"
-                        id="fbEmail"
-                        name="email"
-                        placeholder="you@gmail.com"
-                        autocomplete="email"
-                        required
-                      />
-                      <div class="fb-error">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="12" />
-                          <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                        <span></span>
-                      </div>
-                    </div>
-
-                    <div class="fb-field">
-                      <label class="fb-label" for="fbPhone">
-                        Mobile number<span class="req">*</span>
-                      </label>
-                      <div class="fb-phone">
-                        <select
-                          class="fb-select"
-                          id="fbPhoneCode"
-                          name="phoneCode"
-                        >
-                          <option value="+92">PK +92</option>
-                          <option value="+971">AE +971</option>
-                          <option value="+966">SA +966</option>
-                          <option value="+44">UK +44</option>
-                          <option value="+1">US +1</option>
-                        </select>
-                        <input
-                          class="fb-input"
-                          type="tel"
-                          id="fbPhone"
-                          name="phone"
-                          placeholder="Mobile number (+92)"
-                          autocomplete="tel"
-                          required
-                        />
-                      </div>
-                      <div class="fb-error">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="12" />
-                          <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                        <span></span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="fb-toggles">
-                    <button type="button" class="fb-chip">
-                      Send updates by SMS as well
-                    </button>
-                    <button type="button" class="fb-chip">
-                      Add travel insurance
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </div>
-
-            <!-- ---------- Sidebar ---------- -->
-            <div class="fb-side" id="fbSide"></div>
-
-            <!-- ---------- Continue ---------- -->
-            <div class="fb-continue" id="fbContinue">
-              <section class="fb-card">
-                <div class="fb-card-body">
-                  <h2 class="fb-side-title">Before you continue</h2>
-                  <p class="fb-side-sub" id="fbReviewNote">
-                    Complete all 4 travellers to continue. Review itinerary
-                    details and price.
-                  </p>
-
-                  <div class="fb-check-wrap">
-                    <label class="fb-check">
-                      <input type="checkbox" id="fbTerms" />
-                      <span>
-                        I have checked that every traveller's name, date of
-                        birth and document number matches the travel document,
-                        and I accept the
-                        <a href="/contact-us.html#faq"
-                          >fare rules and ticketing terms</a
-                        >.
-                      </span>
-                    </label>
-                    <div class="fb-error">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                      <span></span>
-                    </div>
-                  </div>
-
-                  <div class="fb-security">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <span>
-                      Encrypted in transit and held under our data protection
-                      policy. Card details are never stored on our servers.
-                    </span>
-                  </div>
-
-                  <button class="fb-btn primary" id="fbConfirm" type="button">
-                    Confirm and review · 4
-                  </button>
-
-                  <button class="fb-btn ghost" id="fbSave" type="button">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
-                      />
-                    </svg>
-                    Save these travellers for next time
-                  </button>
-
-                  <p class="fb-hint-block">
-                    This fare is held for 20 minutes. Payment is taken on the
-                    next step.
-                  </p>
-                </div>
-              </section>
+              <span>Reservation time <b id="bkClockValue">08:00</b></span>
             </div>
           </div>
         </div>
-        <!-- ================= /FORM ================= -->
 
-        <!-- ================= REVIEW & PAY ================= -->
-        <div id="fbReview">
-          <a class="fb-back" href="#" id="fbReviewBack">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Edit traveller details
-          </a>
+        <!-- Step indicator is rebuilt by js/flight-booking.js -->
+        <ol class="bk-steps" id="bkSteps"></ol>
 
-          <div class="fb-head-row">
-            <div>
-              <h1 class="fb-title">Review &amp; pay</h1>
-              <p class="fb-sub">
-                Check every name and document number one last time. Payment is
-                taken on the next screen.
-              </p>
-            </div>
+        <div class="bk-layout">
+          <!-- ---------- Screen column (rendered per step) ---------- -->
+          <div class="bk-main-col" id="bkScreen"></div>
 
-            <div class="fb-wallet">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4" />
-                <path d="M4 6v12a2 2 0 0 0 2 2h14v-4" />
-                <path d="M18 12a2 2 0 0 0 0 4h4v-4z" />
-              </svg>
-              <span class="fb-wallet-text"
-                >Wallet balance <b>PKR 0</b></span
-              >
-            </div>
-          </div>
-
-          <ol class="fb-steps" id="fbStepsReview">
-            <li class="fb-step done">
-              <span class="fb-step-num">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              Search flights
-            </li>
-            <li class="fb-step-line done"></li>
-            <li class="fb-step done">
-              <span class="fb-step-num">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              Traveller details
-            </li>
-            <li class="fb-step-line done"></li>
-            <li class="fb-step active">
-              <span class="fb-step-num">3</span>
-              Review &amp; pay
-            </li>
-          </ol>
-
-          <div class="fb-layout">
-            <div class="fb-col-main">
-              <!-- Rendered by js/flight-booking.js -->
-              <div id="fbReviewBody"></div>
-            </div>
-
-            <div class="fb-side">
-              <section class="fb-card">
-                <div class="fb-card-body">
-                  <h2 class="fb-side-title">Total payable</h2>
-                  <p class="fb-side-sub">
-                    Includes taxes, fees and carrier charges
-                  </p>
-                  <div id="fbReviewTotal"></div>
-
-                  <div class="fb-check-wrap" style="margin-top: 16px">
-                    <label class="fb-check">
-                      <input type="checkbox" id="fbReviewTerms" />
-                      <span
-                        >I have checked the traveller details above and accept
-                        the
-                        <a href="/contact-us.html#faq"
-                          >fare rules and ticketing terms</a
-                        >.</span
-                      >
-                    </label>
-                    <div class="fb-error">
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                      <span></span>
-                    </div>
-                  </div>
-
-                  <button
-                    class="fb-btn primary"
-                    id="fbPayNow"
-                    type="button"
-                  >
-                    Confirm and pay
-                  </button>
-                  <button
-                    class="fb-btn ghost"
-                    id="fbReviewEdit"
-                    type="button"
-                  >
-                    Back to traveller details
-                  </button>
-
-                  <div class="fb-security">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <span>
-                      Card details are entered on our payment provider's secure
-                      page and are never stored on our servers.
-                    </span>
-                  </div>
-
-                  <p class="fb-hint-block">
-                    This fare is held for 20 minutes. Complete payment before the
-                    hold expires.
-                  </p>
-                </div>
-              </section>
-            </div>
-          </div>
+          <!-- ---------- Right rail (rendered per step) ---------- -->
+          <aside class="bk-rail" id="bkRail" aria-label="Booking summary"></aside>
         </div>
-        <!-- ================= /REVIEW & PAY ================= -->
-
-        <!-- ================= /REVIEW STATE ================= -->
       </div>
     </main>
 
-    <!-- Sticky total bar mobile only -->
-    <div class="fb-sticky" id="fbSticky">
-      <div class="fb-sticky-total">
-        <span>Total payable</span>
-        <b id="fbStickyTotal">PKR 0</b>
+    <!-- Sticky action bar, mobile only -->
+    <div class="bk-sticky" id="bkSticky">
+      <div>
+        <span class="bk-sticky-lbl" data-role="sticky-label">Total for 3 travelers</span>
+        <b class="bk-sticky-val" id="bkStickyTotal">PKR 184,800</b>
       </div>
-      <button class="fb-btn primary" id="fbStickyConfirm" type="button">
-        Confirm and review
+      <button class="bk-btn bk-btn-primary" id="bkStickyNext" type="button">
+        Continue to add-ons
       </button>
     </div>
 
@@ -723,85 +311,179 @@
       </svg>
     </button>
 
-    <!-- ================= BOOKING HELD MODAL ================= -->
-    <div class="fb-modal" id="fbModal" hidden>
-      <div class="fb-modal-backdrop" data-modal-close></div>
-      <div
-        class="fb-modal-box"
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="fbModalTitle"
-        aria-describedby="fbModalText"
-      >
-        <button
-          type="button"
-          class="fb-modal-x"
-          data-modal-close
-          aria-label="Close"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
+    <div class="bk-toast" id="bkToast" role="status" aria-live="polite" hidden></div>
 
-        <div class="fb-modal-icon">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
+ 
 
-        <h2 id="fbModalTitle">Booking held</h2>
-        <p id="fbModalText">
-          Your fare is held while you complete payment. We have emailed the
-          itinerary to
-          <b id="fbModalEmail">you</b>.
-        </p>
-
-        <div class="fb-modal-ref">
-          <span>Booking reference</span>
-          <b id="fbModalRef">—</b>
-        </div>
-
-        <div class="fb-modal-timer">
-          <span>Fare held for</span>
-          <b id="fbModalTimer">20:00</b>
-        </div>
-
-        <div class="fb-modal-actions">
-          <button
-            class="fb-btn ghost"
-            id="fbModalBack"
-            type="button"
-          >
-            Back to review
-          </button>
-          <a class="fb-btn primary" href="/my-bookings.html">
-            Go to my bookings
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
+    <template id="tplAddonsHead">
+      <section class="bk-card">
+        <div class="bk-card-body">
+          <div class="bk-note bk-note-info" data-role="note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="11" x2="12" y2="16" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
-          </a>
+            <span data-role="txt"></span>
+          </div>
+          <!-- traveler tabs + direction toggle injected here -->
+          <div data-role="tabs"></div>
+          <div data-role="dirs"></div>
         </div>
-      </div>
-    </div>
-    <!-- ================= /BOOKING HELD MODAL ================= -->
+      </section>
+    </template>
+
+    <template id="tplBagCard">
+      <section class="bk-card" id="bkBagSec">
+        <div class="bk-card-head">
+          <h2 class="bk-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+            Add extra baggage
+          </h2>
+          <span class="bk-card-sub">Charged per passenger, per flight</span>
+        </div>
+        <div class="bk-card-body">
+          <div class="bk-note bk-note-soft">
+            <div style="flex:1">
+              <b>Included with this fare</b><br />
+              Checked baggage: 0 kg · Not included<br />
+              Cabin bag allowance: to confirm
+            </div>
+          </div>
+          <div style="margin-top:16px" data-role="options"></div>
+        </div>
+      </section>
+    </template>
+
+    <template id="tplMealCard">
+      <section class="bk-card" id="bkMealSec">
+        <div class="bk-card-head">
+          <h2 class="bk-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 2v7a3 3 0 0 0 3 3v10" />
+              <path d="M6 2v6" />
+              <path d="M9 2v6" />
+              <path d="M18 2c-1.5 2-2 4-2 6 0 1.7.7 3 2 3s2-1.3 2-3c0-2-.5-4-2-6z" />
+              <path d="M18 11v11" />
+            </svg>
+            Choose a meal
+          </h2>
+          <span class="bk-card-sub">Per passenger, per flight</span>
+        </div>
+        <div class="bk-card-body">
+          <div class="bk-note bk-note-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="11" x2="12" y2="16" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span>
+              Standard, vegetarian and gluten-free meals are included in your fare.
+              Special meals are charged per flight. Infant meals travel on an adult's lap.
+            </span>
+          </div>
+          <div style="margin-top:16px" data-role="options"></div>
+        </div>
+      </section>
+    </template>
+
+    <template id="tplSeatCard">
+      <section class="bk-card">
+        <div class="bk-card-head">
+          <h2 class="bk-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M5 11V7a2 2 0 0 1 4 0v4h6V9a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-4z"
+              />
+              <path d="M7 17v4" />
+            </svg>
+            Choose your seat
+          </h2>
+          <span class="bk-card-sub" data-role="sub"></span>
+        </div>
+        <div class="bk-card-body">
+          <div class="bk-note bk-note-info" data-role="note"></div>
+          <div class="bk-seat-wrap">
+            <div class="bk-seat-inner">
+              <div class="bk-legend" data-role="legend"></div>
+              <div data-role="grid"></div>
+            </div>
+          </div>
+          <div data-role="picked"></div>
+        </div>
+      </section>
+    </template>
+
+    <template id="tplAddonsFoot">
+      <section class="bk-card">
+        <div class="bk-card-body">
+          <div class="bk-addons-head">
+            <div class="bk-addons-who">
+              <span class="bk-addons-flag" data-role="flag"></span>
+              <b data-role="who"></b>
+              <span class="bk-addons-meta" data-role="meta"></span>
+            </div>
+            <div class="bk-prog" role="progressbar" aria-valuemin="0" data-role="prog"></div>
+          </div>
+          <div class="bk-btn-row" style="margin-top:16px">
+            <button
+              type="button"
+              class="bk-btn bk-btn-outline"
+              data-summary="1"
+              aria-haspopup="dialog"
+              aria-expanded="false"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4z"
+                />
+                <path d="M13 5v2" />
+                <path d="M13 17v2" />
+                <path d="M13 11v2" />
+              </svg>
+              View everyone's choices
+            </button>
+            <button type="button" class="bk-btn bk-btn-primary" data-role="advance"></button>
+          </div>
+          <p class="bk-fine" style="margin-top:10px">
+            Nothing is charged yet. Review and change every choice before payment.
+          </p>
+        </div>
+      </section>
+    </template>
+
+    <template id="tplSummaryModal">
+      <section class="bk-modal" data-summary-close="1">
+        <div class="bk-modal-box" role="dialog" aria-modal="true" aria-label="Review add-ons">
+          <div class="bk-modal-head">
+            <button
+              type="button"
+              class="bk-modal-x"
+              data-summary-close="1"
+              aria-label="Close"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <h2 class="bk-modal-title">Everyone&rsquo;s choices</h2>
+            <p class="bk-modal-sub" data-role="sub"></p>
+          </div>
+          <div class="bk-modal-body" id="bkSummaryBody" data-role="body"></div>
+          <div class="bk-modal-foot">
+            <div data-role="status"></div>
+            <span class="bk-modal-total" data-role="total"></span>
+            <button type="button" class="bk-btn bk-btn-primary" data-summary-next="1">
+              Continue to review
+            </button>
+          </div>
+        </div>
+      </section>
+    </template>
 
     <script src="/js/pages.js"></script>
     <script src="/js/flight-booking.js"></script>

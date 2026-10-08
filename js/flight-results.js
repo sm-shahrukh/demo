@@ -23,8 +23,9 @@
     featuredExpanded: false,
 
     detailTab: "itinerary",
-    // Desktop-only: the wide filter panel starts open, per the reference.
-    wideFiltersOpen: true,
+    // Desktop-only: the wide filter panel starts collapsed, so the page
+    // lands on just the chip row and "More filters" opens the full set.
+    wideFiltersOpen: false,
     selectedPackageName: "Sample Standard",
     cabinBaggage: "1 × 8 kg",
     checkedBaggage: "1 × 23 kg",

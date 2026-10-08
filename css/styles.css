@@ -74,7 +74,7 @@ body {
 }
 
 .navbar-container {
-  max-width: 1920px;
+  max-width: none;
   margin: 0 auto;
   padding: 12px var(--container-padding);
   display: flex;
@@ -2508,6 +2508,10 @@ body {
 
   .navbar-menu {
     display: flex;
+  }
+
+  .navbar-menu-actions {
+    margin-right: -20px;
   }
 
   .nav-btn-outline {
