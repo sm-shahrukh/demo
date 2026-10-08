@@ -1,33 +1,24 @@
 // ============ DATA ============
-const airports = [
-  { code: "LHR", city: "London", country: "United Kingdom" },
-  { code: "DXB", city: "Dubai", country: "UAE" },
-  { code: "JFK", city: "New York", country: "USA" },
-  { code: "LAX", city: "Los Angeles", country: "USA" },
-  { code: "ISB", city: "Islamabad", country: "Pakistan" },
-  { code: "KHI", city: "Karachi", country: "Pakistan" },
-  { code: "LHE", city: "Lahore", country: "Pakistan" },
-  { code: "PEW", city: "Peshawar", country: "Pakistan" },
-  { code: "MED", city: "Medina", country: "Saudi Arabia" },
-  { code: "MCT", city: "Makkah", country: "Saudi Arabia" },
-  { code: "RUH", city: "Riyadh", country: "Saudi Arabia" },
-  { code: "SIN", city: "Singapore", country: "Singapore" },
-  { code: "BKK", city: "Bangkok", country: "Thailand" },
-  { code: "MNL", city: "Manila", country: "Philippines" },
-  { code: "DEL", city: "Delhi", country: "India" },
-  { code: "MUM", city: "Mumbai", country: "India" },
-  { code: "CDG", city: "Paris", country: "France" },
-  { code: "FRA", city: "Frankfurt", country: "Germany" },
-  { code: "AMS", city: "Amsterdam", country: "Netherlands" },
-  { code: "SYD", city: "Sydney", country: "Australia" },
-  { code: "YYZ", city: "Toronto", country: "Canada" },
-  { code: "DOH", city: "Doha", country: "Qatar" },
-  { code: "KWI", city: "Kuwait City", country: "Kuwait" },
-  { code: "BAH", city: "Manama", country: "Bahrain" },
-  { code: "AMM", city: "Amman", country: "Jordan" },
-  { code: "CAI", city: "Cairo", country: "Egypt" },
-  { code: "IST", city: "Istanbul", country: "Turkey" },
+const airportOrder = [
+  "LHR", "DXB", "JFK", "LAX", "ISB", "KHI", "LHE", "PEW", "MED",
+  "MCT", "RUH", "SIN", "BKK", "MNL", "DEL", "BOM", "CDG", "FRA",
+  "AMS", "SYD", "YYZ", "DOH", "KWI", "BAH", "AMM", "CAI", "IST",
 ];
+const airportPriority = new Map(
+  airportOrder.map((code, index) => [code, index]),
+);
+const airports = FlightData.AIRPORTS
+  .slice()
+  .sort(
+    (a, b) =>
+      (airportPriority.get(a.code) ?? airportOrder.length) -
+      (airportPriority.get(b.code) ?? airportOrder.length),
+  )
+  .map((airport) => ({
+    code: airport.code,
+    city: airport.city,
+    country: airport.country,
+  }));
 
 // ============ STATE ============
 let fromSelected = null;
@@ -35,14 +26,6 @@ let toSelected = null;
 let tripType = "oneway";
 let pax = { adults: 1, children: 0, infants: 0 };
 
-// ============ HERO BG ============
-// (function initHeroBg() {
-//   const img = document.getElementById("heroBg");
-//   if (img) {
-//     img.addEventListener("load", () => img.classList.add("loaded"));
-//     if (img.complete && img.naturalWidth) img.classList.add("loaded");
-//   }
-// })();
 document.addEventListener("DOMContentLoaded", () => {
   const shape = document.querySelector(".hero-banner .hero-shape");
   if (!shape) return;
@@ -65,38 +48,23 @@ document.addEventListener("DOMContentLoaded", () => {
   requestAnimationFrame(animate);
 });
 
-// ============ MOBILE MENU ============
-function toggleMobileMenu() {
-  document.getElementById("mobileMenu").classList.toggle("open");
-}
-function toggleMobileNav() {
-  const menu = document.getElementById("navbarMenu");
-  const toggle = document.querySelector(".mobile-toggle");
-  const isOpen = menu.classList.toggle("open");
-  toggle.setAttribute("aria-expanded", String(isOpen));
-}
-function toggleMobileDropdown(id, btn) {
-  document.getElementById(id).classList.toggle("open");
-  btn.classList.toggle("open");
-}
-
 // ============ CURRENCY PANEL ============
 function toggleCurrency(e) {
   e.stopPropagation();
   const panel = document.getElementById("currencyPanel");
-  panel.classList.toggle("show");
+  panel?.classList.toggle("show");
 }
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#currencyWrap")) {
-    document.getElementById("currencyPanel").classList.remove("show");
+    document.getElementById("currencyPanel")?.classList.remove("show");
   }
   if (!e.target.closest("#signupWrap")) {
-    document.getElementById("signupMenu").classList.remove("show");
+    document.getElementById("signupMenu")?.classList.remove("show");
   }
 });
 function toggleSignup(e) {
   e.stopPropagation();
-  document.getElementById("signupMenu").classList.toggle("show");
+  document.getElementById("signupMenu")?.classList.toggle("show");
 }
 
 // ============ TABS ============
@@ -157,7 +125,7 @@ function multiCityAirportField(legId, direction, label, placeholder) {
   return `
     <label class="multi-city-airport">
       <span>${label}</span>
-      <div class="input-wrapper" onclick="openAirportPanel('${key}')">
+      <div class="input-wrapper" data-click="openAirportPanel('${key}')">
         <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="10" r="3" />
           <path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 11 8 11s8-5.6 8-11a8 8 0 0 0-8-8z" />
@@ -167,9 +135,9 @@ function multiCityAirportField(legId, direction, label, placeholder) {
       <div class="dropdown-panel" id="${key}Panel">
         <div class="panel-header">
           <span>Select ${label}</span>
-          <button type="button" class="close-btn" aria-label="Close airport list" onclick="closeAirportPanel('${key}')">×</button>
+          <button type="button" class="close-btn" aria-label="Close airport list" data-click="closeAirportPanel('${key}')">×</button>
         </div>
-        <input id="${key}Query" class="search-input" type="text" placeholder="Search airports..." oninput="searchAirport('${key}')" />
+        <input id="${key}Query" class="search-input" type="text" placeholder="Search airports..." data-input="searchAirport('${key}')" />
         <div id="${key}Results" class="results-list"></div>
       </div>
     </label>`;
@@ -186,7 +154,7 @@ function addMultiCityLeg() {
   leg.innerHTML = `
     <div class="multi-city-leg-heading">
       <strong>FLIGHT ${flightNumber}</strong>
-      <button type="button" class="remove-flight-btn" onclick="removeMultiCityLeg(this)" aria-label="Remove flight ${flightNumber}">Remove</button>
+      <button type="button" class="remove-flight-btn" data-click="removeMultiCityLeg(this)" aria-label="Remove flight ${flightNumber}">Remove</button>
     </div>
     <div class="multi-city-fields">
       ${multiCityAirportField(legId, "From", "From", "Departure city or airport")}
@@ -204,7 +172,7 @@ function removeMultiCityLeg(button) {
 
 function handleModeSearch(event, mode) {
   event.preventDefault();
-  const form = event.currentTarget;
+  const form = this instanceof HTMLFormElement ? this : event.currentTarget;
   let message = `${mode} search started.`;
   if (mode === "Umrah") message = "Searching Umrah packages...";
   if (mode === "Visa") message = "Searching visa options...";
@@ -248,7 +216,7 @@ function renderAirportResults(which, list) {
       .slice(0, 6)
       .map(
         (a) => `
-    <div class="airport-opt" style="padding:8px 12px;cursor:pointer;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background=''" onclick="selectAirport('${which}','${a.code}','${a.city}','${a.country}')">
+    <div class="airport-opt" data-click="selectAirport('${which}','${a.code}','${a.city}','${a.country}')">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-weight:700;color:var(--primary-blue)">${a.code}</span>
         <span style="font-size:14px;color:#374151">${a.city} <span style="color:#9ca3af">— ${a.country}</span></span>
@@ -435,16 +403,25 @@ document.addEventListener("click", (e) => {
     document.getElementById("paxPanel")?.classList.remove("show");
     document.getElementById("paxTrigger")?.classList.remove("open");
   }
-  if (!e.target.closest("#umrahTypeTrigger")) {
+  if (
+    !e.target.closest("#umrahTypeTrigger") &&
+    !e.target.closest("#umrahTypeMenu")
+  ) {
     document.getElementById("umrahTypeMenu")?.classList.remove("show");
     document.getElementById("umrahTypeTrigger")?.classList.remove("open");
   }
-  if (!e.target.closest("#umrahServicesTrigger")) {
+  if (
+    !e.target.closest("#umrahServicesTrigger") &&
+    !e.target.closest("#umrahServicesMenu")
+  ) {
     document.getElementById("umrahServicesMenu")?.classList.remove("show");
     document.getElementById("umrahServicesTrigger")?.classList.remove("open");
   }
   ["visaFrom", "visaTo", "visaType", "visaSpeed", "visaPax"].forEach((key) => {
-    if (!e.target.closest("#" + key + "Trigger")) {
+    if (
+      !e.target.closest("#" + key + "Trigger") &&
+      !e.target.closest("#" + key + "Menu")
+    ) {
       document.getElementById(key + "Menu")?.classList.remove("show");
       document.getElementById(key + "Trigger")?.classList.remove("open");
     }
@@ -479,36 +456,57 @@ function handleFlightSearch(e) {
     showAlert("Please select a return date.", "error");
     return false;
   }
+  const departure = document.getElementById("depDate").value;
+  const returnDate = document.getElementById("retDate").value;
+  if (
+    tripType === "roundtrip" &&
+    new Date(returnDate) < new Date(departure)
+  ) {
+    showAlert("The return date cannot be before the departure date.", "error");
+    return false;
+  }
 
-  const total = pax.adults + pax.children + pax.infants;
   const cabin = document.getElementById("cabinInput").value;
-  const ret =
-    tripType === "roundtrip"
-      ? " — Return: " + document.getElementById("retDate").value
-      : "";
+  const search = new URLSearchParams({
+    trip: tripType,
+    from: fromSelected.code,
+    to: toSelected.code,
+    departure: depDate,
+    adults: String(pax.adults),
+    children: String(pax.children),
+    infants: String(pax.infants),
+    cabin,
+  });
+  if (tripType === "roundtrip") {
+    search.set("return", returnDate);
+  } else if (tripType === "multicity") {
+    const multiLegs = [
+      { from: fromSelected.code, to: toSelected.code, date: depDate },
+    ];
+    const additionalLegs = [
+      ...document.querySelectorAll("#multiCityPanel .multi-city-leg"),
+    ];
 
-  showAlert(
-    `✓ Searching ${fromSelected.city} → ${toSelected.city} on ${depDate}${ret} for ${total} ${total === 1 ? "passenger" : "passengers"} (${cabin})...`,
-    "success",
-  );
+    for (const leg of additionalLegs) {
+      const fromInput = leg.querySelector('input[id$="FromInput"]');
+      const toInput = leg.querySelector('input[id$="ToInput"]');
+      const dateInput = leg.querySelector('input[type="date"]');
+      const fromCode = fromInput?.value.match(/\(([A-Z]{3})\)$/)?.[1];
+      const toCode = toInput?.value.match(/\(([A-Z]{3})\)$/)?.[1];
+      if (!fromCode || !toCode || !dateInput?.value) {
+        showAlert("Complete both airports and a date for every flight.", "error");
+        return false;
+      }
+      multiLegs.push({
+        from: fromCode,
+        to: toCode,
+        date: dateInput.value,
+      });
+    }
 
-  const result = document.getElementById("searchResult");
-  document.getElementById("resultTitle").textContent =
-    `Flights: ${fromSelected.city} ( ${fromSelected.code}) → ${toSelected.city} (${toSelected.code})`;
-  document.getElementById("resultSummary").innerHTML = [
-    `<span class="tag">${fromSelected.code} → ${toSelected.code}</span>`,
-    `<span class="tag">${depDate}</span>`,
-    `<span class="tag">${cabin}</span>`,
-    `<span class="tag">${total} pax</span>`,
-  ].join("");
-  const basePrice = (fromSelected.code + toSelected.code).length * 55 + 150;
-  document.getElementById("resultText").innerHTML = `
-    <strong style="color:var(--primary)">From $${basePrice.toLocaleString()} /person</strong> ·
-    Airlines available: Emirates, Flydubai, Air Arabia, Saudia, Pakistan International Airlines.<br>
-    <small>Showing sample results. Search <a href="#" style="color:var(--primary);text-decoration:underline">full results</a> for live pricing.</small>
-  `;
-  result.classList.add("show");
-  result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    search.set("multiLegs", JSON.stringify(multiLegs));
+  }
+  window.location.href = `/search-flight.html?${search.toString()}`;
   return false;
 }
 function showAlert(msg, type) {

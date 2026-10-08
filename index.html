@@ -12,6 +12,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/css/tokens.css" />
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="/css/pages.css" />
     <link rel="stylesheet" href="/css/typography.css" />
@@ -21,117 +22,118 @@
     <div class="main-page">
       <!-- ========================================== NAVIGATION BAR START ========================================== -->
       <nav class="navbar">
-        <div class="navbar-container">
-          <div class="navbar-brand">
-            <a href="#" class="brand-logo">
-              <img
-                src="/images/smart_moves_solutions.png"
-                alt="Smart Moves Logo"
-                style="height: 30px; width: auto"
-              />
-            </a>
-          </div>
-
-          <div class="navbar-menu" id="navbarMenu">
-            <details class="nav-dropdown">
-              <summary class="nav-item nav-dropdown-trigger">
-                Services
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </summary>
-              <div class="nav-dropdown-menu">
-                <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path
-                      d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-                    />
-                  </svg>
-                  Destinations
-                </a>
-                <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
-                    />
-                  </svg>
-                  Flights
-                </a>
-                <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  </svg>
-                  Umrah
-                </a>
-                <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="2" y="7" width="20" height="14" rx="2" />
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                  </svg>
-                  Hotels
-                </a>
-                <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                    />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                  Visa
+            <div class="navbar-container">
+              <div class="navbar-brand">
+                <a href="/index.html" class="brand-logo">
+                  <img
+                    src="/images/bukhari-booking-logo.png"
+                    alt="Bukhari Booking"
+                    class="brand-logo-image"
+                  />
                 </a>
               </div>
-            </details>
-              <a href="/about-us.html" class="nav-item">About Us</a>
-          <a href="/my-bookings.html" class="nav-item">My Bookings</a>
-          <a href="/contact-us.html" class="nav-item">Contact Us</a>
-            <div class="navbar-menu-actions">
-              <button type="button" class="nav-btn-outline" data-auth="login">Sign In</button>
-              <button type="button" class="nav-btn-primary" data-auth="signup">Get Started</button>
-            </div>
-          </div>
 
-          <div class="navbar-actions">
-            <button
-              class="mobile-toggle"
-              type="button"
-              onclick="toggleMobileNav()"
-              aria-label="Toggle menu"
-              aria-controls="navbarMenu"
-              aria-expanded="false"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          </div>
-        </div>
-      </nav>
+              <div class="navbar-menu" id="navbarMenu">
+                <details class="nav-dropdown">
+                  <summary class="nav-item nav-dropdown-trigger">
+                    Services
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </summary>
+                  <div class="nav-dropdown-menu">
+                    <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path
+                          d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                        />
+                      </svg>
+                      Destinations
+                    </a>
+                    <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"
+                        />
+                      </svg>
+                      Flights
+                    </a>
+                    <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      </svg>
+                      Umrah
+                    </a>
+                    <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect x="2" y="7" width="20" height="14" rx="2" />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                      </svg>
+                      Hotels
+                    </a>
+                    <a href="/index.html#bookingForm" class="nav-item nav-dropdown-link">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      Visa
+                    </a>
+                  </div>
+                </details>
+                <a href="/about-us.html" class="nav-item">About Us</a>
+                <a href="/my-bookings.html" class="nav-item">My Bookings</a>
+                <a href="/contact-us.html" class="nav-item">Contact Us</a>
+           
+                <div class="navbar-menu-actions">
+                  <button type="button" class="nav-btn-outline" data-auth="login">Sign In</button>
+                  <button type="button" class="nav-btn-primary" data-auth="signup">Get Started</button>
+                </div>
+              </div>
+
+              <div class="navbar-actions">
+                <button
+                  class="mobile-toggle"
+                  type="button"
+                  data-nav-toggle
+                  aria-controls="navbarMenu"
+                  aria-expanded="false"
+                  aria-label="Toggle menu"
+                >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </button>
+              </div>
+            </div>
+          </nav>
       <!-- ========================================== NAVIGATION BAR END ========================================== -->
 
       <!-- ========================================== HERO BANNER START========================================== -->
@@ -188,7 +190,7 @@
                 <button
                   class="tab-btn active"
                   data-tab="flights"
-                  onclick="switchTab('flights')"
+                  data-action="switchTab" data-action-args='["flights"]'
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -205,7 +207,7 @@
                 <button
                   class="tab-btn"
                   data-tab="umrah"
-                  onclick="switchTab('umrah')"
+                  data-action="switchTab" data-action-args='["umrah"]'
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -220,7 +222,7 @@
                 <button
                   class="tab-btn"
                   data-tab="visa"
-                  onclick="switchTab('visa')"
+                  data-action="switchTab" data-action-args='["visa"]'
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -242,7 +244,7 @@
                 <div class="tab-panel active" id="panel-flights">
                   <form
                     id="flightSearchForm"
-                    onsubmit="return handleFlightSearch(event);"
+                    data-action="handleFlightSearch" data-action-event="submit" data-action-args='["$event"]'
                   >
                     <div class="alert" id="searchAlert"></div>
 
@@ -253,7 +255,7 @@
                           name="tripType"
                           value="oneway"
                           checked
-                          onclick="setTripType('oneway', this)"
+                          data-action="setTripType" data-action-args='["oneway", "$element"]'
                         />
                         <span class="radio-content">
                           <svg
@@ -272,7 +274,7 @@
                           type="radio"
                           name="tripType"
                           value="roundtrip"
-                          onclick="setTripType('roundtrip', this)"
+                          data-action="setTripType" data-action-args='["roundtrip", "$element"]'
                         />
                         <span class="radio-content">
                           <svg
@@ -293,7 +295,7 @@
                           type="radio"
                           name="tripType"
                           value="multicity"
-                          onclick="setTripType('multicity', this)"
+                          data-action="setTripType" data-action-args='["multicity", "$element"]'
                         />
                         <span class="radio-content">
                           <svg
@@ -317,7 +319,7 @@
 
                         <div
                           class="input-wrapper"
-                          onclick="openAirportPanel('from')"
+                          data-action="openAirportPanel" data-action-args='["from"]'
                         >
                           <svg
                             class="input-icon"
@@ -344,7 +346,7 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="closeAirportPanel('from')"
+                              data-action="closeAirportPanel" data-action-args='["from"]'
                             >
                               ×
                             </button>
@@ -354,7 +356,7 @@
                             id="fromQuery"
                             class="search-input"
                             placeholder="Search..."
-                            oninput="searchAirport('from')"
+                            data-action="searchAirport" data-action-event="input" data-action-args='["from"]'
                           />
                           <div id="fromResults" class="results-list"></div>
                         </div>
@@ -363,14 +365,14 @@
                       <button
                         type="button"
                         class="swap-button"
-                        onclick="swapCities()"
+                        data-action="swapCities" data-action-args='[]'
                       >
                         <svg
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
                           stroke-width="1"
-                          style="width: 17px; height: 17px"
+                          class="u-icon-17"
                         >
                           <path
                             d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
@@ -382,7 +384,7 @@
                         <label class="input-label">To</label>
                         <div
                           class="input-wrapper"
-                          onclick="openAirportPanel('to')"
+                          data-action="openAirportPanel" data-action-args='["to"]'
                         >
                           <svg
                             class="input-icon"
@@ -409,7 +411,7 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="closeAirportPanel('to')"
+                              data-action="closeAirportPanel" data-action-args='["to"]'
                             >
                               ×
                             </button>
@@ -419,7 +421,7 @@
                             id="toQuery"
                             class="search-input"
                             placeholder="Search..."
-                            oninput="searchAirport('to')"
+                            data-action="searchAirport" data-action-event="input" data-action-args='["to"]'
                           />
                           <div id="toResults" class="results-list"></div>
                         </div>
@@ -445,9 +447,9 @@
                       </div>
 
                       <div
-                        class="input-group"
+                        class="input-group u-hidden"
                         id="returnCol"
-                        style="display: none"
+
                       >
                         <label class="input-label">Return</label>
                         <div class="input-wrapper">
@@ -472,7 +474,7 @@
                         <div
                           class="input-wrapper"
                           id="paxTrigger"
-                          onclick="togglePassengerPanel()"
+                          data-action="togglePassengerPanel" data-action-args='[]'
                         >
                           <svg
                             class="input-icon"
@@ -502,7 +504,7 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="togglePassengerPanel()"
+                              data-action="togglePassengerPanel" data-action-args='[]'
                             >
                               ×
                             </button>
@@ -516,14 +518,14 @@
                               <div class="counter">
                                 <button
                                   type="button"
-                                  onclick="changePax('adults', -1)"
+                                  data-action="changePax" data-action-args='["adults", -1]'
                                 >
                                   −
                                 </button>
                                 <span id="countAdults">1</span>
                                 <button
                                   type="button"
-                                  onclick="changePax('adults', 1)"
+                                  data-action="changePax" data-action-args='["adults", 1]'
                                 >
                                   +
                                 </button>
@@ -537,14 +539,14 @@
                               <div class="counter">
                                 <button
                                   type="button"
-                                  onclick="changePax('children', -1)"
+                                  data-action="changePax" data-action-args='["children", -1]'
                                 >
                                   −
                                 </button>
                                 <span id="countChildren">0</span>
                                 <button
                                   type="button"
-                                  onclick="changePax('children', 1)"
+                                  data-action="changePax" data-action-args='["children", 1]'
                                 >
                                   +
                                 </button>
@@ -558,14 +560,14 @@
                               <div class="counter">
                                 <button
                                   type="button"
-                                  onclick="changePax('infants', -1)"
+                                  data-action="changePax" data-action-args='["infants", -1]'
                                 >
                                   −
                                 </button>
                                 <span id="countInfants">0</span>
                                 <button
                                   type="button"
-                                  onclick="changePax('infants', 1)"
+                                  data-action="changePax" data-action-args='["infants", 1]'
                                 >
                                   +
                                 </button>
@@ -580,7 +582,7 @@
                         <div
                           class="input-wrapper"
                           id="cabinTrigger"
-                          onclick="toggleCabinMenu()"
+                          data-action="toggleCabinMenu" data-action-args='[]'
                         >
                           <svg
                             class="input-icon"
@@ -607,24 +609,24 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleCabinMenu()"
+                              data-action="toggleCabinMenu" data-action-args='[]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="setCabin('Economy')"
+                            data-action="setCabin" data-action-args='["Economy"]'
                           >
                             Economy
                           </div>
                           <div
                             class="option-item"
-                            onclick="setCabin('Business')"
+                            data-action="setCabin" data-action-args='["Business"]'
                           >
                             Business
                           </div>
-                          <div class="option-item" onclick="setCabin('First')">
+                          <div class="option-item" data-action="setCabin" data-action-args='["First"]'>
                             First Class
                           </div>
                         </div>
@@ -639,7 +641,7 @@
                           <button
                             type="button"
                             class="add-flight-btn"
-                            onclick="addMultiCityLeg()"
+                            data-action="addMultiCityLeg" data-action-args='[]'
                           >
                             + Add flight
                           </button>
@@ -651,7 +653,7 @@
                           <button
                             type="button"
                             class="remove-flight-btn"
-                            onclick="removeMultiCityLeg(this)"
+                            data-action="removeMultiCityLeg" data-action-args='["$element"]'
                             aria-label="Remove flight 2"
                           >
                             Remove
@@ -662,7 +664,7 @@
                             <span>From</span>
                             <div
                               class="input-wrapper"
-                              onclick="openAirportPanel('multiCity2From')"
+                              data-action="openAirportPanel" data-action-args='["multiCity2From"]'
                             >
                               <svg
                                 class="input-icon"
@@ -693,7 +695,7 @@
                                   type="button"
                                   class="close-btn"
                                   aria-label="Close airport list"
-                                  onclick="closeAirportPanel('multiCity2From')"
+                                  data-action="closeAirportPanel" data-action-args='["multiCity2From"]'
                                 >
                                   ×
                                 </button>
@@ -703,7 +705,7 @@
                                 class="search-input"
                                 type="text"
                                 placeholder="Search airports..."
-                                oninput="searchAirport('multiCity2From')"
+                                data-action="searchAirport" data-action-event="input" data-action-args='["multiCity2From"]'
                               />
                               <div
                                 id="multiCity2FromResults"
@@ -715,7 +717,7 @@
                             <span>To</span>
                             <div
                               class="input-wrapper"
-                              onclick="openAirportPanel('multiCity2To')"
+                              data-action="openAirportPanel" data-action-args='["multiCity2To"]'
                             >
                               <svg
                                 class="input-icon"
@@ -743,7 +745,7 @@
                                   type="button"
                                   class="close-btn"
                                   aria-label="Close airport list"
-                                  onclick="closeAirportPanel('multiCity2To')"
+                                  data-action="closeAirportPanel" data-action-args='["multiCity2To"]'
                                 >
                                   ×
                                 </button>
@@ -753,7 +755,7 @@
                                 class="search-input"
                                 type="text"
                                 placeholder="Search airports..."
-                                oninput="searchAirport('multiCity2To')"
+                                data-action="searchAirport" data-action-event="input" data-action-args='["multiCity2To"]'
                               />
                               <div
                                 id="multiCity2ToResults"
@@ -790,7 +792,7 @@
 
                 <!-- UMRAH TAB -->
                 <div class="tab-panel" id="panel-umrah">
-                  <form onsubmit="return handleModeSearch(event, 'Umrah');">
+                  <form data-action="handleModeSearch" data-action-event="submit" data-action-args='["$event", "Umrah"]'>
                     <div class="search-grid">
                       <div class="input-group">
                         <label class="input-label">Destination</label>
@@ -857,7 +859,7 @@
                         <label class="input-label">Package Type</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleUmrahTypeMenu(event)"
+                          data-action="toggleUmrahTypeMenu" data-action-args='["$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -883,26 +885,26 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleUmrahTypeMenu()"
+                              data-action="toggleUmrahTypeMenu" data-action-args='[]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="setUmrahType('Economy', this)"
+                            data-action="setUmrahType" data-action-args='["Economy", "$element"]'
                           >
                             Economy
                           </div>
                           <div
                             class="option-item"
-                            onclick="setUmrahType('3 Star', this)"
+                            data-action="setUmrahType" data-action-args='["3 Star", "$element"]'
                           >
                             3 Star
                           </div>
                           <div
                             class="option-item"
-                            onclick="setUmrahType('5 Star', this)"
+                            data-action="setUmrahType" data-action-args='["5 Star", "$element"]'
                           >
                             5 Star
                           </div>
@@ -913,7 +915,7 @@
                         <label class="input-label">Services</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleUmrahServicesMenu(event)"
+                          data-action="toggleUmrahServicesMenu" data-action-args='["$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -934,14 +936,13 @@
                         <div
                           class="dropdown-panel services-panel"
                           id="umrahServicesMenu"
-                          onclick="event.stopPropagation()"
                         >
                           <div class="panel-header">
                             <span>Select Services</span>
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleUmrahServicesMenu()"
+                              data-action="toggleUmrahServicesMenu" data-action-args='[]'
                             >
                               ×
                             </button>
@@ -952,7 +953,7 @@
                               name="umrahService"
                               value="Flights"
                               checked
-                              onchange="updateUmrahServices()"
+                              data-action="updateUmrahServices" data-action-event="change" data-action-args='[]'
                             />
                             <span>Flights</span>
                           </label>
@@ -962,7 +963,7 @@
                               name="umrahService"
                               value="Hotel"
                               checked
-                              onchange="updateUmrahServices()"
+                              data-action="updateUmrahServices" data-action-event="change" data-action-args='[]'
                             />
                             <span>Hotel</span>
                           </label>
@@ -972,7 +973,7 @@
                               name="umrahService"
                               value="Transport"
                               checked
-                              onchange="updateUmrahServices()"
+                              data-action="updateUmrahServices" data-action-event="change" data-action-args='[]'
                             />
                             <span>Transport</span>
                           </label>
@@ -997,13 +998,13 @@
 
                 <!-- VISA TAB -->
                 <div class="tab-panel" id="panel-visa">
-                  <form onsubmit="return handleModeSearch(event, 'Visa');">
+                  <form data-action="handleModeSearch" data-action-event="submit" data-action-args='["$event", "Visa"]'>
                     <div class="search-grid">
                       <div class="input-group">
                         <label class="input-label">From</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaFrom', event)"
+                          data-action="toggleVisaDropdown" data-action-args='["visaFrom", "$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -1027,42 +1028,32 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleVisaDropdown('visaFrom')"
+                              data-action="toggleVisaDropdown" data-action-args='["visaFrom"]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="setVisaVal('visaFrom', 'Pakistan', this)"
+                            data-action="setVisaVal" data-action-args='["visaFrom", "Pakistan", "$element"]'
                           >
                             Pakistan
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal(
-                                'visaFrom',
-                                'United Arab Emirates',
-                                this,
-                              )
-                            "
+                            data-action="setVisaVal" data-action-args='["visaFrom", "United Arab Emirates", "$element"]'
                           >
                             UAE
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaFrom', 'United Kingdom', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaFrom", "United Kingdom", "$element"]'
                           >
                             UK
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaFrom', 'United States', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaFrom", "United States", "$element"]'
                           >
                             USA
                           </div>
@@ -1073,7 +1064,7 @@
                         <label class="input-label">To</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaTo', event)"
+                          data-action="toggleVisaDropdown" data-action-args='["visaTo", "$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -1097,30 +1088,26 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleVisaDropdown('visaTo')"
+                              data-action="toggleVisaDropdown" data-action-args='["visaTo"]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="setVisaVal('visaTo', 'Saudi Arabia', this)"
+                            data-action="setVisaVal" data-action-args='["visaTo", "Saudi Arabia", "$element"]'
                           >
                             Saudi Arabia
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaTo', 'United Kingdom', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaTo", "United Kingdom", "$element"]'
                           >
                             UK
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaTo', 'United Arab Emirates', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaTo", "United Arab Emirates", "$element"]'
                           >
                             UAE
                           </div>
@@ -1150,7 +1137,7 @@
                         <label class="input-label">Visa Type</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaType', event)"
+                          data-action="toggleVisaDropdown" data-action-args='["visaType", "$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -1176,24 +1163,20 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleVisaDropdown('visaType')"
+                              data-action="toggleVisaDropdown" data-action-args='["visaType"]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaType', 'Tourist Visa', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaType", "Tourist Visa", "$element"]'
                           >
                             Tourist
                           </div>
                           <div
                             class="option-item"
-                            onclick="
-                              setVisaVal('visaType', 'Business Visa', this)
-                            "
+                            data-action="setVisaVal" data-action-args='["visaType", "Business Visa", "$element"]'
                           >
                             Business
                           </div>
@@ -1204,7 +1187,7 @@
                         <label class="input-label">Processing</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaSpeed', event)"
+                          data-action="toggleVisaDropdown" data-action-args='["visaSpeed", "$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -1229,20 +1212,20 @@
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleVisaDropdown('visaSpeed')"
+                              data-action="toggleVisaDropdown" data-action-args='["visaSpeed"]'
                             >
                               ×
                             </button>
                           </div>
                           <div
                             class="option-item"
-                            onclick="setVisaVal('visaSpeed', 'Standard', this)"
+                            data-action="setVisaVal" data-action-args='["visaSpeed", "Standard", "$element"]'
                           >
                             Standard
                           </div>
                           <div
                             class="option-item"
-                            onclick="setVisaVal('visaSpeed', 'Express', this)"
+                            data-action="setVisaVal" data-action-args='["visaSpeed", "Express", "$element"]'
                           >
                             Express
                           </div>
@@ -1253,7 +1236,7 @@
                         <label class="input-label">Travelers</label>
                         <div
                           class="input-wrapper"
-                          onclick="toggleVisaDropdown('visaPax', event)"
+                          data-action="toggleVisaDropdown" data-action-args='["visaPax", "$event"]'
                         >
                           <svg
                             class="input-icon"
@@ -1277,14 +1260,13 @@
                         <div
                           class="dropdown-panel"
                           id="visaPaxMenu"
-                          onclick="event.stopPropagation()"
                         >
                           <div class="panel-header">
                             <span>Travelers</span>
                             <button
                               type="button"
                               class="close-btn"
-                              onclick="toggleVisaDropdown('visaPax')"
+                              data-action="toggleVisaDropdown" data-action-args='["visaPax"]'
                             >
                               ×
                             </button>
@@ -1296,14 +1278,14 @@
                             <div class="counter">
                               <button
                                 type="button"
-                                onclick="changeVisaTravelers(-1)"
+                                data-action="changeVisaTravelers" data-action-args='[-1]'
                               >
                                 −
                               </button>
                               <span id="countVisaTravelers">1</span>
                               <button
                                 type="button"
-                                onclick="changeVisaTravelers(1)"
+                                data-action="changeVisaTravelers" data-action-args='[1]'
                               >
                                 +
                               </button>
@@ -1567,110 +1549,110 @@
 
       <!-- ========================================== FOOTER START ========================================== -->
       <footer class="footer">
-        <div class="footer-top">
-          <div class="footer-grid">
-            <div class="footer-col-large">
-              <img
-                src="images/smart_moves_solutions.png"
-                alt="Logo"
-                class="footer-logo"
-              />
-              <p class="footer-about">
-                Your trusted travel partner for flights, Umrah packages, visa
-                services, and more. Making travel simple since 2020.
-              </p>
-              <div class="social-links">
-                <a href="#" aria-label="Facebook">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.12 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"
-                    />
-                  </svg>
-                </a>
-                <a href="#" aria-label="Twitter">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M23.95 4.57a10 10 0 0 1-2.83.78 4.94 4.94 0 0 0 2.17-2.73c-.95.56-2 .96-3.13 1.18A4.92 4.92 0 0 0 16.62 2c-2.72 0-4.92 2.2-4.92 4.92 0 .39.04.76.13 1.12-4.09-.2-7.72-2.16-10.15-5.14-.42.73-.67 1.58-.67 2.48 0 1.71.87 3.21 2.19 4.09-.81-.03-1.57-.25-2.23-.62v.06c0 2.39 1.7 4.38 3.95 4.83-.41.11-.85.17-1.29.17-.32 0-.63-.03-.93-.08.63 1.95 2.44 3.37 4.6 3.41-1.68 1.32-3.8 2.11-6.1 2.11-.4 0-.79-.02-1.17-.07 2.18 1.4 4.77 2.21 7.55 2.21 9.05 0 14-7.5 14-14 0-.21 0-.42-.02-.63.96-.69 1.8-1.56 2.46-2.55z"
-                    />
-                  </svg>
-                </a>
-                <a href="#" aria-label="Instagram">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                </a>
-                <a href="#" aria-label="LinkedIn">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
-                    />
-                  </svg>
-                </a>
+            <div class="footer-top">
+              <div class="footer-grid">
+                <div class="footer-col-large">
+                  <img
+                    src="/images/bukhari-booking-logo.png"
+                    alt="Bukhari Booking"
+                    class="footer-logo"
+                  />
+                  <p class="footer-about">
+                    Your trusted travel partner for flights, Umrah packages, visa
+                    services, and more. Making travel simple since 2020.
+                  </p>
+                  <div class="social-links">
+                    <a href="#" aria-label="Facebook">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.12 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"
+                        />
+                      </svg>
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M23.95 4.57a10 10 0 0 1-2.83.78 4.94 4.94 0 0 0 2.17-2.73c-.95.56-2 .96-3.13 1.18A4.92 4.92 0 0 0 16.62 2c-2.72 0-4.92 2.2-4.92 4.92 0 .39.04.76.13 1.12-4.09-.2-7.72-2.16-10.15-5.14-.42.73-.67 1.58-.67 2.48 0 1.71.87 3.21 2.19 4.09-.81-.03-1.57-.25-2.23-.62v.06c0 2.39 1.7 4.38 3.95 4.83-.41.11-.85.17-1.29.17-.32 0-.63-.03-.93-.08.63 1.95 2.44 3.37 4.6 3.41-1.68 1.32-3.8 2.11-6.1 2.11-.4 0-.79-.02-1.17-.07 2.18 1.4 4.77 2.21 7.55 2.21 9.05 0 14-7.5 14-14 0-.21 0-.42-.02-.63.96-.69 1.8-1.56 2.46-2.55z"
+                        />
+                      </svg>
+                    </a>
+                    <a href="#" aria-label="Instagram">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                      </svg>
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="footer-col">
+                  <h4>Quick Links</h4>
+                  <ul>
+                    <li><a href="/about-us.html">About Us</a></li>
+                    <li><a href="/contact-us.html">Contact</a></li>
+                    <li><a href="/contact-us.html#careers">Careers</a></li>
+                    <li><a href="/my-bookings.html">My Bookings</a></li>
+                  </ul>
+                </div>
+
+                <div class="footer-col">
+                  <h4>Services</h4>
+                  <ul>
+                    <li><a href="/search-flight.html">Flight Booking</a></li>
+                    <li><a href="/index.html">Umrah Packages</a></li>
+                    <li><a href="/index.html">Visa Services</a></li>
+                    <li><a href="/index.html">Hotel Booking</a></li>
+                  </ul>
+                </div>
+
+                <div class="footer-col">
+                  <h4>Support</h4>
+                  <ul>
+                    <li><a href="/contact-us.html#faq">Help Center</a></li>
+                    <li><a href="/contact-us.html#faq">FAQs</a></li>
+                    <li><a href="/contact-us.html">Privacy Policy</a></li>
+                    <li><a href="/contact-us.html">Terms of Service</a></li>
+                  </ul>
+                </div>
+
+                <div class="footer-col">
+                  <h4>Contact</h4>
+                  <div class="contact-info">
+                    <p>📧 support@gmail.com</p>
+                    <p>📞 +92 21 111 234 567</p>
+                    <p>📍 Blue Area, Islamabad</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="footer-col">
-              <h4>Quick Links</h4>
-              <ul>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact</a></li>
-                <li><a href="#">Careers</a></li>
-                <li><a href="#">Press</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-col">
-              <h4>Services</h4>
-              <ul>
-                <li><a href="#">Flight Booking</a></li>
-                <li><a href="#">Umrah Packages</a></li>
-                <li><a href="#">Visa Services</a></li>
-                <li><a href="#">Hotel Booking</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-col">
-              <h4>Support</h4>
-              <ul>
-                <li><a href="#">Help Center</a></li>
-                <li><a href="#">FAQs</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-col">
-              <h4>Contact</h4>
-              <div class="contact-info">
-                <p>📧 support@gmail.com</p>
-                <p>📞 +1 234 567 8900</p>
-                <p>📍 123 Travel St, City</p>
+            <div class="footer-bottom">
+              <p>&copy; 2026 Bukhari Booking. All rights reserved.</p>
+              <div class="footer-badges">
+                <span class="badge-item">🛡️ Secure Payments</span>
+                <span class="badge-item">✅ Verified Agency</span>
+                <span class="badge-item">⭐ 5-Star Rated</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="footer-bottom">
-          <p>&copy; 2026 Smart Moves. All rights reserved.</p>
-          <div class="footer-badges">
-            <span class="badge-item">🛡️ Secure Payments</span>
-            <span class="badge-item">✅ Verified Agency</span>
-            <span class="badge-item">⭐ 5-Star Rated</span>
-          </div>
-        </div>
-      </footer>
+          </footer>
       <!-- ========================================== FOOTER END ========================================== -->
       <button
         class="scroll-top"
         id="backToTop"
-        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        data-action="scrollToTop"
         aria-label="Scroll to top"
       >
         <svg
@@ -1683,7 +1665,11 @@
         </svg>
       </button>
     </div>
+    <script src="/js/flight-data.js"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/auth-modal.js"></script>
+    <script src="js/site-layout.js" defer></script>
+    <script src="/js/site-actions.js" defer></script>
+
   </body>
 </html>

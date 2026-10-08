@@ -31,7 +31,7 @@
      the two halves of the round trip — each `start` is an offset into legs.
      Nothing here should nest segments inside directions; that would break
      every consumer that walks legs directly. */
-  var FLIGHT = {
+  var DEFAULT_FLIGHT = {
     destination: "London",
     tripType: "Round trip",
     cabin: "Economy",
@@ -100,6 +100,105 @@
       { id: "ret", label: "Returning", from: "LHR", to: "ISB", start: 2, count: 2 },
     ],
   };
+
+  var bookingSelection = null;
+  try {
+    var storedSelection = sessionStorage.getItem(
+      "smartmoves.bookingSelection",
+    );
+    if (storedSelection) bookingSelection = JSON.parse(storedSelection);
+  } catch (error) {
+    console.error("Could not read the selected itinerary.", error);
+    window.alert(
+      "Your saved flight selection could not be read. The demo itinerary will be shown instead.",
+    );
+  }
+
+  function clockFromMinutes(minutes) {
+    var value = ((minutes % 1440) + 1440) % 1440;
+    return ("0" + Math.floor(value / 60)).slice(-2) +
+      ":" + ("0" + (value % 60)).slice(-2);
+  }
+
+  function durationFromMinutes(minutes) {
+    var hours = Math.floor(minutes / 60);
+    var remainder = minutes % 60;
+    return (hours ? hours + "h " : "") + remainder + "m";
+  }
+
+  function flightFromSelection(selection) {
+    var sourceLegs = selection &&
+      selection.itinerary &&
+      selection.itinerary.legs;
+    if (!Array.isArray(sourceLegs) || !sourceLegs.length) return null;
+
+    var legs = [];
+    var directions = [];
+    var totalMinutes = 0;
+    sourceLegs.forEach(function (journey, index) {
+      if (!journey || !Array.isArray(journey.segments) ||
+          !journey.segments.length) {
+        throw new Error("The selected itinerary contains an empty flight leg.");
+      }
+      var start = legs.length;
+      journey.segments.forEach(function (segment) {
+        totalMinutes += segment.durationMin;
+        legs.push({
+          airline: segment.airline,
+          flightNo: segment.flightNumber,
+          from: segment.from,
+          to: segment.to,
+          depart: clockFromMinutes(segment.departAt),
+          arrive: clockFromMinutes(segment.arriveAt),
+          duration: durationFromMinutes(segment.durationMin),
+          seatsLeft: 4,
+          baggage: "Checked baggage: confirm with airline",
+          cabinBag: "Cabin baggage allowance: confirm with airline",
+        });
+      });
+      directions.push({
+        id: index === 0 ? "out" : "leg-" + (index + 1),
+        label: selection.tripType === "roundtrip"
+          ? (index === 0 ? "Departing" : "Returning")
+          : "Flight " + (index + 1),
+        from: journey.origin.code,
+        to: journey.destination.code,
+        date: journey.date,
+        start: start,
+        count: legs.length - start,
+      });
+    });
+
+    var first = sourceLegs[0];
+    var last = sourceLegs[sourceLegs.length - 1];
+    var cabin = selection.cabin || "Economy";
+    return {
+      destination: last.destination.city,
+      tripType: selection.tripType === "roundtrip"
+        ? "Round trip"
+        : (selection.tripType === "multicity" ? "Multi-city" : "One way"),
+      cabin: cabin.replace(/\b\w/g, function (letter) {
+        return letter.toUpperCase();
+      }),
+      totalDuration: durationFromMinutes(totalMinutes),
+      route: sourceLegs.map(function (journey) {
+        return journey.origin.city + " → " + journey.destination.city;
+      }).join(" · "),
+      legs: legs,
+      directions: directions,
+    };
+  }
+
+  var FLIGHT = null;
+  try {
+    FLIGHT = bookingSelection ? flightFromSelection(bookingSelection) : null;
+  } catch (error) {
+    console.error("The selected itinerary could not be prepared.", error);
+    window.alert(
+      "Your selected flight details are invalid. The demo itinerary will be shown instead.",
+    );
+  }
+  FLIGHT = FLIGHT || DEFAULT_FLIGHT;
 
   function directionOf(dir) {
     return FLIGHT.directions[dir] || FLIGHT.directions[0];
@@ -197,13 +296,23 @@
     month: "short",
     year: "numeric",
   });
-  var TRIP_NIGHTS = Math.round((RETURN_DATE - FLIGHT_DATE) / 86400000);
-
   function dateLabelFor(dir) {
+    var direction = FLIGHT.directions[dir];
+    if (direction && direction.date) {
+      var date = new Date(direction.date + "T00:00:00");
+      return date.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    }
     return dir === 0 ? FLIGHT_DATE_LABEL : RETURN_DATE_LABEL;
   }
 
   function dateIsoFor(dir) {
+    var direction = FLIGHT.directions[dir];
+    if (direction && direction.date) return direction.date;
     return dir === 0 ? FLIGHT_DATE_ISO : RETURN_DATE_ISO;
   }
 
@@ -216,19 +325,70 @@
     Infant: { base: 21220, tax:  5760, fee:  480 },
   };
 
-  /* One traveler of each type: 1 adult, 1 child, 1 infant. */
-  var TRAVELLERS = [
-    { id: 1, type: "Adult", label: "Adult 1", flag: "🇵🇰", dob: "18 Feb 1998", doc: "4821" },
-    { id: 2, type: "Child", label: "Child 1", flag: "🇵🇰", dob: "08 Jan 2018", doc: "4831" },
-    { id: 3, type: "Infant", label: "Infant 1", flag: "🇵🇰", dob: "12 Mar 2025", doc: "4841" },
-  ];
+  var DEFAULT_ADULT_FARE = FARE_SHARE.Adult.base +
+    FARE_SHARE.Adult.tax + FARE_SHARE.Adult.fee;
+  var selectedAdultFare = bookingSelection &&
+    bookingSelection.fare &&
+    Number(bookingSelection.fare.perAdultTotal);
+  var fareScale = Number.isFinite(selectedAdultFare) && selectedAdultFare > 0
+    ? selectedAdultFare / DEFAULT_ADULT_FARE
+    : 1;
+
+  function fareShareFor(type) {
+    var share = FARE_SHARE[type];
+    var tax = Math.round(share.tax * fareScale);
+    var fee = Math.round(share.fee * fareScale);
+    var total = Math.round((share.base + share.tax + share.fee) * fareScale);
+    return { base: total - tax - fee, tax: tax, fee: fee };
+  }
+
+  var selectedFareName = bookingSelection &&
+    bookingSelection.fare &&
+    typeof bookingSelection.fare.packageName === "string"
+    ? bookingSelection.fare.packageName
+    : "";
+
+  var TRAVELLERS = (function () {
+    var counts = bookingSelection && bookingSelection.passengers;
+    if (!counts) {
+      return [
+        { id: 1, type: "Adult", label: "Adult 1", flag: "🇵🇰", dob: "18 Feb 1998", doc: "4821" },
+        { id: 2, type: "Child", label: "Child 1", flag: "🇵🇰", dob: "08 Jan 2018", doc: "4831" },
+        { id: 3, type: "Infant", label: "Infant 1", flag: "🇵🇰", dob: "12 Mar 2025", doc: "4841" },
+      ];
+    }
+
+    var travelers = [];
+    [
+      { type: "Adult", count: counts.adults, dob: "18 Feb 1998" },
+      { type: "Child", count: counts.children, dob: "08 Jan 2018" },
+      { type: "Infant", count: counts.infants, dob: "12 Mar 2025" },
+    ].forEach(function (group) {
+      var count = Number.isInteger(group.count)
+        ? Math.min(9, Math.max(0, group.count))
+        : 0;
+      for (var index = 1; index <= count; index += 1) {
+        travelers.push({
+          id: travelers.length + 1,
+          type: group.type,
+          label: group.type + " " + index,
+          flag: "🇵🇰",
+          dob: group.dob,
+          doc: String(4820 + travelers.length + 1),
+        });
+      }
+    });
+    return travelers.length ? travelers : [
+      { id: 1, type: "Adult", label: "Adult 1", flag: "🇵🇰", dob: "18 Feb 1998", doc: "4821" },
+    ];
+  })();
 
   var FARE = (function () {
     var base = 0;
     var taxes = 0;
     var serviceFee = 0;
     TRAVELLERS.forEach(function (t) {
-      var share = FARE_SHARE[t.type];
+      var share = fareShareFor(t.type);
       base += share.base;
       taxes += share.tax;
       serviceFee += share.fee;
@@ -237,13 +397,24 @@
   })();
 
   function travellerTotal(t) {
-    var share = FARE_SHARE[t.type];
+    var share = fareShareFor(t.type);
     return share.base + share.tax + share.fee;
   }
 
   var ADULT_TRAVELLERS = TRAVELLERS.filter(function (t) {
     return t.type === "Adult";
   });
+
+  function passengerCount(type) {
+    return TRAVELLERS.filter(function (traveler) {
+      return traveler.type === type;
+    }).length;
+  }
+
+  function passengerLabel(type, plural) {
+    var count = passengerCount(type);
+    return count + " " + (count === 1 ? type.toLowerCase() : plural);
+  }
 
   var NATIONALITIES = [
     "Pakistani", "Saudi Arabian", "Emirati", "Qatari", "British",
@@ -257,23 +428,38 @@
 
   /* Priced per traveler, per flight — a round trip charges twice. No `desc`
      here: it is built at render time from the active traveler and direction,
-     because a fixed string would keep naming one flight forever. */
+     because a fixed string would keep naming one flight forever.
+
+     `bag0` is a real, selectable card rather than the absence of a choice: an
+     adult who wants no extra baggage should be able to leave it alone and
+     still see a confirmed answer, instead of leaving the panel looking
+     un-answered. It is pre-selected (see DEFAULT_BAG / DEFAULT_MEAL). */
   var BAGGAGE_OPTIONS = [
-    { id: "bag10", name: "Extra 10 kg", price: 22710 },
-    { id: "bag15", name: "Extra 15 kg", price: 33940 },
-    { id: "bag23", name: "Extra 23 kg", price: 51910 },
+    { id: "bag0",  name: "Included with this fare", price: 0, free: true,  desc: "No extra checked bag" },
+    { id: "bag10", name: "Extra 10 kg",            price: 22710, free: false, desc: "One additional checked bag" },
+    { id: "bag15", name: "Extra 15 kg",            price: 33940, free: false, desc: "One additional checked bag" },
+    { id: "bag23", name: "Extra 23 kg",            price: 51910, free: false, desc: "One additional checked bag" },
   ];
 
-  /* Standard meals come with the fare; everything else is charged per flight. */
+  /* Standard meals come with the fare; everything else is charged per flight.
+     `none` lets a traveler decline a meal entirely — the carrier serves none
+     by default, so "Skip meal" is the honest label for that. */
   var MEAL_OPTIONS = [
-    { id: "std", name: "Standard meal", price: 0, free: true, desc: "Hot main, bread, dessert, drink" },
-    { id: "veg", name: "Vegetarian", price: 0, free: true, desc: "No meat or fish" },
-    { id: "gfree", name: "Gluten-free", price: 0, free: true, desc: "Prepared on request" },
-    { id: "halal", name: "Halal", price: 2500, free: false, desc: "Special request" },
-    { id: "child", name: "Child meal", price: 1500, free: false, desc: "Smaller portions, ages 2–11" },
-    { id: "lowsod", name: "Low sodium", price: 2000, free: false, desc: "Reduced salt" },
-    { id: "fruit", name: "Fruit platter", price: 3200, free: false, desc: "Seasonal fruit and cheese" },
+    { id: "none",   name: "No meal needed",   price: 0,    free: true,  desc: "Skip — nothing is served on this flight" },
+    { id: "std",    name: "Standard meal",    price: 0,    free: true,  desc: "Hot main, bread, dessert, drink" },
+    { id: "veg",    name: "Vegetarian",       price: 0,    free: true,  desc: "No meat or fish" },
+    { id: "gfree",  name: "Gluten-free",      price: 0,    free: true,  desc: "Prepared on request" },
+    { id: "halal",  name: "Halal",            price: 2500, free: false, desc: "Special request" },
+    { id: "child",  name: "Child meal",       price: 1500, free: false, desc: "Smaller portions, ages 2–11" },
+    { id: "lowsod", name: "Low sodium",       price: 2000, free: false, desc: "Reduced salt" },
+    { id: "fruit",  name: "Fruit platter",    price: 3200, free: false, desc: "Seasonal fruit and cheese" },
   ];
+
+  /* Baggage and a meal are pre-answered so the user is never blocked on
+     something they don't want. A seat is NOT: every traveler has to be
+     placed, so it stays empty until someone picks one (see SEAT_REQUIRED). */
+  var DEFAULT_BAG = "bag0";
+  var DEFAULT_MEAL = "none";
 
   var PAYMENT_METHODS = [
     {
@@ -339,42 +525,57 @@
     pending: 3,
   };
 
+  function searchResultsHref() {
+    var current = new URLSearchParams(window.location.search);
+    var params = new URLSearchParams();
+    [
+      "trip",
+      "from",
+      "to",
+      "departure",
+      "return",
+      "adults",
+      "children",
+      "infants",
+      "cabin",
+      "multiLegs",
+    ].forEach(function (key) {
+      if (current.has(key)) params.set(key, current.get(key));
+    });
+    if (!params.has("from") || !params.has("to")) {
+      return "/search-flight.html";
+    }
+    return "/search-flight.html?" + params.toString();
+  }
+
+  /* Per-screen header copy. There is no sticky action bar; each screen renders
+     its own forward-action button where the user needs it. */
   var SCREENS = {
     details: {
       title: "Traveler details",
       sub: "Save time, and you’re one step closer to " + FLIGHT.destination + ".",
       back: "Back to flight results",
-      backHref: "/search-flight.html",
-      next: "Continue to add-ons",
-      stickyLabel: "Baseline booking",
+      backHref: searchResultsHref(),
     },
     addons: {
       title: "Baggage & seats",
       sub: "Make the journey yours. Choose flight and flight a seat.",
       back: "Back to traveler details",
-      next: "Review add-ons",
-      stickyLabel: "Reference price",
     },
     review: {
       title: "Review your selections",
       sub: "Check every extra before you continue to payment.",
       back: "Back to add-ons",
-      next: "Continue to payment",
-      stickyLabel: "Reference price",
     },
     payment: {
       title: "Choose how to pay",
       sub: "Select a payment method. Your flight is not ticketed until payment clears.",
       back: "Back to review",
-      next: "Create payment order",
-      stickyLabel: "Amount due",
     },
     pending: {
       title: "Order created · Payment pending",
       sub: "Your order is ready. Complete payment to request ticket issuance.",
       back: "Manage booking",
-      next: "Manage booking",
-      stickyLabel: "Awaiting payment",
     },
   };
 
@@ -404,6 +605,25 @@
     promo: null,
     rate: null,
   };
+
+  /* Baggage and a meal are answered before the user ever looks at them, so
+     those two panels never read as "you still have to do something here" —
+     an adult who wants no bag and no meal can leave both alone and go
+     straight to the seat. A seat is deliberately NOT seeded: it is the one
+     choice the user must actually make (see missingAddons / SEAT_REQUIRED).
+
+     Seeded here rather than defaulted at render time so that every reader of
+     state.bag[key] / state.meal[key] — the rail, review, the popup, the
+     totals — agrees with what the option grid shows, with no special case. */
+  (function seedAddonDefaults() {
+    TRAVELLERS.forEach(function (t) {
+      FLIGHT.directions.forEach(function (d, di) {
+        var key = addonKey(di, t.id);
+        state.bag[key] = DEFAULT_BAG;
+        state.meal[key] = DEFAULT_MEAL;
+      });
+    });
+  })();
 
   /* Read every currently-rendered input back into state before we replace the
      markup. Ids are stable across renders, which is what makes this work. */
@@ -469,6 +689,14 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  /* Take a node out of its parent. Element.remove() does exactly this, but the
+     local DOM shim only models removeChild, so go via the parent and no-op on
+     a node that is already detached. */
+  function detachNode(node) {
+    if (!node || !node.parentNode) return;
+    node.parentNode.removeChild(node);
   }
 
   /* =====================================================================
@@ -578,7 +806,7 @@
 
   /* Three add-on kinds per traveler per direction. */
   var ADDONS_PER_DIRECTION = 3;
-  var ADDONS_PER_PAX = 6;
+  var ADDONS_PER_PAX = ADDONS_PER_DIRECTION * FLIGHT.directions.length;
 
   function paxAddonCount(paxId) {
     var n = 0;
@@ -609,19 +837,51 @@
   }
 
   /* Human-readable gaps, e.g. "Adult 1 return seat". Drives the warn-but-
-     allow toast rather than a hard block. */
+     allow toast rather than a hard block.
+
+     Baggage and a meal are pre-seeded (see seedAddonDefaults), so in practice
+     only seats appear here — but the other two are still checked rather than
+     assumed, so a key that somehow loses its default is reported instead of
+     silently billed at zero. */
   function missingAddons() {
     var out = [];
     TRAVELLERS.forEach(function (t) {
       FLIGHT.directions.forEach(function (d, di) {
         var k = addonKey(di, t.id);
-        var side = di === 0 ? "outbound" : "return";
+        var side = directionOf(di).label.toLowerCase();
         if (!state.bag[k]) out.push(t.label + " " + side + " baggage");
         if (!state.meal[k]) out.push(t.label + " " + side + " meal");
         if (!state.seat[k]) out.push(t.label + " " + side + " seat");
       });
     });
     return out;
+  }
+
+  /* Seats are the one thing that cannot be left to a default, so these are
+     the only gaps that actually block. Returns "Adult 1 · Returning seat" etc. */
+  function missingSeats() {
+    var out = [];
+    TRAVELLERS.forEach(function (t) {
+      FLIGHT.directions.forEach(function (d, di) {
+        if (!state.seat[addonKey(di, t.id)]) {
+          out.push(t.label + " · " + directionOf(di).label + " seat");
+        }
+      });
+    });
+    return out;
+  }
+
+  /* The same gaps, but as the first raw key — used to jump the screen onto
+     the traveler who still owes a seat. null when every seat is chosen. */
+  function missingSeatKey() {
+    var found = null;
+    TRAVELLERS.forEach(function (t) {
+      if (found) return;
+      FLIGHT.directions.forEach(function (d, di) {
+        if (!found && !state.seat[addonKey(di, t.id)]) found = addonKey(di, t.id);
+      });
+    });
+    return found;
   }
 
   function addonSumFor(paxId) {
@@ -851,7 +1111,7 @@
   }
 
   /* =====================================================================
-     SHELL — steps, header band, sticky bar
+     SHELL — steps and header band
      ===================================================================== */
 
   function renderSteps() {
@@ -893,16 +1153,6 @@
     }
 
     renderSteps();
-
-    var sticky = document.getElementById("bkSticky");
-    /* The bar is display:none without .is-on, which used to leave desktop
-       with no Continue affordance at all on the add-ons screen. */
-    sticky.classList.toggle("is-on", !!cfg.next);
-    sticky.querySelector('[data-role="sticky-label"]').textContent = cfg.stickyLabel;
-    document.getElementById("bkStickyTotal").textContent = money(
-      state.screen === "payment" || state.screen === "pending" ? amountDue() : bookingTotal()
-    );
-    document.getElementById("bkStickyNext").textContent = cfg.next;
   }
 
   /* =====================================================================
@@ -961,11 +1211,12 @@
       '<div class="bk-route-chip">' + ICON.plane +
       esc(FLIGHT.tripType) + " · " + esc(FLIGHT.cabin) + "</div>" +
       '<div class="bk-route-line">' + esc(FLIGHT.route) + "</div>" +
-      '<div class="bk-route-meta">' + esc(FLIGHT_DATE_LABEL) + " · " +
+      '<div class="bk-route-meta">' + esc(dateLabelFor(state.activeDir)) + " · " +
       esc(FLIGHT.totalDuration) + " total elapsed<br>" +
-      TRAVELLERS.length + " travelers · " + ADULT_TRAVELLERS.length + " adults, " +
-      TRAVELLERS.filter(function (t) { return t.type === "Child"; }).length + " children, " +
-      TRAVELLERS.filter(function (t) { return t.type === "Infant"; }).length + " infant</div>" +
+      TRAVELLERS.length + " travelers · " +
+      passengerLabel("Adult", "adults") + ", " +
+      passengerLabel("Child", "children") + ", " +
+      passengerLabel("Infant", "infants") + "</div>" +
       "</div>" +
       '<div style="padding:0 22px 20px">' + legs + notes + "</div>" +
       "</section>"
@@ -990,17 +1241,17 @@
       '<p class="bk-sect-note">Illustrative reference booking</p>' +
       '<div style="font-size:12px;color:var(--bk-muted);line-height:1.7;margin-bottom:12px">' +
       "For all " + TRAVELLERS.length + " travelers · PKR. Not a guaranteed fare.<br>" +
-      ADULT_TRAVELLERS.length + " adults · " +
-      TRAVELLERS.filter(function (t) { return t.type === "Child"; }).length + " children · " +
-      TRAVELLERS.filter(function (t) { return t.type === "Infant"; }).length + " infant" +
+      passengerLabel("Adult", "adults") + " · " +
+      passengerLabel("Child", "children") + " · " +
+      passengerLabel("Infant", "infants") +
       "</div>" +
       (state.screen === "addons" || state.screen === "review"
         ? '<div style="margin-bottom:10px">' + perTraveller + "</div>" +
-          sumRow("Baseline booking", money(FARE.base + FARE.taxes + FARE.serviceFee), "is-rule is-strong")
+          sumRow(selectedFareName || "Baseline booking", money(FARE.base + FARE.taxes + FARE.serviceFee), "is-rule is-strong")
         : sumRow("Base fare", money(FARE.base)) +
           sumRow("Taxes", money(FARE.taxes)) +
           sumRow("Service fee", money(FARE.serviceFee)) +
-          sumRow("Baseline booking", money(FARE.base + FARE.taxes + FARE.serviceFee), "is-rule is-strong")) +
+          sumRow(selectedFareName || "Baseline booking", money(FARE.base + FARE.taxes + FARE.serviceFee), "is-rule is-strong")) +
       sumRow("Selected add-ons", money(extras), extras > 0 ? "is-rule" : "") +
       (convenienceFee() > 0
         ? sumRow(paymentLabel() + " convenience fee", money(convenienceFee()))
@@ -1289,8 +1540,8 @@
       '<span class="bk-card-sub">' + TRAVELLERS.length + " travelers on this booking</span></div>" +
       '<div class="bk-card-body">' +
       '<div class="bk-note bk-note-info">' + ICON.info +
-      "<span><b>Itinerary and rights.</b> This booking is issued under the Etihad Airways conditions of carriage. " +
-      "Checked baggage, seats and meals are confirmed at ticketing; seats not chosen in the next step are assigned at check-in.</span></div>" +
+      "<span><b>Itinerary and conditions.</b> Confirm all airline terms before payment. " +
+      "Baggage and meals are requests until ticketing. A seat is required for every traveler on every selected flight.</span></div>" +
       TRAVELLERS.map(travelerCard).join("") +
       "</div></section>";
 
@@ -1328,6 +1579,54 @@
   /* =====================================================================
      SCREEN 2 — BAGGAGE & SEATS
      ===================================================================== */
+
+  /* "Who am I configuring, and for which flight?" — the single most-asked
+     question on this screen. The tabs and the direction toggle answer it, but
+     both sit far from the option grids, so the answer is repeated as a
+     banner directly above them. Cheap, and it removes the need to scroll
+     back up to check you are editing the right thing. */
+  function contextBanner() {
+    var pax = travById(state.activePax);
+    var d = directionOf(state.activeDir);
+    var leg = anchorLeg(state.activeDir);
+    var seatKeyHere = addonKey(state.activeDir, state.activePax);
+    var gaps = missingSeats().length;
+
+    return (
+      '<div class="bk-context">' +
+      '<div class="bk-context-who">' +
+      '<span class="bk-context-flag">' + esc(pax.flag) + "</span>" +
+      "<div><b>" + esc(pax.label) + "</b>" +
+      "<span>" + esc(pax.type) + "</span></div>" +
+      "</div>" +
+      '<div class="bk-context-div"></div>' +
+      '<div class="bk-context-where">' +
+      "<div><b>" + esc(d.label) + " flight · " + esc(d.from) + " → " + esc(d.to) + "</b>" +
+      "<span>" + esc(dateLabelFor(state.activeDir)) + " · " + esc(flightNos(state.activeDir)) +
+      "</span></div>" +
+      "</div>" +
+      '<div class="bk-context-state' + (gaps ? " is-warn" : " is-ok") + '">' +
+      (gaps
+        ? ICON.info + "<span>A seat is still required</span>"
+        : ICON.check + "<span>All three chosen</span>") +
+      "</div>" +
+      "</div>"
+    );
+  }
+
+  /* The same sentence, shortened, for the head of each add-on card so the
+     card is self-describing even when read on its own. */
+  function cardContextLine() {
+    var pax = travById(state.activePax);
+    var d = directionOf(state.activeDir);
+    return (
+      '<div class="bk-card-ctx">' +
+      '<span class="bk-card-ctx-ico">' + esc(pax.flag) + "</span>" +
+      "<span>For <b>" + esc(pax.label) + "</b> on the <b>" + esc(d.label.toLowerCase()) +
+      "</b> flight · " + esc(d.from) + " → " + esc(d.to) + "</span>" +
+      "</div>"
+    );
+  }
 
   /* One tab per traveler, showing how many of their 6 add-on slots are filled.
      These are buttons, not inputs — harvest() only reads input/select/textarea,
@@ -1401,18 +1700,19 @@
     var options = BAGGAGE_OPTIONS.map(function (opt) {
       var on = selected === opt.id;
       return (
-        '<div class="bk-opt' + (on ? " is-on" : "") + '">' +
-        '<div class="bk-opt-top"><div><span class="bk-opt-name">' + esc(opt.name) + "</span>" +
-        '<span class="bk-opt-desc">' + esc(addonDesc(pax, dir)) + "</span></div>" +
-        '<span class="bk-picked-p">' + money(opt.price) + "</span></div>" +
+        '<div class="bk-opt' + (on ? " is-on" : "") + (opt.free ? " is-default" : "") + '">' +
+        '<div class="bk-opt-top"><div><span class="bk-opt-name">' + esc(opt.name) +
+        (opt.free ? '<span class="bk-opt-tag">Already set</span>' : "") + "</span>" +
+        '<span class="bk-opt-desc">' + esc(opt.free ? opt.desc : addonDesc(pax, dir)) + "</span></div>" +
+        '<span class="bk-picked-p">' + (opt.free ? "Free" : money(opt.price)) + "</span></div>" +
         '<button type="button" class="bk-btn ' + (on ? "bk-btn-primary" : "bk-btn-outline") +
         ' bk-btn-sm" data-bag-pick="' + opt.id + '">' +
-        (on ? ICON.check + "Selected" : "Select baggage") +
+        (on ? ICON.check + "Selected" : "Add this bag") +
         "</button></div>"
       );
     }).join("");
 
-    return fill(tpl("tplBagCard"), { options: options });
+    return fill(tpl("tplBagCard"), { ctx: cardContextLine(), options: options });
   }
 
   function mealCard() {
@@ -1422,20 +1722,23 @@
 
     var options = MEAL_OPTIONS.map(function (opt) {
       var on = selected === opt.id;
+      var isSkip = opt.id === DEFAULT_MEAL;
       return (
-        '<div class="bk-opt' + (on ? " is-on" : "") + '">' +
-        '<div class="bk-opt-top"><div><span class="bk-opt-name">' + esc(opt.name) + "</span>" +
-        '<span class="bk-opt-desc">' + esc(opt.desc) + " · " + esc(pax.label) + "</span></div>" +
+        '<div class="bk-opt' + (on ? " is-on" : "") +
+        (isSkip ? " is-default" : "") + '">' +
+        '<div class="bk-opt-top"><div><span class="bk-opt-name">' + esc(opt.name) +
+        (isSkip ? '<span class="bk-opt-tag">Already set</span>' : "") + "</span>" +
+        '<span class="bk-opt-desc">' + esc(opt.desc) + "</span></div>" +
         '<span class="bk-picked-p' + (opt.free ? " bk-meal-free" : "") + '">' +
         (opt.free ? "Included" : money(opt.price)) + "</span></div>" +
         '<button type="button" class="bk-btn ' + (on ? "bk-btn-primary" : "bk-btn-outline") +
         ' bk-btn-sm" data-meal-pick="' + opt.id + '">' +
-        (on ? ICON.check + "Selected" : "Select meal") +
+        (on ? ICON.check + "Selected" : "Choose this meal") +
         "</button></div>"
       );
     }).join("");
 
-    return fill(tpl("tplMealCard"), { options: options });
+    return fill(tpl("tplMealCard"), { ctx: cardContextLine(), options: options });
   }
 
   function seatMap() {
@@ -1508,8 +1811,9 @@
         "</div></div>";
     } else {
       picked =
-        '<div class="bk-empty">Select a free or paid seat in the map to hold it for ' +
-        esc(pax.label) + " on the " + esc(directionOf(dir).label.toLowerCase()) + " flight.</div>";
+        '<div class="bk-empty"><b>A seat is required for every traveler.</b> ' +
+        "Pick a free or paid seat for " + esc(pax.label) + " on the " +
+        esc(directionOf(dir).label.toLowerCase()) + " flight.</div>";
     }
 
     /* Be honest that the map covers one segment, not the whole direction. */
@@ -1521,13 +1825,16 @@
       " seat is assigned at check-in. " +
       "Infant and child seats cannot be booked without an accompanying adult.</span>";
 
-    var skip =
-      '<div style="margin-top:14px">' +
-      '<button type="button" class="bk-btn bk-btn-quiet" id="bkSkipSeat">' +
-      (current ? "Skip seats / remove selection" : "Skip seats for this passenger") +
-      "</button></div>";
+    /* Only offered when a seat is actually held — there is no way to decline,
+       because the carrier will not release a booking without a seat. */
+    var skip = current
+      ? '<div style="margin-top:14px">' +
+        '<button type="button" class="bk-btn bk-btn-quiet" id="bkSkipSeat">' +
+        "Remove this seat</button></div>"
+      : "";
 
     return fill(tpl("tplSeatCard"), {
+      ctx: cardContextLine(),
       sub:
         esc(pax.label) + " · " + esc(leg.flightNo) + " · " +
         esc(leg.from.code) + " → " + esc(leg.to.code) + " · " + esc(dateLabelFor(dir)),
@@ -1555,8 +1862,9 @@
     if (nextTraveler != null) {
       advance = '<button type="button" class="bk-btn bk-btn-primary" data-next-pax="' +
         nextTraveler + '">Save &amp; next traveler →</button>';
-    } else if (state.activeDir === 0) {
-      advance = '<button type="button" class="bk-btn bk-btn-primary" data-next-dir="1">' +
+    } else if (state.activeDir < FLIGHT.directions.length - 1) {
+      advance = '<button type="button" class="bk-btn bk-btn-primary" data-next-dir="' +
+        (state.activeDir + 1) + '">' +
         "Save &amp; next flight →</button>";
     } else {
       advance = '<button type="button" class="bk-btn bk-btn-primary" data-go-review="1">' +
@@ -1643,7 +1951,9 @@
       '<section class="bk-card"><div class="bk-card-body">' +
       '<h2 class="bk-sect-title">Add-ons summary</h2>' +
       '<p class="bk-sect-note">' + chosen + " of " + addonsTotalSlots() +
-      " selected · round trip · both flights</p>" +
+      " selected · " + esc(FLIGHT.tripType.toLowerCase()) + " · " +
+      FLIGHT.directions.length + " flight direction" +
+      (FLIGHT.directions.length === 1 ? "" : "s") + "</p>" +
       (blocks || '<p class="bk-fine" style="margin:0">No extras selected yet.</p>') +
       (blocks ? sumRow("Add-ons subtotal", money(total), "is-rule is-strong") : "") +
       '<div class="bk-total"><div>' +
@@ -1658,10 +1968,14 @@
   function screenAddons() {
     var head = fill(tpl("tplAddonsHead"), {
       txt:
-        "Round trip · " + esc(FLIGHT_DATE_LABEL) + " – " + esc(RETURN_DATE_LABEL) +
-        " · " + TRIP_NIGHTS + " nights. Add-ons are priced per traveler, per flight.",
+        esc(FLIGHT.tripType) + " · " +
+        FLIGHT.directions.map(function (direction, index) {
+          return esc(direction.label) + " " + esc(dateLabelFor(index));
+        }).join(" · ") +
+        ". Add-ons are priced per traveler, per flight.",
       tabs: paxTabs(),
       dirs: dirToggle(),
+      ctx: contextBanner(),
     });
 
     return head + baggageCard() + mealCard() + seatMap() + paxActions();
@@ -1753,7 +2067,7 @@
       '<section class="bk-card">' +
       '<div class="bk-card-head"><h2 class="bk-card-title">' + ICON.check + "Your selected add-ons</h2>" +
       '<span class="bk-card-sub">' + selectionCount + " of " + addonsTotalSlots() +
-      " selections · round trip</span></div>" +
+      " selections · " + esc(FLIGHT.tripType.toLowerCase()) + "</span></div>" +
       '<div class="bk-card-body">' +
       (items || '<div class="bk-empty">You have not added any extras yet. Go back to choose baggage, a meal or a seat.</div>') +
       (items ? sumRow("Add-ons subtotal", money(addonsTotal()), "is-rule is-strong") : "") +
@@ -1820,7 +2134,8 @@
       '<div class="bk-card-head"><h2 class="bk-card-title">' + ICON.wallet + 'Booking &amp; fare review</h2></div>' +
       '<div class="bk-card-body">' +
       '<div class="bk-route-line" style="margin-top:0">' + esc(FLIGHT.route) + "</div>" +
-      '<div class="bk-route-meta">' + esc(FLIGHT_DATE_LABEL) + " · Economy</div>" +
+      '<div class="bk-route-meta">' + esc(dateLabelFor(0)) + " · " +
+      esc(FLIGHT.cabin) + "</div>" +
       sumRow("Baseline fare", money(FARE.base + FARE.taxes + FARE.serviceFee), "is-rule") +
       sumRow("Selected add-ons", money(addonsTotal())) +
       sumRow("Booking total", money(bookingTotal()), "is-rule is-strong") +
@@ -2141,9 +2456,9 @@
           " · " + FLIGHT.cabin
         ) + "<br>";
       }).join("") +
-      ADULT_TRAVELLERS.length + " adults + " +
-      TRAVELLERS.filter(function (t) { return t.type === "Child"; }).length + " children + " +
-      TRAVELLERS.filter(function (t) { return t.type === "Infant"; }).length + " infants = " +
+      passengerLabel("Adult", "adults") + " + " +
+      passengerLabel("Child", "children") + " + " +
+      passengerLabel("Infant", "infants") + " = " +
       TRAVELLERS.length + " travelers · " +
       esc(FLIGHT.totalDuration) + " total</div>" +
       '<div style="margin-top:16px">' +
@@ -2321,8 +2636,10 @@
 
     return fill(tpl("tplSummaryModal"), {
       sub:
-        "Round trip · " + esc(FLIGHT_DATE_LABEL) + " – " +
-        esc(RETURN_DATE_LABEL) + " · " + TRIP_NIGHTS + " nights · " +
+        esc(FLIGHT.tripType) + " · " +
+        FLIGHT.directions.map(function (direction, index) {
+          return esc(direction.label) + " " + esc(dateLabelFor(index));
+        }).join(" · ") + " · " +
         addonsChosen() + " of " + addonsTotalSlots() + " selections made",
       body: blocks,
       status: gaps.length
@@ -2335,10 +2652,12 @@
   function openSummary(trigger) {
     summaryTrigger = trigger || null;
 
-    if (summaryOverlay) summaryOverlay.remove();
+    closeSummary();
     var holder = document.createElement("div");
     holder.innerHTML = summaryMarkup();
-    summaryOverlay = holder.firstElementChild;
+    /* childNodes[0] rather than firstElementChild: both are correct in a
+       browser, but the local DOM shim only models the former. */
+    summaryOverlay = holder.childNodes[0];
     document.body.appendChild(summaryOverlay);
 
     summaryBody = summaryOverlay.querySelector("#bkSummaryBody");
@@ -2352,7 +2671,9 @@
 
   function closeSummary() {
     if (!summaryOverlay) return;
-    summaryOverlay.remove();
+    /* detachNode() rather than Element.remove() — same effect in a browser,
+       and the local DOM shim only models removeChild. */
+    detachNode(summaryOverlay);
     summaryOverlay = null;
     summaryBody = null;
     document.body.style.overflow = "";
@@ -2452,7 +2773,7 @@
       event.preventDefault();
       var prev = { addons: "details", review: "addons", payment: "review", pending: "details" }[state.screen];
       if (prev) go(prev);
-      else window.location.href = "/search-flight.html";
+      else window.location.href = back.getAttribute("href") || "/search-flight.html";
       return;
     }
 
@@ -2512,7 +2833,10 @@
 
     var dirBtn = target.closest("[data-dir]");
     if (dirBtn) {
-      state.activeDir = Number(dirBtn.dataset.dir) === 1 ? 1 : 0;
+      state.activeDir = Math.min(
+        FLIGHT.directions.length - 1,
+        Math.max(0, Number(dirBtn.dataset.dir) || 0),
+      );
       render();
       return;
     }
@@ -2609,10 +2933,14 @@
       return;
     }
 
+    /* Clearing a seat you already picked is fine; the button only appears
+       once one is held. Declining is not — a seat is required, so this can
+       only ever take a selection back off. */
     if (target.closest("#bkSkipSeat")) {
+      if (!state.seat[currentKey()]) return;
       delete state.seat[currentKey()];
       render();
-      toast("Seat selection skipped");
+      toast("Seat selection removed");
       return;
     }
 
@@ -2647,7 +2975,10 @@
 
     var nextDir = target.closest("[data-next-dir]");
     if (nextDir) {
-      state.activeDir = Number(nextDir.dataset.nextDir) === 1 ? 1 : 0;
+      state.activeDir = Math.min(
+        FLIGHT.directions.length - 1,
+        Math.max(0, Number(nextDir.dataset.nextDir) || 0),
+      );
       state.activePax = TRAVELLERS[0].id;
       render();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2655,13 +2986,23 @@
     }
 
     if (target.closest("[data-go-review]")) {
-      var gaps = missingAddons();
-      go("review");
-      /* Warn but allow: naming the gaps is more useful than blocking. */
-      if (gaps.length) {
-        toast(gaps.length + " still to choose: " + gaps.slice(0, 3).join(", ") +
-          (gaps.length > 3 ? "…" : ""));
+      /* Seats are required, so this is the one hard stop in the add-ons flow.
+         Land on the first one that's missing rather than just naming it, so
+         the user is looking at the seat they still owe. */
+      var noSeat = missingSeats();
+      if (noSeat.length) {
+        var first = parseKey(missingSeatKey());
+        if (first) {
+          state.activeDir = first.dir;
+          state.activePax = first.pax;
+          render();
+        }
+        toast(noSeat.length === 1
+          ? "Seat required: " + noSeat[0]
+          : noSeat.length + " seats still to choose — starting with " + noSeat[0]);
+        return;
       }
+      go("review");
       return;
     }
 
@@ -2693,13 +3034,24 @@
     }
 
     if (target.closest("[data-summary-next]")) {
-      var gaps2 = missingAddons();
+      /* Same seat requirement as the footer button — the popup is just
+         another way of reaching review, so it must not become a way around
+         the gate. */
+      var noSeat2 = missingSeats();
       closeSummary();
-      go("review");
-      if (gaps2.length) {
-        toast(gaps2.length + " still to choose: " + gaps2.slice(0, 3).join(", ") +
-          (gaps2.length > 3 ? "…" : ""));
+      if (noSeat2.length) {
+        var first2 = parseKey(missingSeatKey());
+        if (first2) {
+          state.activeDir = first2.dir;
+          state.activePax = first2.pax;
+          render();
+        }
+        toast(noSeat2.length === 1
+          ? "Seat required: " + noSeat2[0]
+          : noSeat2.length + " seats still to choose — starting with " + noSeat2[0]);
+        return;
       }
+      go("review");
       return;
     }
 
@@ -2720,6 +3072,22 @@
       return;
     }
     if (target.closest("[data-go-payment]")) {
+      /* Re-checked here as well as on the add-ons screen: review has its own
+         forward button, and a seat removed via a Change link has to be caught
+         on the way out too. */
+      var noSeat3 = missingSeats();
+      if (noSeat3.length) {
+        go("addons");
+        var first3 = parseKey(missingSeatKey());
+        if (first3) {
+          state.activeDir = first3.dir;
+          state.activePax = first3.pax;
+          render();
+        }
+        toast("Pick a seat before payment: " + noSeat3[0] +
+          (noSeat3.length > 1 ? " and " + (noSeat3.length - 1) + " more" : ""));
+        return;
+      }
       go("payment");
       return;
     }
@@ -2886,38 +3254,6 @@
     var el = event.target;
     if (!el || !el.id) return;
     remember(el);
-  });
-
-  /* Sticky bar continues to the next step. The details and payment screens
-     have their own gated buttons, so re-dispatch through those. */
-  document.getElementById("bkStickyNext").addEventListener("click", function () {
-    if (state.screen === "details") {
-      document.getElementById("bkContinue").click();
-      return;
-    }
-    if (state.screen === "payment") {
-      document.getElementById("bkPay").click();
-      return;
-    }
-    /* Add-ons: warn but allow. The counter is always on screen, so the toast
-       only has to name what is missing rather than block the step. */
-    if (state.screen === "addons") {
-      var gaps = missingAddons();
-      go("review");
-      if (gaps.length) {
-        toast(
-          gaps.length +
-            (gaps.length === 1 ? " selection still to make" : " selections still to make") +
-            ": " + gaps.slice(0, 3).join(", ") + (gaps.length > 3 ? "…" : "")
-        );
-      }
-      return;
-    }
-    var next = {
-      review: "payment",
-      pending: "details",
-    }[state.screen];
-    if (next) go(next);
   });
 
   /* =====================================================================

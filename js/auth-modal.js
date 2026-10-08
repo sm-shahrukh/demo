@@ -284,7 +284,7 @@
     { label: "Weak — add more characters", color: "#ef4444" },
     { label: "Weak — mix upper and lower case", color: "#ef4444" },
     { label: "Fair — add a number", color: "#f59e0b" },
-    { label: "Good — add a symbol", color: "#0284c7" },
+    { label: "Good — add a symbol", color: "var(--primary-blue)" },
     { label: "Strong password", color: "#10b981" },
   ];
 

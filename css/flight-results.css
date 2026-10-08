@@ -6,30 +6,10 @@
 /* Mobile */
 .fr-page {
   box-sizing: border-box;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* Tablet + Desktop */
-@media (min-width: 768px) {
-  .fr-page {
-    width: calc(100% - 300px);
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0;
-  }
-}
-
-/* Large Desktop */
-@media (min-width: 992px) {
-  .fr-page {
-    width: calc(100% - 300px);
-    max-width: 1400px;
-    padding: 0 0 20px 0;
-  }
+  width: auto;
+  max-width: none;
+  margin: 0 var(--container-padding);
+  padding: 0 0 20px;
 }
 /* ---------- Trip type tabs ---------- */
 .fr-trip-tabs {
@@ -1181,7 +1161,7 @@
 
 .fr-package.selected {
   border-color: var(--accent-teal);
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+  box-shadow: 0 0 0 3px rgb(var(--brand-orange-rgb) / 0.12);
 }
 
 .fr-package-radio {
@@ -1555,18 +1535,10 @@
 
 
 @media (min-width: 992px) {
-  :root {
-    --container-padding: 140px;
-  }
-
   .navbar-container,
   .footer-top,
   .footer-bottom {
     max-width: none;
-  }
-
-  .navbar-menu-actions {
-    margin-right: -20px;
   }
 
   .search-panels {
@@ -1575,10 +1547,10 @@
   }
 
   .fr-page {
-    width: calc(100% - 280px);
+    width: auto;
     max-width: none;
-    margin-left: 140px;
-    margin-right: 140px;
+    margin-left: var(--container-padding);
+    margin-right: var(--container-padding);
   }
 
   /* Keep the dates, filters, and results in the main column; the rail runs
@@ -1843,7 +1815,7 @@
      focus treatment of the other custom select fields. */
   .fr-sort-select-wrap:has(.fr-sort-trigger:focus-visible) {
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
   }
 
   .fr-sort-trigger .bi {

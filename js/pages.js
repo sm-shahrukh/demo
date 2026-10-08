@@ -1,28 +1,6 @@
 (function () {
   "use strict";
 
-  /* ---------------- Mobile navigation ---------------- */
-  window.toggleMobileNav = function toggleMobileNav() {
-    var menu = document.getElementById("navbarMenu");
-    if (!menu) return;
-    var toggle = document.querySelector(".mobile-toggle");
-    var isOpen = menu.classList.toggle("open");
-    if (toggle) toggle.setAttribute("aria-expanded", String(isOpen));
-  };
-
-  /* Close the drawer when a nav link is tapped on mobile */
-  document.addEventListener("DOMContentLoaded", function () {
-    var menu = document.getElementById("navbarMenu");
-    if (!menu) return;
-    menu.addEventListener("click", function (e) {
-      if (e.target.closest("a") && window.innerWidth <= 991) {
-        menu.classList.remove("open");
-        var toggle = document.querySelector(".mobile-toggle");
-        if (toggle) toggle.setAttribute("aria-expanded", "false");
-      }
-    });
-  });
-
   /* ---------------- Back to top ---------------- */
   window.addEventListener("scroll", function () {
     var btn = document.getElementById("backToTop");
@@ -60,7 +38,7 @@
     { label: "Weak — add more characters", color: "#ef4444" },
     { label: "Weak — mix upper and lower case", color: "#ef4444" },
     { label: "Fair — add a number", color: "#f59e0b" },
-    { label: "Good — add a symbol", color: "#0284c7" },
+    { label: "Good — add a symbol", color: "var(--primary-blue)" },
     { label: "Strong password", color: "#10b981" },
   ];
 
@@ -410,8 +388,8 @@
 
   function carrierColor(code) {
     var palette = [
-      "#0284c7",
-      "#14b8a6",
+      "var(--primary-blue)",
+      "var(--accent-teal)",
       "#7c3aed",
       "#e11d48",
       "#ea580c",
@@ -603,20 +581,20 @@
       "</div>" +
       "</div>" +
       '<div class="bc-actions">' +
-      '<button class="bc-btn" onclick="viewBooking(\'' +
+      '<button class="bc-btn" data-click="viewBooking(\'' +
       b.ref +
       "')\">" +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
       '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
       "View Details</button>" +
-      '<button class="bc-btn" onclick="printBooking(\'' +
+      '<button class="bc-btn" data-click="printBooking(\'' +
       b.ref +
       "')\">" +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
       '<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>' +
       '<rect x="6" y="14" width="12" height="8"/></svg>' +
       "Print</button>" +
-      '<button class="bc-btn primary" onclick="downloadTicket(\'' +
+      '<button class="bc-btn primary" data-click="downloadTicket(\'' +
       b.ref +
       "')\">" +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -624,7 +602,7 @@
       '<line x1="12" y1="15" x2="12" y2="3"/></svg>' +
       "E-Ticket</button>" +
       (canCancel
-        ? '<button class="bc-btn danger" onclick="askCancelBooking(\'' +
+        ? '<button class="bc-btn danger" data-click="askCancelBooking(\'' +
           b.ref +
           "')\">" +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -742,7 +720,7 @@
         return (
           '<button class="bc-btn ' +
           (a.cls || "") +
-          '" onclick="' +
+          '" data-click="' +
           a.fn +
           '">' +
           a.label +

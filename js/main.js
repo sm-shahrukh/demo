@@ -50,7 +50,7 @@
     return `
       <label class="multi-city-airport">
         <span>${label}</span>
-        <div class="field-box" onclick="openAirportPanel('${key}')">
+        <div class="field-box" data-click="openAirportPanel('${key}')">
           <span class="field-box-icon"><i class="bi bi-geo-alt"></i></span>
           <div class="field-box-content">
             <input class="field-box-input" id="${key}Input" type="text" placeholder="${placeholder}" readonly />
@@ -59,21 +59,13 @@
         <div class="dd-panel airport-panel" id="${key}Panel">
           <div class="dd-panel-header">
             <span>Select ${label}</span>
-            <button type="button" class="dd-panel-close" onclick="closeAirportPanel('${key}')" aria-label="Close airport list">×</button>
+            <button type="button" class="dd-panel-close" data-click="closeAirportPanel('${key}')" aria-label="Close airport list">×</button>
           </div>
-          <input class="airport-search-input" id="${key}Query" type="text" placeholder="Search airport or city..." oninput="searchAirport('${key}')" />
+          <input class="airport-search-input" id="${key}Query" type="text" placeholder="Search airport or city..." data-input="searchAirport('${key}')" />
           <div class="airport-results" id="${key}Results"></div>
         </div>
       </label>`;
   }
-
-  window.toggleMobileNav = function () {
-    const menu = getElement("navbarMenu");
-    const toggle = document.querySelector(".mobile-toggle");
-    if (!menu || !toggle) return;
-    const isOpen = menu.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(isOpen));
-  };
 
   window.switchTab = function (tab) {
     const buttons = document.querySelectorAll(".search-tab");
@@ -141,7 +133,7 @@
       ? matches
           .map(
             (airport) => `
-              <button type="button" class="dd-opt airport-result" onclick="selectAirport('${key}', '${airport.code}', '${airport.city}', '${airport.country}')">
+              <button type="button" class="dd-opt airport-result" data-click="selectAirport('${key}', '${airport.code}', '${airport.city}', '${airport.country}')">
                 <strong>${airport.code}</strong> ${airport.city}, ${airport.name}
                 <small>${airport.country}</small>
               </button>`,
@@ -449,7 +441,7 @@
     leg.innerHTML = `
       <div class="multi-city-leg-heading">
         <strong>FLIGHT ${flightNumber}</strong>
-        <button type="button" class="remove-flight-btn" onclick="removeMultiCityLeg(this)">Remove</button>
+        <button type="button" class="remove-flight-btn" data-click="removeMultiCityLeg(this)">Remove</button>
       </div>
       <div class="multi-city-fields">
         ${airportField(legId, "From", "From", "Departure city")}
@@ -598,6 +590,135 @@
     return true;
   }
 
+  function restoreSearchFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const tripType = params.get("trip") || "oneway";
+    if (!["oneway", "roundtrip", "multicity"].includes(tripType)) return;
+
+    let multiLegs = null;
+    if (tripType === "multicity") {
+      try {
+        multiLegs = JSON.parse(params.get("multiLegs") || "null");
+      } catch (error) {
+        console.error("The multi-city search URL contains invalid flight data.", error);
+        const alert = getElement("searchAlert");
+        if (alert) {
+          alert.textContent = "The multi-city search details could not be read.";
+          alert.className = "alert show error";
+        }
+        return;
+      }
+      if (
+        !Array.isArray(multiLegs) ||
+        multiLegs.length < 2 ||
+        multiLegs.length > 6 ||
+        multiLegs.some(
+          (leg) =>
+            !leg ||
+            !FlightData.AIRPORT_BY_CODE[leg.from] ||
+            !FlightData.AIRPORT_BY_CODE[leg.to] ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(leg.date || ""),
+        )
+      ) {
+        const alert = getElement("searchAlert");
+        if (alert) {
+          alert.textContent = "The multi-city search details are incomplete.";
+          alert.className = "alert show error";
+        }
+        return;
+      }
+    }
+
+    const firstLeg = multiLegs && multiLegs[0];
+    const origin = FlightData.AIRPORT_BY_CODE[
+      (firstLeg ? firstLeg.from : params.get("from") || "").toUpperCase()
+    ];
+    const destination = FlightData.AIRPORT_BY_CODE[
+      (firstLeg ? firstLeg.to : params.get("to") || "").toUpperCase()
+    ];
+    if (!origin || !destination) return;
+
+    window.setTripType(tripType);
+    window.selectAirport("from", origin.code, origin.city, origin.country);
+    window.selectAirport(
+      "to",
+      destination.code,
+      destination.city,
+      destination.country,
+    );
+
+    const departure = firstLeg ? firstLeg.date : params.get("departure");
+    const returnDate = params.get("return");
+    if (departure) setDateValue(getElement("depDate"), departure);
+    if (returnDate && tripType === "roundtrip") {
+      setDateValue(getElement("retDate"), returnDate);
+    }
+    if (tripType === "multicity") {
+      const rows = document.querySelectorAll(
+        "#multiCityPanel .multi-city-leg",
+      );
+      for (let index = rows.length; index < multiLegs.length - 1; index += 1) {
+        window.addMultiCityLeg();
+      }
+      multiLegs.slice(1).forEach((leg, index) => {
+        const row = document.querySelectorAll(
+          "#multiCityPanel .multi-city-leg",
+        )[index];
+        const legId = row && row.dataset.legId;
+        if (!legId) return;
+        const from = FlightData.AIRPORT_BY_CODE[leg.from];
+        const to = FlightData.AIRPORT_BY_CODE[leg.to];
+        window.selectAirport(
+          `multiCity${legId}From`,
+          from.code,
+          from.city,
+          from.country,
+        );
+        window.selectAirport(
+          `multiCity${legId}To`,
+          to.code,
+          to.city,
+          to.country,
+        );
+        setDateValue(
+          getElement(`multiCity${legId}Date`),
+          leg.date,
+        );
+      });
+    }
+
+    const readPassengerCount = (name, minimum) => {
+      const parsed = Number(params.get(name));
+      return Number.isInteger(parsed)
+        ? Math.min(9, Math.max(minimum, parsed))
+        : minimum;
+    };
+    passengerCounts.adults = readPassengerCount("adults", 1);
+    passengerCounts.children = readPassengerCount("children", 0);
+    passengerCounts.infants = readPassengerCount("infants", 0);
+    const countLabels = {
+      adults: "countAdults",
+      children: "countChildren",
+      infants: "countInfants",
+    };
+    Object.entries(countLabels).forEach(([type, id]) => {
+      const count = getElement(id);
+      if (count) count.textContent = passengerCounts[type];
+    });
+    const totalPassengers = Object.values(passengerCounts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    if (getElement("paxInput")) {
+      getElement("paxInput").value =
+        `${totalPassengers} ${totalPassengers === 1 ? "Passenger" : "Passengers"}`;
+    }
+
+    const cabin = params.get("cabin");
+    if (cabin) window.setCabin(cabin);
+    runSearch(tripType, true);
+  }
+
   window.handleFlightSearch = function (event) {
     event.preventDefault();
     runSearch(selectedTripType, false);
@@ -606,7 +727,7 @@
 
   window.handleModeSearch = function (event, mode) {
     event.preventDefault();
-    const form = event.currentTarget;
+    const form = this instanceof HTMLFormElement ? this : event.currentTarget;
     form.querySelector(".mode-search-notice")?.remove();
     const notice = document.createElement("div");
     notice.className = "mode-search-notice";
@@ -707,6 +828,7 @@
   updateMultiCityCount();
   initDateFields();
   defaultSearch();
+  restoreSearchFromUrl();
   // The two-week default is set after the mirrors exist, so seed them once more.
   document
     .querySelectorAll('.field-box-input[type="date"]')
@@ -718,5 +840,7 @@
 
 
   const emptyState = document.getElementById("frResults");
-  if (emptyState) emptyState.classList.add("fr-awaiting-search");
+  if (emptyState && !window.FlightResults.getState().search) {
+    emptyState.classList.add("fr-awaiting-search");
+  }
 })();

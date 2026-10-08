@@ -6,28 +6,26 @@
    right-hand rail, so the shell lives here and each screen only adds its own
    block further down.
 
-   Font sizes are declared !important on class selectors on purpose:
-   css/typography.css loads after this file and forces !important sizes onto
-   bare element selectors. Class specificity (0-1-0) beats element (0-0-1), so
-   matching it here keeps typography.css from flattening the scale.
+   Typography starts from css/typography.css and component classes set the
+   smaller booking-specific hierarchy where the flow needs it.
    ========================================================================== */
 
 :root {
-  --bk-page: #eef4f9;
-  --bk-band: #dceefb;
-  --bk-ink: #0f172a;
-  --bk-muted: #64748b;
-  --bk-line: #dfe7ef;
-  --bk-soft: #f6f9fc;
-  --bk-blue: #0284c7;
-  --bk-blue-dark: #0369a1;
-  --bk-blue-tint: #f2f9fe;
-  --bk-teal: #14b8a6;
-  --bk-green: #10b981;
-  --bk-amber: #b45309;
-  --bk-amber-bg: #fdf6e7;
-  --bk-red: #dc2626;
-  --bk-red-bg: #fdf0f0;
+  --bk-page: var(--booking-page);
+  --bk-band: var(--booking-band);
+  --bk-ink: var(--dark-navy);
+  --bk-muted: var(--gray-500);
+  --bk-line: var(--booking-line);
+  --bk-soft: var(--booking-soft);
+  --bk-blue: var(--primary-blue);
+  --bk-blue-dark: var(--primary-blue-dark);
+  --bk-blue-tint: var(--primary-light);
+  --bk-teal: var(--accent-teal);
+  --bk-green: var(--success);
+  --bk-amber: var(--warning-dark);
+  --bk-amber-bg: var(--warning-light);
+  --bk-red: var(--danger-dark);
+  --bk-red-bg: var(--danger-light);
   --bk-radius: 14px;
   --bk-radius-sm: 10px;
   --bk-rail: 372px;
@@ -35,11 +33,24 @@
   --bk-shadow-pop: 0 12px 28px -10px rgba(15, 23, 42, 0.18);
 }
 
+.bk-flex-1 {
+  flex: 1;
+}
+
+.bk-mt-16 {
+  margin-top: 16px;
+}
+
+.bk-mt-10 {
+  margin-top: 10px;
+}
+
 /* ============================ SCREEN SHELL ============================ */
 
 .bk-main {
   background: var(--bk-page);
-  padding: 26px var(--container-padding) 90px;
+  /* No bottom reservation: the fixed sticky action bar was removed. */
+  padding: 26px var(--container-padding) 40px;
   min-height: 70vh;
 }
 
@@ -84,7 +95,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 500;
   color: var(--bk-blue);
   text-decoration: none;
@@ -120,10 +131,10 @@
   align-items: center;
   gap: 8px;
   background: #fff;
-  border: 1px solid rgba(2, 132, 199, 0.25);
+  border: 1px solid rgb(var(--brand-blue-rgb) / 0.25);
   border-radius: 999px;
   padding: 8px 16px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 500;
   color: var(--bk-ink);
   white-space: nowrap;
@@ -154,7 +165,7 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 500;
   color: var(--bk-muted);
   white-space: nowrap;
@@ -167,7 +178,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 700;
   background: #fff;
   border: 1.5px solid var(--bk-line);
@@ -283,7 +294,7 @@
 }
 
 .bk-card-sub {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-muted);
 }
 
@@ -303,7 +314,7 @@
 }
 
 .bk-sect-note {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-muted);
   margin: 0 0 14px;
 }
@@ -316,7 +327,7 @@
   align-items: flex-start;
   border-radius: var(--bk-radius-sm);
   padding: 13px 15px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   line-height: 1.55;
   margin: 0 0 16px;
 }
@@ -432,7 +443,7 @@
 
 .bk-btn-sm {
   padding: 9px 15px;
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 .bk-btn-row {
@@ -445,7 +456,7 @@
   background: none;
   border: none;
   padding: 0;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--bk-blue);
   cursor: pointer;
@@ -473,7 +484,7 @@
   gap: 5px;
   border-radius: 999px;
   padding: 3px 10px;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -491,6 +502,13 @@
 .bk-badge-done {
   background: #e6f7f1;
   color: #0f7a56;
+}
+
+/* Marks the one add-on the user cannot skip. Deliberately stronger than
+   .bk-badge-pending: this is a hard requirement, not a warning. */
+.bk-badge-required {
+  background: var(--bk-blue);
+  color: #fff;
 }
 
 /* ============================ FORM FIELDS ============================ */
@@ -516,7 +534,7 @@
 
 .bk-label {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 600;
   color: var(--bk-ink);
   margin-bottom: 6px;
@@ -546,7 +564,7 @@
 
 .bk-control:focus {
   border-color: var(--bk-blue);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.12);
   outline: none;
 }
 
@@ -586,7 +604,7 @@ select.bk-control {
   display: none;
   align-items: center;
   gap: 5px;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-red);
   margin-top: 5px;
 }
@@ -622,7 +640,7 @@ select.bk-control {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  font-size: 13px !important;
+  font-size: 14px !important;
   line-height: 1.55;
   color: var(--bk-ink);
   cursor: pointer;
@@ -700,7 +718,7 @@ select.bk-control {
 
 .bk-select-txt span {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   line-height: 1.5;
   margin-top: 2px;
@@ -773,7 +791,7 @@ select.bk-control {
 
 .bk-method-txt span {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 1px;
 }
@@ -794,7 +812,7 @@ select.bk-control {
 
 .bk-pax.is-open {
   border-color: #bfdcef;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.06);
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.06);
 }
 
 .bk-pax-head {
@@ -884,7 +902,7 @@ select.bk-control {
 }
 
 .bk-block-head h4 {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700;
   color: var(--bk-ink);
   margin: 0;
@@ -932,14 +950,14 @@ select.bk-control {
 }
 
 .bk-drop-txt {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--bk-blue);
 }
 
 .bk-drop-hint {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 3px;
 }
@@ -956,7 +974,7 @@ select.bk-control {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 600;
   color: var(--bk-blue-dark);
 }
@@ -976,7 +994,7 @@ select.bk-control {
 }
 
 .bk-route-meta {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   line-height: 1.6;
 }
@@ -999,7 +1017,7 @@ select.bk-control {
 }
 
 .bk-leg-name {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700;
   color: var(--bk-ink);
 }
@@ -1026,7 +1044,7 @@ select.bk-control {
 
 .bk-leg-mid b {
   display: block;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 500;
   color: var(--bk-muted);
 }
@@ -1059,7 +1077,7 @@ select.bk-control {
 }
 
 .bk-leg-note {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
   line-height: 1.5;
 }
@@ -1071,7 +1089,7 @@ select.bk-control {
   background: var(--bk-blue-tint);
   border-radius: 999px;
   padding: 3px 10px;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 600;
   color: var(--bk-blue-dark);
   margin: 2px 0;
@@ -1084,7 +1102,7 @@ select.bk-control {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   padding: 5px 0;
   color: var(--bk-muted);
 }
@@ -1120,7 +1138,7 @@ select.bk-control {
 }
 
 .bk-total-lbl {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
 }
 
@@ -1135,12 +1153,12 @@ select.bk-control {
 
 .bk-total-note {
   width: 100%;
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
 }
 
 .bk-fine {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
   line-height: 1.6;
   margin: 12px 0 0;
@@ -1153,7 +1171,7 @@ select.bk-control {
 }
 
 .bk-support p {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-muted);
   line-height: 1.6;
   margin: 0 0 14px;
@@ -1175,7 +1193,40 @@ select.bk-control {
 
 .bk-opt.is-on {
   border-color: var(--bk-blue);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
+}
+
+/* The pre-answered cards (no bag / no meal) get a dashed edge so they read as
+   "this is your standing answer, change it if you want" rather than as a
+   paid option that happens to be selected. */
+.bk-opt.is-default {
+  border-style: dashed;
+  border-color: #b6c8d8;
+  background: var(--bk-soft);
+}
+
+.bk-opt.is-default.is-on {
+  border-style: solid;
+  border-color: var(--bk-blue);
+}
+
+.bk-opt-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bk-soft);
+  color: var(--bk-muted);
+  font-size: 12px !important;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.bk-opt.is-on .bk-opt-tag {
+  background: var(--bk-blue-tint);
+  color: var(--bk-blue-dark);
 }
 
 .bk-opt-top {
@@ -1194,7 +1245,7 @@ select.bk-control {
 
 .bk-opt-desc {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 2px;
 }
@@ -1226,7 +1277,7 @@ select.bk-control {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
 }
 
@@ -1265,13 +1316,13 @@ select.bk-control {
 
 .bk-seat-head span {
   text-align: center;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700;
   color: var(--bk-muted);
 }
 
 .bk-seat-rownum {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: #b0bfcc;
   text-align: center;
 }
@@ -1281,7 +1332,7 @@ select.bk-control {
   border-radius: 7px;
   border: 1.5px solid #c3d3e0;
   background: #fff;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 600;
   color: var(--bk-muted);
   display: flex;
@@ -1341,7 +1392,7 @@ select.bk-control {
 }
 
 .bk-seat-exit span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1366,7 +1417,7 @@ select.bk-control {
 }
 
 .bk-picked-k {
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700;
   color: var(--bk-blue-dark);
   text-transform: uppercase;
@@ -1402,7 +1453,7 @@ select.bk-control {
   border-radius: var(--bk-radius-sm);
   padding: 18px 16px;
   text-align: center;
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-muted);
   margin-top: 16px;
 }
@@ -1454,7 +1505,7 @@ select.bk-control {
 
 .bk-item-txt span {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 2px;
   line-height: 1.5;
@@ -1524,14 +1575,14 @@ select.bk-control {
 
 .bk-cov-txt b {
   display: block;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700;
   color: var(--bk-ink);
 }
 
 .bk-cov-txt span {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 2px;
 }
@@ -1557,7 +1608,7 @@ select.bk-control {
   background: var(--bk-soft);
   border: 1px solid var(--bk-line);
   color: var(--bk-muted);
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -1572,14 +1623,14 @@ select.bk-control {
 
 .bk-trav-b b {
   display: block;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700;
   color: var(--bk-ink);
 }
 
 .bk-trav-b span {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin-top: 2px;
   line-height: 1.5;
@@ -1589,7 +1640,7 @@ select.bk-control {
   border-top: 1px solid var(--bk-line);
   margin-top: 14px;
   padding-top: 13px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-muted);
   line-height: 1.7;
 }
@@ -1621,7 +1672,7 @@ select.bk-control {
   gap: 11px;
   align-items: flex-start;
   margin-bottom: 11px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   line-height: 1.55;
   color: var(--bk-ink);
 }
@@ -1638,7 +1689,7 @@ select.bk-control {
   border-radius: 50%;
   background: var(--bk-blue);
   color: #fff;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -1653,7 +1704,7 @@ select.bk-control {
 .bk-how span {
   display: block;
   color: var(--bk-muted);
-  font-size: 12px !important;
+  font-size: 13px !important;
   margin-top: 1px;
 }
 
@@ -1665,7 +1716,7 @@ select.bk-control {
   border: 1px solid #f4e0b6;
   border-radius: var(--bk-radius-sm);
   padding: 11px 14px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600;
   color: #7c4a06;
   width: 100%;
@@ -1721,7 +1772,7 @@ select.bk-control {
 
 .bk-order-lbl {
   display: block;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
 }
 
@@ -1811,7 +1862,7 @@ select.bk-control {
 
 .bk-channel b {
   display: block;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600;
   color: var(--bk-ink);
 }
@@ -1847,43 +1898,6 @@ select.bk-control {
   color: #fff;
 }
 
-/* ============================ STICKY MOBILE BAR ============================ */
-
-.bk-sticky {
-  display: none;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 900;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid var(--bk-line);
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-  box-shadow: 0 -4px 18px -8px rgba(15, 23, 42, 0.2);
-}
-
-.bk-sticky-lbl {
-  font-size: 11px !important;
-  color: var(--bk-muted);
-}
-
-.bk-sticky-val {
-  display: block;
-  font-size: 19px !important;
-  font-weight: 700;
-  color: var(--bk-blue-dark);
-  letter-spacing: -0.02em;
-}
-
-.bk-sticky .bk-btn {
-  margin-top: 8px;
-}
-
-.bk-sticky.is-on {
-  display: block;
-}
-
 /* ============================ TOAST ============================ */
 
 .bk-toast {
@@ -1896,7 +1910,7 @@ select.bk-control {
   color: #fff;
   border-radius: 999px;
   padding: 11px 20px;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 500;
   box-shadow: var(--bk-shadow-pop);
   animation: bkToast 0.2s ease;
@@ -1935,15 +1949,127 @@ select.bk-control {
 }
 
 .bk-dir-head b {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-ink);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .bk-dir-head span {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
+}
+
+/* --------------------------------------------------------------------------
+   WHO / WHICH FLIGHT
+   The user picked a traveler and a flight somewhere above the option grids,
+   then has to scroll a long way down to reach the seat map. Without this, the
+   only reminder of scope is far from the decision being made — the single
+   most common confusion on this screen. The banner states it once, loudly,
+   above the controls; the smaller .bk-card-ctx line repeats it per card.
+   -------------------------------------------------------------------------- */
+
+.bk-context {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--bk-line);
+  border-left: 4px solid var(--bk-blue);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-blue-tint);
+}
+
+.bk-context-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.bk-context-flag {
+  font-size: 26px !important;
+  line-height: 1;
+}
+
+.bk-context b {
+  font-size: 16px !important;
+  font-weight: 700;
+  display: block;
+  color: var(--bk-ink);
+}
+
+.bk-context span:not(.bk-context-flag) {
+  font-size: 13px !important;
+  color: var(--bk-muted);
+  display: block;
+}
+
+.bk-context-div {
+  width: 1px;
+  align-self: stretch;
+  background: var(--bk-line);
+}
+
+.bk-context-where {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right-hand status: green once this traveler is settled on this flight,
+   amber while a seat is still owed. */
+.bk-context-state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bk-context-state svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bk-context-state.is-ok {
+  background: #e7f7f0;
+  color: var(--bk-green);
+}
+
+.bk-context-state.is-warn {
+  background: var(--bk-amber-bg);
+  color: var(--bk-amber);
+}
+
+/* The per-card restatement — deliberately quieter than the banner so it
+   annotates the card rather than competing with it. */
+.bk-card-ctx {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-soft);
+  border: 1px solid var(--bk-line);
+  font-size: 13px !important;
+  color: var(--bk-muted);
+}
+
+.bk-card-ctx b {
+  font-weight: 700;
+  color: var(--bk-ink);
+}
+
+.bk-card-ctx-ico {
+  font-size: 18px !important;
+  line-height: 1;
 }
 
 /* One button per traveler. The n/6 badge is the whole point — with three
@@ -1976,7 +2102,7 @@ select.bk-control {
 .bk-tab.is-on {
   border-color: var(--bk-blue);
   background: var(--bk-blue-tint);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
 }
 
 .bk-tab-ico {
@@ -2000,7 +2126,7 @@ select.bk-control {
 }
 
 .bk-tab-txt b {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-ink);
   white-space: nowrap;
   overflow: hidden;
@@ -2008,13 +2134,13 @@ select.bk-control {
 }
 
 .bk-tab-txt span {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
 }
 
 .bk-tab-badge {
   flex: 0 0 auto;
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 999px;
@@ -2057,16 +2183,16 @@ select.bk-control {
 .bk-seg-btn.is-on {
   border-color: var(--bk-blue);
   background: var(--bk-blue-tint);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+  box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.1);
 }
 
 .bk-seg-btn b {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-ink);
 }
 
 .bk-seg-btn span {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -2089,12 +2215,12 @@ select.bk-control {
 }
 
 .bk-prog-txt b {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-ink);
 }
 
 .bk-prog-txt span {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
 }
 
@@ -2138,13 +2264,13 @@ select.bk-control {
 }
 
 .bk-addons-who b {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-ink);
   display: block;
 }
 
 .bk-addons-meta {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
 }
 
@@ -2174,13 +2300,13 @@ select.bk-control {
 }
 
 .bk-rail-pax-head b {
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-ink);
 }
 
 .bk-rail-pax-total {
   margin-left: auto;
-  font-size: 13px !important;
+  font-size: 14px !important;
   color: var(--bk-ink);
 }
 
@@ -2228,7 +2354,7 @@ select.bk-control {
 }
 
 .bk-modal-sub {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-muted);
   margin: 4px 0 0;
 }
@@ -2330,18 +2456,18 @@ select.bk-control {
 }
 
 .bk-side-head b {
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: var(--bk-ink);
 }
 
 .bk-side-head span {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
 }
 
 .bk-side-price {
   margin-left: auto;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 700;
   color: var(--bk-ink);
 }
@@ -2351,7 +2477,7 @@ select.bk-control {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px !important;
+  font-size: 13px !important;
   padding: 5px 0;
   border-top: 1px solid var(--bk-line);
 }
@@ -2384,7 +2510,7 @@ select.bk-control {
 }
 
 .bk-sum-empty {
-  font-size: 11px !important;
+  font-size: 12px !important;
   color: var(--bk-muted);
   padding: 5px 0;
 }
@@ -2477,7 +2603,7 @@ select.bk-control {
 
 @media (max-width: 575.98px) {
   .bk-main {
-    padding: 14px 12px 74px;
+    padding: 14px 12px 32px;
   }
 
   .bk-band-top {
@@ -2510,6 +2636,26 @@ select.bk-control {
 
   .bk-seg {
     grid-template-columns: 1fr;
+  }
+
+  /* Banner stacks: the divider line is meaningless once the rows wrap, and
+     the status pill drops its auto margin so it sits flush left. */
+  .bk-context {
+    gap: 12px;
+  }
+
+  .bk-context-div {
+    display: none;
+  }
+
+  .bk-context-where,
+  .bk-context-state {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .bk-context-state {
+    justify-content: center;
   }
 
   .bk-addons-head {

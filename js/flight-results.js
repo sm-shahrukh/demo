@@ -723,7 +723,7 @@
                        itinerary.serviceFee,
                    ),
                  )}</b>
-                 <small class="fr-row-price-note">Total trip price</small>
+                 <small class="fr-row-price-note">Per-adult trip price</small>
                  ${options.collapse || ""}
                </div>`
             : ""
@@ -749,7 +749,7 @@
               : ""
           }
           <b class="fr-row-price">${escapeHtml(totalFare)}</b>
-          <small class="fr-row-price-note">Total trip price</small>
+          <small class="fr-row-price-note">Per-adult trip price</small>
           ${options.collapse || ""}
         </div>
         ${itinerary.legs
@@ -917,7 +917,7 @@
             )}</b>
             <small>${itinerary.legs.length} journey leg${
               itinerary.legs.length > 1 ? "s" : ""
-            } · all segments included</small>
+            } · all segments included · price shown per adult</small>
             <small>Base fare includes ${escapeHtml(
               itinerary.cabin.checkedBag,
             )} checked and ${escapeHtml(
@@ -943,9 +943,7 @@
               </div>
               <b>${money(selectedPackage.price + itinerary.taxes + itinerary.serviceFee)}</b>
             </div>
-            <small class="fr-fare-fine">${escapeHtml(
-              paxCount(state.search.passengers),
-            )} adult · incl. taxes &amp; service fee</small>
+            <small class="fr-fare-fine">Illustrative per-adult price · incl. taxes &amp; service fee</small>
             <small class="fr-fare-fine">Review traveller details and final fare before payment.</small>
             <button type="button" class="fr-book-btn" data-book="${escapeHtml(
               itinerary.id,
@@ -958,12 +956,8 @@
   function buildPackageCard(pkg, selectedId, itinerary) {
     const selected = pkg.id === selectedId;
     const delta = pkg.uplift
-      ? `+${money(pkg.uplift)} vs Starter · total for ${escapeHtml(
-          paxCount(state.search.passengers),
-        )}`
-      : `Base package · +${formatPKR(0)} · total for ${escapeHtml(
-          paxCount(state.search.passengers),
-        )}`;
+      ? `+${money(pkg.uplift)} vs Starter · per adult`
+      : `Base package · +${formatPKR(0)} · per adult`;
 
     const rows = [
       { label: "Cabin bag", value: pkg.cabinBag },
@@ -1005,7 +999,6 @@
   }
 
   function buildPackages(itinerary, selectedPackage) {
-    const total = paxCount(state.search.passengers);
     const grandTotal =
       selectedPackage.price + itinerary.taxes + itinerary.serviceFee;
 
@@ -1014,9 +1007,7 @@
         <div class="fr-packages-head">
           <p>Illustrative comparison only these are not verified company fare
              names, prices or rules. Benefits apply to all segments and
-             ${escapeHtml(
-               total,
-             )} adult${total > 1 ? "s" : ""}. Confirm each operating
+             the selected passengers. Prices are shown per adult. Confirm each operating
              carrier's conditions before booking.</p>
         </div>
         <div class="fr-package-grid">
@@ -1026,7 +1017,7 @@
         </div>
         <div class="fr-continue">
           <div>
-            <b>${escapeHtml(selectedPackage.name)} · ${money(grandTotal)}</b>
+            <b>${escapeHtml(selectedPackage.name)} · ${money(grandTotal)} per adult</b>
             <small>${escapeHtml(paxLabel(state.search.passengers))} · ${escapeHtml(
               tripLabel(state.search.tripType),
             )} · all taxes &amp; service fee included</small>
@@ -1596,10 +1587,80 @@
         (item) => item.id === continueButton.dataset.book,
       );
       if (!itinerary) return;
+      const selectedPackage =
+        itinerary.packages.find((pkg) => pkg.id === state.packageId) ||
+        itinerary.packages[1];
       const departure = FlightData.toISODate(itinerary.legs[0].date);
-      window.location.href = `/flight-booking.html?departure=${encodeURIComponent(
+      const selection = {
+        tripType: state.search.tripType,
+        cabin: state.search.cabin,
+        passengers: state.search.passengers,
+        fare: {
+          packageId: selectedPackage.id,
+          packageName: selectedPackage.name,
+          perAdultTotal: Math.round(
+            (selectedPackage.price + itinerary.taxes + itinerary.serviceFee) *
+              FlightData.CURRENCY.eurToPkr,
+          ),
+        },
+        itinerary: {
+          legs: itinerary.legs.map((leg) => ({
+            origin: { code: leg.origin.code, city: leg.origin.city },
+            destination: {
+              code: leg.destination.code,
+              city: leg.destination.city,
+            },
+            date: FlightData.toISODate(leg.date),
+            segments: leg.segments.map((segment) => ({
+              airline: segment.airline.name,
+              flightNumber: segment.flightNumber,
+              from: { code: segment.from.code, city: segment.from.city },
+              to: { code: segment.to.code, city: segment.to.city },
+              departAt: segment.departAt,
+              arriveAt: segment.arriveAt,
+              durationMin: segment.durationMin,
+            })),
+          })),
+        },
+      };
+      try {
+        sessionStorage.setItem(
+          "smartmoves.bookingSelection",
+          JSON.stringify(selection),
+        );
+      } catch (error) {
+        console.error("Could not save the selected itinerary.", error);
+        window.alert(
+          "Your selected flight could not be saved. Please check your browser storage settings and try again.",
+        );
+        return;
+      }
+      const params = new URLSearchParams({
         departure,
-      )}`;
+        trip: state.search.tripType,
+        from: itinerary.legs[0].origin.code,
+        to: itinerary.legs[0].destination.code,
+        adults: String(state.search.passengers.adults),
+        children: String(state.search.passengers.children),
+        infants: String(state.search.passengers.infants),
+        cabin: state.search.cabin,
+      });
+      if (state.search.tripType === "roundtrip" && itinerary.legs[1]) {
+        params.set("return", FlightData.toISODate(itinerary.legs[1].date));
+      }
+      if (state.search.tripType === "multicity") {
+        params.set(
+          "multiLegs",
+          JSON.stringify(
+            itinerary.legs.map((leg) => ({
+              from: leg.origin.code,
+              to: leg.destination.code,
+              date: FlightData.toISODate(leg.date),
+            })),
+          ),
+        );
+      }
+      window.location.href = `/flight-booking.html?${params.toString()}`;
       return;
     }
 
@@ -1668,11 +1729,9 @@
         <b>${escapeHtml(carrierNames(itinerary))} · ${escapeHtml(
           tripLabel(state.search.tripType),
         )}</b>
-        <span>${escapeHtml(paxLabel(state.search.passengers))} · ${escapeHtml(
-          selectedPackage.name,
-        )} · ${money(
+        <span>${escapeHtml(selectedPackage.name)} · ${money(
           selectedPackage.price + itinerary.taxes + itinerary.serviceFee,
-        )} total</span>
+        )} per adult</span>
       </div>
       <button type="button" aria-label="Dismiss"><i class="bi bi-x-lg"></i></button>`;
     notice
