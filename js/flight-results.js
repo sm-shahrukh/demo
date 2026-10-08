@@ -1656,7 +1656,9 @@
           ),
         );
       }
-      window.location.href = `/flight-booking.html?${params.toString()}`;
+      const bookingUrl = new URL("flight-booking.html", window.location.href);
+      bookingUrl.search = params.toString();
+      window.location.href = bookingUrl.toString();
       return;
     }
 

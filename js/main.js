@@ -506,6 +506,37 @@
     window.setTripType(tripType);
   };
 
+  function syncSearchUrl(search) {
+    const legs = search.legs.map((leg) => ({
+      from: leg.from.code,
+      to: leg.to.code,
+      date: FlightData.toISODate(leg.date),
+    }));
+    const firstLeg = legs[0];
+    const params = new URLSearchParams({
+      trip: search.tripType,
+      from: firstLeg.from,
+      to: firstLeg.to,
+      departure: firstLeg.date,
+      adults: String(search.passengers.adults),
+      children: String(search.passengers.children),
+      infants: String(search.passengers.infants),
+      cabin: search.cabin,
+    });
+
+    if (search.tripType === "roundtrip" && legs[1]) {
+      params.set("return", legs[1].date);
+    } else if (search.tripType === "multicity") {
+      params.set("multiLegs", JSON.stringify(legs));
+    }
+
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}?${params.toString()}`,
+    );
+  }
+
   function runSearch(tripType, silent) {
     const alert = getElement("searchAlert");
     const showError = (message) => {
@@ -542,6 +573,7 @@
       });
 
       if (!result.ok) return showError("Please complete every flight.");
+      syncSearchUrl(result.search);
       if (alert) {
         alert.textContent = `Multi-city search ready: ${legs.length} flights.`;
         alert.className = "alert show success";
@@ -578,6 +610,7 @@
     });
 
     if (!result.ok) return showError("Please complete the search.");
+    syncSearchUrl(result.search);
 
     if (alert) {
       alert.textContent = `Search ready: ${selectedFrom.city} to ${selectedTo.city} on ${departure}.`;

@@ -487,7 +487,9 @@ function handleFlightSearch(e) {
 
     search.set("multiLegs", JSON.stringify(multiLegs));
   }
-  window.location.href = `/search-flight.html?${search.toString()}`;
+  const searchUrl = new URL("search-flight.html", window.location.href);
+  searchUrl.search = search.toString();
+  window.location.href = searchUrl.toString();
   return false;
 }
 function showAlert(msg, type) {
