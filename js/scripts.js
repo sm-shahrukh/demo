@@ -79,6 +79,13 @@ function setTripType(type, btn) {
   if (type !== "roundtrip") {
     document.getElementById("retDate").value = "";
     document.getElementById("retDate").dataset.iso = "";
+  } else {
+    const returnInput = document.getElementById("retDate");
+    if (returnInput && !returnInput.dataset.iso) {
+      const today = new Date();
+      returnInput.dataset.iso = flightDateISO(today);
+      returnInput.value = formatFlightDate(today);
+    }
   }
 }
 
@@ -1245,6 +1252,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (departureInput) {
     departureInput.dataset.iso = flightDateISO(now);
     departureInput.value = formatFlightDate(now);
+  }
+  const returnInput = document.getElementById("retDate");
+  if (returnInput) {
+    returnInput.dataset.iso = flightDateISO(now);
+    returnInput.value = formatFlightDate(now);
   }
   if (document.getElementById("umrahStartDate")) {
     document.getElementById("umrahStartDate").min = today;

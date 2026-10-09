@@ -290,6 +290,19 @@
   })();
 
   var RETURN_DATE_ISO = isoDate(RETURN_DATE);
+  var DEFAULT_DOC_ISSUE_DATE = (function () {
+    var today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return today > FLIGHT_DATE ? new Date(FLIGHT_DATE.getTime()) : today;
+  })();
+  var DEFAULT_DOC_EXPIRY_DATE = (function () {
+    var month = RETURN_DATE.getMonth() + 6;
+    var firstOfTargetMonth = new Date(RETURN_DATE.getFullYear(), month, 1);
+    var lastDay = new Date(firstOfTargetMonth.getFullYear(), firstOfTargetMonth.getMonth() + 1, 0).getDate();
+    return new Date(firstOfTargetMonth.getFullYear(), firstOfTargetMonth.getMonth(), Math.min(RETURN_DATE.getDate(), lastDay));
+  })();
+  var DEFAULT_DOC_ISSUE_ISO = isoDate(DEFAULT_DOC_ISSUE_DATE);
+  var DEFAULT_DOC_EXPIRY_ISO = isoDate(DEFAULT_DOC_EXPIRY_DATE);
   var RETURN_DATE_LABEL = RETURN_DATE.toLocaleDateString("en-GB", {
     weekday: "short",
     day: "numeric",
@@ -1043,6 +1056,59 @@
     return d;
   }
 
+  function formatBookingDate(date) {
+    return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(date);
+  }
+
+  function bookingDateFromValue(value) {
+    var date = parseDate(value || "");
+    return date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+  }
+
+  function renderBookingDatepicker(input, monthDate) {
+    var panel = input.closest(".bk-field") && input.closest(".bk-field").querySelector(".bk-date-menu");
+    if (!panel) return;
+    panel.dataset.year = monthDate.getFullYear();
+    panel.dataset.month = monthDate.getMonth();
+    var min = bookingDateFromValue(input.dataset.dateMin);
+    var max = bookingDateFromValue(input.dataset.dateMax);
+    var firstDay = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    var offset = (firstDay.getDay() + 6) % 7;
+    var days = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+    var selected = bookingDateFromValue(input.value);
+    var today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    panel.innerHTML = '<div class="bk-date-head"><button type="button" data-booking-month="-1" aria-label="Previous month">‹</button><strong>' +
+      new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(monthDate) +
+      '</strong><button type="button" data-booking-month="1" aria-label="Next month">›</button></div>' +
+      '<div class="bk-date-grid bk-date-weekdays">' + ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(function (day) { return "<span>" + day + "</span>"; }).join("") + "</div>" +
+      '<div class="bk-date-grid">' + Array.from({ length: offset }, function () { return '<span class="bk-date-blank"></span>'; }).join("") +
+      Array.from({ length: days }, function (_, index) {
+        var date = new Date(monthDate.getFullYear(), monthDate.getMonth(), index + 1);
+        var disabled = (min && date < min) || (max && date > max);
+        var isSelected = selected && date.getTime() === selected.getTime();
+        var isToday = date.getTime() === today.getTime();
+        return '<button type="button" class="bk-date-day' + (isSelected ? " selected" : "") + (isToday ? " today" : "") + '" data-booking-date="' +
+          [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-") + '"' +
+          (disabled ? " disabled" : "") + ">" + (index + 1) + "</button>";
+      }).join("") + "</div>";
+  }
+
+  function openBookingDatepicker(input) {
+    var panel = input.closest(".bk-field") && input.closest(".bk-field").querySelector(".bk-date-menu");
+    if (!panel) return;
+    document.querySelectorAll(".bk-date-menu").forEach(function (menu) { menu.hidden = true; });
+    var current = bookingDateFromValue(input.value) || new Date();
+    renderBookingDatepicker(input, new Date(current.getFullYear(), current.getMonth(), 1));
+    panel.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  }
+
+  function closeBookingDatepickers() {
+    document.querySelectorAll(".bk-date-menu").forEach(function (menu) { menu.hidden = true; });
+    document.querySelectorAll("[data-date-picker]").forEach(function (input) { input.setAttribute("aria-expanded", "false"); });
+  }
+
   function validateInput(input) {
     var value = (input.value || "").trim();
     var name = input.name;
@@ -1356,15 +1422,22 @@
           .join("") +
         "</select>";
     } else {
+      var isDate = cfg.type === "date";
+      var dateValue = value == null ? "" : value;
+      if (isDate && dateValue) {
+        var parsedDate = bookingDateFromValue(dateValue);
+        if (parsedDate) dateValue = formatBookingDate(parsedDate);
+      }
       control =
-        '<input class="bk-control" id="' + id + '" name="' + cfg.name + '"' +
-        ' type="' + (cfg.type || "text") + '"' +
+        '<input class="bk-control' + (isDate ? " bk-date-input" : "") + '" id="' + id + '" name="' + cfg.name + '"' +
+        ' type="' + (isDate ? "text" : (cfg.type || "text")) + '"' +
         ' placeholder="' + esc(cfg.placeholder || "") + '"' +
         (cfg.required ? " required" : "") +
-        (cfg.min ? ' min="' + cfg.min + '"' : "") +
-        (cfg.max ? ' max="' + cfg.max + '"' : "") +
+        (isDate ? ' readonly data-date-picker="true" aria-haspopup="dialog" aria-expanded="false" data-date-min="' + esc(cfg.min || "") + '" data-date-max="' + esc(cfg.max || "") + '"' : "") +
+        (!isDate && cfg.min ? ' min="' + cfg.min + '"' : "") +
+        (!isDate && cfg.max ? ' max="' + cfg.max + '"' : "") +
         (cfg.autocomplete ? ' autocomplete="' + cfg.autocomplete + '"' : "") +
-        ' value="' + esc(value == null ? "" : value) + '" />';
+        ' value="' + esc(dateValue) + '" />';
     }
 
     /* A linked field mirrors its partner on every change, so the duplicate
@@ -1374,7 +1447,7 @@
       control = control.replace(/^<(select|input)/, '<$1 data-sync="' + esc(cfg.sync) + '"');
     }
 
-    return '<div class="bk-field">' + label + control + errBox() + "</div>";
+    return '<div class="bk-field">' + label + control + (cfg.type === "date" ? '<div class="bk-date-menu" role="dialog" aria-label="Choose date" hidden></div>' : "") + errBox() + "</div>";
   }
 
   function paxHeadline(t) {
@@ -1396,8 +1469,8 @@
       { id: p + "Surname", value: "" },
       { id: p + "DocNo", value: t.doc },
       { id: p + "Dob", value: dobToInput(t.dob) },
-      { id: p + "DocIssue", value: "" },
-      { id: p + "DocExp", value: "" },
+      { id: p + "DocIssue", value: formatBookingDate(DEFAULT_DOC_ISSUE_DATE) },
+      { id: p + "DocExp", value: formatBookingDate(DEFAULT_DOC_EXPIRY_DATE) },
     ];
 
     return fields.every(function (field) {
@@ -1444,10 +1517,10 @@
       '<div class="bk-block"><div class="bk-block-head">' + ICON.upload +
       "<h4>Passport scan</h4></div>" +
       '<label class="bk-drop" data-drop-for="' + p + '">' +
-      '<input type="file" accept="image/*,.pdf" />' +
+      '<input type="file" accept="image/*" />' +
       '<span class="bk-drop-ico">' + ICON.upload + "</span>" +
       '<span class="bk-drop-txt" data-role="drop-txt">Upload passport to fill details</span>' +
-      '<span class="bk-drop-hint">JPG or PDF · the name, date of birth and passport number are read from it</span>' +
+      '<span class="bk-drop-hint">Choose a clear passport photo. OCR runs in your browser; check the filled details before continuing.</span>' +
       "</label></div>";
 
     var documents =
@@ -1456,8 +1529,8 @@
       '<div class="bk-grid bk-grid-2">' +
       field({ id: p + "DocNo", name: "docNo", label: "Passport number", required: true, value: t.doc, placeholder: "Passport number" }) +
       field({ id: p + "Dob", name: "dob", label: "Date of birth", required: true, type: "date", max: FLIGHT_DATE_ISO, value: dobToInput(t.dob), sync: p + "DobEcho" }) +
-      field({ id: p + "DocIssue", name: "docIssue", label: "Passport issue", required: true, type: "date", max: FLIGHT_DATE_ISO }) +
-      field({ id: p + "DocExp", name: "docExp", label: "Passport expiry", required: true, type: "date", min: RETURN_DATE_ISO }) +
+      field({ id: p + "DocIssue", name: "docIssue", label: "Passport issue", required: true, type: "date", max: FLIGHT_DATE_ISO, value: DEFAULT_DOC_ISSUE_ISO }) +
+      field({ id: p + "DocExp", name: "docExp", label: "Passport expiry", required: true, type: "date", min: RETURN_DATE_ISO, value: DEFAULT_DOC_EXPIRY_ISO }) +
       field({ id: p + "NatEcho", name: "nationality", label: "Nationality", type: "select", values: NATIONALITIES, value: "Pakistani", sync: p + "Nationality" }) +
       "</div>" +
       '<div class="bk-note bk-note-info" style="margin-top:14px">' + ICON.info +
@@ -1731,21 +1804,40 @@
   /* Outbound / return. Two pills, each carrying its own date and route. */
   function dirToggle() {
     return (
-      '<div class="bk-seg" role="group" aria-label="Flight direction">' +
+      '<div class="bk-flight-tabs" role="tablist" aria-label="Choose flight direction">' +
       FLIGHT.directions
         .map(function (d, i) {
           var on = i === state.activeDir;
           return (
-            '<button type="button" class="bk-seg-btn' + (on ? " is-on" : "") + '"' +
-            ' aria-pressed="' + (on ? "true" : "false") + '" data-dir="' + i + '">' +
+            '<button type="button" role="tab" class="bk-flight-tab' + (on ? " is-on" : "") + '"' +
+            ' aria-selected="' + (on ? "true" : "false") + '" data-dir="' + i + '">' +
             "<b>" + esc(d.label) + "</b>" +
             "<span>" + esc(d.from + " to " + d.to) + " · " + esc(dateLabelFor(i)) + "</span>" +
+            "<small>" + TRAVELLERS.filter(function (traveler) { return !!state.seat[addonKey(i, traveler.id)]; }).length + " of " + TRAVELLERS.length + " seats selected</small>" +
             "</button>"
           );
         })
         .join("") +
       "</div>"
     );
+  }
+
+  function seatRoster() {
+    var dir = state.activeDir;
+    return '<section class="bk-seat-roster" aria-label="Seat selection by traveler">' +
+      '<div class="bk-seat-roster-head"><b>Seats for all travelers</b><span>' +
+      TRAVELLERS.filter(function (traveler) { return !!state.seat[addonKey(dir, traveler.id)]; }).length +
+      " / " + TRAVELLERS.length + " selected on this flight</span></div>" +
+      '<div class="bk-seat-roster-list">' + TRAVELLERS.map(function (traveler) {
+        var seat = state.seat[addonKey(dir, traveler.id)];
+        var active = traveler.id === state.activePax;
+        return '<button type="button" class="bk-seat-person' + (active ? " is-active" : "") + (seat ? " has-seat" : "") + '" data-pax-tab="' + traveler.id + '"' +
+          ' aria-pressed="' + active + '"><span class="bk-seat-person-icon">' + (seat ? ICON.check : ICON.user) + '</span>' +
+          '<span class="bk-seat-person-copy"><b>' + esc(traveler.label) + '</b><small>' +
+          (seat ? "Seat " + esc(seat) + " selected" : "Choose a seat") + '</small></span>' +
+          (seat ? '<span class="bk-seat-person-status" aria-label="Seat selected">' + esc(seat) + "</span>" : '<span class="bk-seat-person-status is-needed">Required</span>') +
+          "</button>";
+      }).join("") + "</div></section>";
   }
 
   function tripProgress() {
@@ -1846,24 +1938,28 @@
       var cells = '<div class="bk-seat-rownum">' + row + "</div>";
       SEAT_LETTERS.forEach(function (letter) {
         var code = seatCode(row, letter);
-        var selectedByOther = seatSelectedByOther(code, dir, state.activePax);
-        var taken = seatTaken(row, letter, dir) || selectedByOther;
+        var owner = TRAVELLERS.find(function (traveler) {
+          return traveler.id !== state.activePax && state.seat[addonKey(dir, traveler.id)] === code;
+        });
+        var selectedByOther = !!owner;
+        var physicallyTaken = seatTaken(row, letter, dir);
+        var taken = physicallyTaken || selectedByOther;
         var paid = seatPaid(row, letter, dir);
         var picked = current === code;
         var cls = "bk-seat";
-        if (taken) cls += " is-taken";
+        if (selectedByOther) cls += " is-held";
+        else if (physicallyTaken) cls += " is-taken";
         else if (picked) cls += " is-pick";
         else if (paid) cls += " is-paid";
         cells +=
           '<button type="button" class="' + cls + '" data-seat="' + code + '"' +
-          (taken ? " disabled" : "") +
+          (physicallyTaken ? " disabled" : "") +
+          (owner ? ' data-seat-owner="' + owner.id + '" title="Seat ' + code + ' is reserved for ' + esc(owner.label) + '"' : physicallyTaken ? ' title="Seat ' + code + ' is occupied"' : "") +
           ' aria-label="Seat ' + code +
           (selectedByOther
-            ? ", selected for " + esc(TRAVELLERS.filter(function (t) {
-                return state.seat[addonKey(dir, t.id)] === code;
-              })[0].label)
+            ? ", reserved for " + esc(owner.label)
             : taken ? ", occupied" : paid ? ", paid" : ", free") + '">' +
-          (taken ? "×" : code) +
+          (selectedByOther ? '<span class="bk-seat-owner-icon" aria-hidden="true">' + ICON.user + "</span>" : physicallyTaken ? "×" : code) +
           "</button>";
       });
       rows += '<div class="bk-seat-row">' + cells + '<div class="bk-seat-rownum">' + row + "</div></div>";
@@ -1874,6 +1970,7 @@
       "<span><i></i>Free</span>" +
       '<span><i class="l-paid"></i>Paid ' + money(WINDOW_PRICE) + "</span>" +
       '<span><i class="l-taken"></i>Occupied</span>' +
+      '<span><i class="l-held"></i>Reserved by your traveler</span>' +
       '<span><i class="l-pick"></i>Selected</span>' +
       "</div>";
 
@@ -1922,7 +2019,8 @@
         esc(leg.from.code) + " to " + esc(leg.to.code) + " · " + esc(dateLabelFor(dir)),
       note: note,
       legend: legend,
-      grid: head + rows,
+      "seat-roster": seatRoster(),
+      grid: '<div class="bk-aircraft"><div class="bk-plane-nose" aria-hidden="true">FRONT OF AIRCRAFT</div><i class="bk-plane-wing bk-plane-wing-left" aria-hidden="true"></i><i class="bk-plane-wing bk-plane-wing-right" aria-hidden="true"></i><div class="bk-plane-cabin">' + head + rows + '</div><div class="bk-plane-tail" aria-hidden="true"></div></div>',
       picked: picked + skip,
     });
   }
@@ -2873,6 +2971,35 @@
     var target = event.target;
     if (!target || !target.closest) return;
 
+    if (!target.closest(".bk-date-menu") && !target.closest("[data-date-picker]")) closeBookingDatepickers();
+    var dateInput = target.closest("[data-date-picker]");
+    if (dateInput) {
+      event.preventDefault();
+      openBookingDatepicker(dateInput);
+      return;
+    }
+    var monthButton = target.closest("[data-booking-month]");
+    if (monthButton) {
+      var monthPanel = monthButton.closest(".bk-date-menu");
+      var monthInput = monthPanel && monthPanel.closest(".bk-field").querySelector("[data-date-picker]");
+      if (monthPanel && monthInput) {
+        renderBookingDatepicker(monthInput, new Date(Number(monthPanel.dataset.year), Number(monthPanel.dataset.month) + Number(monthButton.dataset.bookingMonth), 1));
+      }
+      return;
+    }
+    var dateButton = target.closest("[data-booking-date]");
+    if (dateButton) {
+      var datePanel = dateButton.closest(".bk-date-menu");
+      var dateField = datePanel && datePanel.closest(".bk-field").querySelector("[data-date-picker]");
+      if (dateField) {
+        dateField.value = formatBookingDate(new Date(dateButton.dataset.bookingDate + "T00:00:00"));
+        dateField.dispatchEvent(new Event("input", { bubbles: true }));
+        dateField.dispatchEvent(new Event("change", { bubbles: true }));
+        closeBookingDatepickers();
+      }
+      return;
+    }
+
     /* --- Back link: in-flow steps go to the previous screen --- */
     var back = target.closest("#bkBack");
     if (back) {
@@ -3013,6 +3140,11 @@
 
     /* --- Add-ons: seats --- */
     var seat = target.closest("[data-seat]");
+    if (seat && seat.dataset.seatOwner) {
+      var reservingTraveler = travById(Number(seat.dataset.seatOwner));
+      toast("Seat " + seat.dataset.seat + " is reserved for " + (reservingTraveler ? reservingTraveler.label : "another traveler"));
+      return;
+    }
     if (seat && !seat.disabled) {
       var seatKeyNow = currentKey();
       var code2 = seat.dataset.seat;
@@ -3287,7 +3419,271 @@
     }
   });
 
-  /* Passenger upload — just confirms the file, the real OCR is server-side. */
+  var passportOcrWorkerPromise = null;
+
+  function getPassportOcrWorker() {
+    if (!window.Tesseract) return Promise.reject(new Error("Passport text recognition could not load. Check your internet connection and try again."));
+    if (!passportOcrWorkerPromise) {
+      passportOcrWorkerPromise = window.Tesseract.createWorker("eng").catch(function (error) {
+        passportOcrWorkerPromise = null;
+        throw error;
+      });
+    }
+    return passportOcrWorkerPromise;
+  }
+
+  function createPassportMrzCrop(file) {
+    if (typeof createImageBitmap !== "function") return Promise.reject(new Error("This browser cannot prepare the passport image for scanning."));
+    return createImageBitmap(file).then(function (bitmap) {
+      var sourceY = Math.floor(bitmap.height * 0.62);
+      var sourceHeight = Math.max(1, bitmap.height - sourceY);
+      var scale = Math.min(3, 2600 / bitmap.width);
+      var canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+      var context = canvas.getContext("2d", { willReadFrequently: true });
+      context.drawImage(bitmap, 0, sourceY, bitmap.width, sourceHeight, 0, 0, canvas.width, canvas.height);
+      if (bitmap.close) bitmap.close();
+      var pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+      var histogram = new Array(256).fill(0);
+      var total = pixels.data.length / 4;
+      for (var i = 0; i < pixels.data.length; i += 4) {
+        var gray = pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114;
+        histogram[Math.round(gray)] += 1;
+      }
+      var weightedSum = 0;
+      for (var level = 0; level < 256; level += 1) weightedSum += level * histogram[level];
+      var backgroundWeight = 0;
+      var backgroundSum = 0;
+      var bestVariance = 0;
+      var threshold = 170;
+      for (var thresholdLevel = 0; thresholdLevel < 256; thresholdLevel += 1) {
+        backgroundWeight += histogram[thresholdLevel];
+        if (!backgroundWeight) continue;
+        var foregroundWeight = total - backgroundWeight;
+        if (!foregroundWeight) break;
+        backgroundSum += thresholdLevel * histogram[thresholdLevel];
+        var meanBackground = backgroundSum / backgroundWeight;
+        var meanForeground = (weightedSum - backgroundSum) / foregroundWeight;
+        var variance = backgroundWeight * foregroundWeight * Math.pow(meanBackground - meanForeground, 2);
+        if (variance > bestVariance) {
+          bestVariance = variance;
+          threshold = thresholdLevel;
+        }
+      }
+      for (var pixel = 0; pixel < pixels.data.length; pixel += 4) {
+        var luminance = pixels.data[pixel] * 0.299 + pixels.data[pixel + 1] * 0.587 + pixels.data[pixel + 2] * 0.114;
+        var binary = luminance <= threshold ? 0 : 255;
+        pixels.data[pixel] = pixels.data[pixel + 1] = pixels.data[pixel + 2] = binary;
+      }
+      context.putImageData(pixels, 0, 0);
+      return canvas;
+    });
+  }
+
+  function createPassportMrzLineCrops(file) {
+    if (typeof createImageBitmap !== "function") return Promise.reject(new Error("This browser cannot prepare the passport image for scanning."));
+    return createImageBitmap(file).then(function (bitmap) {
+      var rowHeight = Math.max(1, Math.round(bitmap.height * 0.075));
+      var scale = Math.min(5, 3200 / bitmap.width);
+      var crops = [0, 1].map(function (row) {
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(rowHeight * scale));
+        var context = canvas.getContext("2d");
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+        var y = Math.max(0, bitmap.height - rowHeight * (2 - row));
+        context.drawImage(bitmap, 0, y, bitmap.width, rowHeight, 0, 0, canvas.width, canvas.height);
+        return canvas;
+      });
+      if (bitmap.close) bitmap.close();
+      return crops;
+    });
+  }
+
+  function mrzDate(value, isExpiry) {
+    var digits = String(value || "").replace(/[OQD]/g, "0").replace(/[IL]/g, "1");
+    if (!/^\d{6}$/.test(digits)) return "";
+    var yy = Number(digits.slice(0, 2));
+    var month = Number(digits.slice(2, 4));
+    var day = Number(digits.slice(4, 6));
+    var currentYear = new Date().getFullYear() % 100;
+    var year = isExpiry ? 2000 + yy : (yy > currentYear ? 1900 + yy : 2000 + yy);
+    var date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return "";
+    return [year, String(month).padStart(2, "0"), String(day).padStart(2, "0")].join("-");
+  }
+
+  function parsePassportText(rawText) {
+    var lines = String(rawText || "").toUpperCase().split(/\r?\n/).map(function (line) {
+      return line.replace(/[«‹]/g, "<").replace(/\s+/g, "").replace(/[^A-Z0-9<]/g, "");
+    }).filter(Boolean);
+    var candidates = lines.slice();
+    for (var lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+      for (var span = 2; span <= 3 && lineIndex + span <= lines.length; span += 1) {
+        var joined = lines.slice(lineIndex, lineIndex + span).join("");
+        if (joined.length <= 55) candidates.push(joined);
+      }
+    }
+    var fixMrzDigits = function (value) { return String(value || "").replace(/[OQD]/g, "0").replace(/[IL]/g, "1"); };
+    var first = candidates.filter(function (line) { return /^P[<A-Z0-9]/.test(line) && line.length >= 20 && (line.indexOf("<<") >= 0 || /^P</.test(line)); })
+      .sort(function (a, b) { return Math.abs(a.length - 44) - Math.abs(b.length - 44); })[0] || "";
+    var second = candidates.filter(function (line) {
+      return line.length >= 28 && /^[A-Z0-9<]+$/.test(line) && /[0-9OQDIL]{5,}/.test(line.slice(12, 28));
+    }).sort(function (a, b) { return Math.abs(a.length - 44) - Math.abs(b.length - 44); })[0] || "";
+    if (first.length < 44) first = first.padEnd(44, "<");
+    if (second.length < 44) second = second.padEnd(44, "<");
+
+    var data = {};
+    if (first.startsWith("P<")) {
+      var names = first.slice(5).split("<<");
+      data.surname = (names.shift() || "").replace(/</g, " ").trim();
+      data.given = names.join(" ").replace(/</g, " ").trim();
+    }
+    if (second) {
+      var number = second.slice(0, 9).replace(/</g, "").replace(/[OQD]/g, "0");
+      if (number.length >= 5) data.passportNumber = number;
+      data.nationalityCode = second.slice(10, 13).replace(/</g, "");
+      data.dob = mrzDate(fixMrzDigits(second.slice(13, 19)), false);
+      data.sex = second.charAt(20);
+      data.expiry = mrzDate(fixMrzDigits(second.slice(21, 27)), true);
+    }
+
+    var visualLines = String(rawText || "").toUpperCase().split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+    function labelledValue(labelPattern) {
+      for (var index = 0; index < visualLines.length; index += 1) {
+        var match = labelPattern.exec(visualLines[index]);
+        if (!match) continue;
+        var tail = visualLines[index].slice(match.index + match[0].length).replace(/^[\s:#-]+/, "").trim();
+        if (tail) return tail;
+        if (visualLines[index + 1] && !/^[A-Z][A-Z ]{2,}:?$/.test(visualLines[index + 1])) return visualLines[index + 1].trim();
+      }
+      return "";
+    }
+    function labelledDate(labelPattern) {
+      var value = labelledValue(labelPattern);
+      var dateMatch = value.match(/\b(\d{4}[./-]\d{1,2}[./-]\d{1,2}|\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{1,2}\s+[A-Z]{3}\s+\d{4})\b/);
+      if (!dateMatch) return "";
+      var dateText = dateMatch[1];
+      var parts = dateText.match(/\d+/g) || [];
+      var parsed;
+      if (/^\d{4}[./-]/.test(dateText) && parts.length === 3) {
+        parsed = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      } else if (/[A-Z]{3}/.test(dateText)) {
+        var monthNames = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+        var named = /([0-9]{1,2})\s+([A-Z]{3})\s+([0-9]{4})/.exec(dateText);
+        if (named) parsed = new Date(Number(named[3]), monthNames[named[2]], Number(named[1]));
+      } else if (parts.length === 3) {
+        var year = Number(parts[2]);
+        if (year < 100) year += year > (new Date().getFullYear() % 100) ? 1900 : 2000;
+        var firstPart = Number(parts[0]);
+        var secondPart = Number(parts[1]);
+        var day = firstPart > 12 ? firstPart : secondPart > 12 ? secondPart : firstPart;
+        var month = firstPart > 12 ? secondPart : secondPart > 12 ? firstPart : secondPart;
+        parsed = new Date(year, month - 1, day);
+      }
+      if (!parsed || Number.isNaN(parsed.getTime())) return "";
+      return [parsed.getFullYear(), String(parsed.getMonth() + 1).padStart(2, "0"), String(parsed.getDate()).padStart(2, "0")].join("-");
+    }
+
+    if (!data.passportNumber) {
+      var visualNumber = labelledValue(/PASSPORT\s*(?:NO\.?|NUMBER|#)/i).match(/[A-Z0-9]{5,15}/);
+      if (visualNumber) data.passportNumber = visualNumber[0];
+    }
+    if (!data.surname) data.surname = labelledValue(/(?:SURNAME|FAMILY\s+NAME)/i).replace(/[^A-Z '-]/g, "").trim();
+    if (!data.given) data.given = labelledValue(/(?:GIVEN\s+NAMES?|FIRST\s+NAME)/i).replace(/[^A-Z '-]/g, "").trim();
+    if (!data.dob) data.dob = labelledDate(/(?:DATE\s+OF\s+BIRTH|BIRTH\s+DATE|DOB)/i);
+    if (!data.expiry) data.expiry = labelledDate(/(?:DATE\s+OF\s+EXPIR(?:Y|ATION)|EXPIR(?:Y|ATION)\s+DATE|VALID\s+UNTIL)/i);
+    if (!data.issue) data.issue = labelledDate(/(?:DATE\s+OF\s+ISSUE|ISSUE\s+DATE|DATE\s+ISSUED|ISSUED\s+ON)/i);
+    if (!data.sex) {
+      var visualSex = labelledValue(/(?:SEX|GENDER)/i).match(/\b(MALE|FEMALE|M|F)\b/);
+      if (visualSex) data.sex = visualSex[1] === "MALE" ? "M" : visualSex[1] === "FEMALE" ? "F" : visualSex[1];
+    }
+    if (!data.nationalityCode) {
+      var nationalityValue = labelledValue(/NATIONALITY/i);
+      var nationalityCodes = { PAKISTANI: "PAK", "SAUDI ARABIAN": "SAU", EMIRATI: "ARE", QATARI: "QAT", BRITISH: "GBR", AMERICAN: "USA", CANADIAN: "CAN", MALAYSIAN: "MYS", BANGLADESHI: "BGD", INDIAN: "IND", TURKISH: "TUR" };
+      var nationalityKey = Object.keys(nationalityCodes).find(function (name) { return nationalityValue.includes(name); });
+      if (nationalityKey) data.nationalityCode = nationalityCodes[nationalityKey];
+      else if (/GOVERNMENT OF PAKISTAN|ISLAMIC REPUBLIC OF PAKISTAN/i.test(rawText)) data.nationalityCode = "PAK";
+    }
+
+    var issueMatch = String(rawText || "").match(/(?:DATE\s+OF\s+ISSUE|ISSUE\s+DATE|DATE\s+ISSUED|ISSUED\s+ON)[^\d]{0,18}(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\d{1,2}\s+[A-Z]{3}\s+\d{4}|\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2})/i);
+    if (issueMatch) {
+      var issueValue = issueMatch[1];
+      var parts = issueValue.match(/\d+/g) || [];
+      var issueDate;
+      if (/^\d{4}[\/.-]/.test(issueValue) && parts.length === 3) issueDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      else if (/[A-Z]{3}/i.test(issueValue)) issueDate = new Date(issueValue);
+      else if (parts.length === 3) {
+        var issueYear = Number(parts[2]);
+        if (issueYear < 100) issueYear += issueYear > (new Date().getFullYear() % 100) ? 1900 : 2000;
+        issueDate = new Date(issueYear, Number(parts[1]) - 1, Number(parts[0]));
+      }
+      if (issueDate && !Number.isNaN(issueDate.getTime())) data.issue = [issueDate.getFullYear(), String(issueDate.getMonth() + 1).padStart(2, "0"), String(issueDate.getDate()).padStart(2, "0")].join("-");
+    }
+    return data;
+  }
+
+  function fillPassportFields(label, extracted) {
+    var paxId = (label.dataset.dropFor || (label.closest(".bk-pax") && label.closest(".bk-pax").dataset.pax) || "").replace("pax", "");
+    if (!paxId) return [];
+    var prefix = "pax" + paxId;
+    var filledFields = [];
+    var nationalityByCode = {
+      PAK: "Pakistani", SAU: "Saudi Arabian", ARE: "Emirati", QAT: "Qatari",
+      GBR: "British", USA: "American", CAN: "Canadian", MYS: "Malaysian",
+      BGD: "Bangladeshi", IND: "Indian", TUR: "Turkish",
+    };
+    var fields = {
+      Given: extracted.given,
+      Surname: extracted.surname,
+      DocNo: extracted.passportNumber,
+      Dob: extracted.dob,
+      DocExp: extracted.expiry,
+      DocIssue: extracted.issue,
+    };
+    Object.keys(fields).forEach(function (suffix) {
+      var input = document.getElementById(prefix + suffix);
+      if (input && fields[suffix]) {
+        var nextValue = fields[suffix];
+        if (input.dataset.datePicker) {
+          var parsedDateValue = bookingDateFromValue(nextValue);
+          if (parsedDateValue) nextValue = formatBookingDate(parsedDateValue);
+        }
+        input.value = nextValue;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        filledFields.push({ Given: "Given names", Surname: "Surname", DocNo: "Passport number", Dob: "Date of birth", DocExp: "Passport expiry", DocIssue: "Passport issue" }[suffix]);
+      }
+    });
+    var nationality = extracted.nationalityCode ? (nationalityByCode[extracted.nationalityCode] || "Other") : "";
+    ["Nationality", "NatEcho"].forEach(function (suffix) {
+      var select = document.getElementById(prefix + suffix);
+      if (select && nationality && Array.from(select.options).some(function (option) { return option.value === nationality; })) {
+        select.value = nationality;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+    if (nationality) filledFields.push("Nationality");
+    var gender = extracted.sex === "M" ? "Male" : extracted.sex === "F" ? "Female" : "";
+    var genderSelect = document.getElementById(prefix + "Gender");
+    if (genderSelect && gender) {
+      genderSelect.value = gender;
+      genderSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      filledFields.push("Gender");
+    }
+    var titleSelect = document.getElementById(prefix + "Title");
+    var title = gender === "Male" ? "Mr" : gender === "Female" ? "Ms" : "";
+    if (titleSelect && title) {
+      titleSelect.value = title;
+      titleSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      filledFields.push("Title");
+    }
+    return filledFields;
+  }
+
+  /* Passport photos are recognized locally in the browser using Tesseract.js. */
   document.addEventListener("change", function (event) {
     var file = event.target;
     if (!file || file.type !== "file") return;
@@ -3295,10 +3691,77 @@
     if (!label || !file.files || !file.files.length) return;
     var txt = label.querySelector('[data-role="drop-txt"]');
     var hint = label.querySelector(".bk-drop-hint");
+    var image = file.files[0];
+    if (!image.type || !image.type.startsWith("image/")) {
+      if (hint) hint.textContent = "Please choose a passport photo in JPG, PNG, or another image format.";
+      file.value = "";
+      return;
+    }
+    if (image.size > 15 * 1024 * 1024) {
+      if (hint) hint.textContent = "This image is larger than 15 MB. Choose a smaller passport photo.";
+      file.value = "";
+      return;
+    }
     label.classList.add("has-file");
-    if (txt) txt.textContent = file.files[0].name;
-    if (hint) hint.textContent = "Ready to read — details fill in after upload.";
-    toast("Passport attached");
+    if (txt) txt.textContent = image.name;
+    if (hint) hint.textContent = "Reading passport text in your browser…";
+    getPassportOcrWorker().then(function (worker) {
+      return worker.recognize(image).then(function (result) {
+        var fullText = result && result.data ? result.data.text : "";
+        return createPassportMrzCrop(image).then(function (crop) {
+          var mrzWhitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<";
+          var prepareMrz = typeof worker.setParameters === "function"
+            ? worker.setParameters({ tessedit_char_whitelist: mrzWhitelist, tessedit_pageseg_mode: 6 }).catch(function () {})
+            : Promise.resolve();
+          return prepareMrz.then(function () { return worker.recognize(crop); }).then(function (mrzResult) {
+            var mrzText = mrzResult && mrzResult.data ? mrzResult.data.text : "";
+            return createPassportMrzLineCrops(image).then(function (lineCrops) {
+              var lineMode = typeof worker.setParameters === "function"
+                ? worker.setParameters({ tessedit_pageseg_mode: 7 }).catch(function () {})
+                : Promise.resolve();
+              return lineMode.then(function () {
+                return lineCrops.reduce(function (promise, lineCrop) {
+                  return promise.then(function (text) {
+                    return worker.recognize(lineCrop).then(function (lineResult) {
+                      return text + "\n" + (lineResult && lineResult.data ? lineResult.data.text : "");
+                    });
+                  });
+                }, Promise.resolve(mrzText));
+              });
+            }).catch(function () { return mrzText; }).then(function (allMrzText) {
+              var restore = typeof worker.setParameters === "function"
+                ? worker.setParameters({ tessedit_char_whitelist: "", tessedit_pageseg_mode: 3 }).catch(function () {})
+                : Promise.resolve();
+              return restore.then(function () { return fullText + "\n" + allMrzText; });
+            });
+          });
+        }).catch(function () { return fullText; });
+      });
+    }).then(function (rawText) {
+      var extracted = parsePassportText(rawText);
+      var filled = fillPassportFields(label, extracted);
+      if (hint) hint.textContent = filled.length
+        ? "Filled: " + filled.join(", ") + ". Verify every value against the passport."
+        : "Text was read, but passport fields could not be identified. Enter the details manually or try a clearer image.";
+      var prior = label.parentNode.querySelector(".bk-ocr-result");
+      if (prior) prior.remove();
+      if (rawText.trim()) {
+        var details = document.createElement("details");
+        details.className = "bk-ocr-result";
+        var summary = document.createElement("summary");
+        summary.textContent = "View all recognized text";
+        var pre = document.createElement("pre");
+        pre.textContent = rawText.trim();
+        details.append(summary, pre);
+        label.insertAdjacentElement("afterend", details);
+      }
+      toast(filled.length ? "Passport details filled — verify them" : "Passport text read — check the form");
+    }).catch(function (error) {
+      if (hint) hint.textContent = error && error.message
+        ? error.message
+        : "Could not read this image. Try a clearer, well-lit passport photo.";
+      toast("Could not read passport image");
+    });
   });
 
   /* Live validation, once the user leaves a field or types into it. */

@@ -837,6 +837,10 @@
 
   document.addEventListener("click", (event) => {
 
+    if (!event.target.closest("#paxTrigger, #paxPanel")) {
+      getElement("paxPanel")?.classList.remove("show");
+    }
+
     const day = event.target.closest(".date-cell[data-date]");
     if (day && !day.disabled) {
       selectCalendarDate(day.dataset.date);
