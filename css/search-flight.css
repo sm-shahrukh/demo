@@ -2792,3 +2792,12 @@ small {
     height: 34px;
   }
 }
+
+/* Use the same rounded corners on every flight-search dropdown panel. */
+.dropdown-panel,
+.dd-panel,
+.airport-panel,
+.cabin-select-menu,
+.nav-dropdown-menu {
+  border-radius: var(--radius-md);
+}

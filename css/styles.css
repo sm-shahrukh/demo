@@ -582,6 +582,55 @@ body {
   cursor: pointer;
 }
 
+/* The date field itself opens the picker; hide the browser's trailing icon. */
+.input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+.input-wrapper input[type="date"] {
+  cursor: pointer;
+}
+
+.flight-date-panel {
+  z-index: 30;
+  width: 100%;
+  max-width: min(304px, calc(100vw - 32px));
+  padding: 14px;
+  overflow: visible;
+}
+.flight-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: var(--gray-800);
+}
+.flight-calendar-head strong { font-size: 14px; }
+.flight-calendar-nav,
+.flight-calendar-day {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+.flight-calendar-nav { width: 32px; height: 32px; font-size: 22px; }
+.flight-calendar-nav:hover,
+.flight-calendar-day:not(:disabled):hover { background: var(--gray-100); }
+.flight-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+.flight-calendar-weekdays { margin-bottom: 5px; color: var(--gray-500); font-size: 11px; }
+.flight-calendar-weekdays span { padding: 5px 0; }
+.flight-calendar-day { aspect-ratio: 1; font-size: 13px; }
+.flight-calendar-day.selected { background: var(--primary-blue); color: var(--white); }
+.flight-calendar-day:disabled { color: var(--gray-300); cursor: not-allowed; }
+.flight-calendar-blank { aspect-ratio: 1; }
+
 .dropdown-panel {
   display: none;
   position: absolute;
@@ -598,7 +647,21 @@ body {
 
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: var(--gray-300) transparent;
+  scrollbar-color: var(--gray-300) var(--white);
+}
+
+/* Keep both airport menus rounded evenly on all four corners. */
+#fromPanel,
+#toPanel {
+  border-radius: var(--radius-md);
+  background-clip: padding-box;
+}
+
+#paxPanel {
+  max-height: none;
+  overflow: visible;
+  border-radius: var(--radius-md);
+  background-clip: padding-box;
 }
 
 /* Chrome, Edge, Safari */
@@ -2584,3 +2647,11 @@ body {
 /* @media (max-width: 767.98px) {
   
 } */
+#fromPanel,
+#toPanel,
+#paxPanel,
+#cabinMenu,
+.dropdown-panel,
+.nav-dropdown-menu {
+  border-radius: var(--radius-md);
+}

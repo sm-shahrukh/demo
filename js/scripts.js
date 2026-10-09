@@ -78,6 +78,7 @@ function setTripType(type, btn) {
     .classList.toggle("show", type === "multicity");
   if (type !== "roundtrip") {
     document.getElementById("retDate").value = "";
+    document.getElementById("retDate").dataset.iso = "";
   }
 }
 
@@ -245,12 +246,66 @@ function setCabin(val) {
 }
 
 // ============ DATE PICKER ============
+function formatFlightDate(date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit", month: "short", year: "numeric",
+  }).format(date);
+}
+
+function flightDateISO(date) {
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+}
+
+function closeFlightDatePickers() {
+  document.querySelectorAll(".flight-date-panel.show").forEach((panel) => panel.classList.remove("show"));
+  document.querySelectorAll("#depDate, #retDate").forEach((input) => input.setAttribute("aria-expanded", "false"));
+}
+
+function renderFlightCalendar(input, monthDate) {
+  const panel = input.closest(".input-wrapper")?.querySelector(".flight-date-panel");
+  if (!panel) return;
+  const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const minDate = input.id === "retDate" && document.getElementById("depDate").dataset.iso
+    ? new Date(document.getElementById("depDate").dataset.iso + "T00:00:00") : today;
+  const offset = (monthStart.getDay() + 6) % 7;
+  const days = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+  panel.innerHTML = '<div class="flight-calendar-head"><button type="button" class="flight-calendar-nav" data-step="-1" aria-label="Previous month">‹</button><strong>' +
+    new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(monthDate) +
+    '</strong><button type="button" class="flight-calendar-nav" data-step="1" aria-label="Next month">›</button></div>' +
+    '<div class="flight-calendar-grid flight-calendar-weekdays">' + ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => "<span>" + d + "</span>").join("") + "</div>" +
+    '<div class="flight-calendar-grid">' + Array.from({ length: offset }, () => '<span class="flight-calendar-blank"></span>').join("") +
+    Array.from({ length: days }, (_, i) => {
+      const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), i + 1);
+      const iso = flightDateISO(date);
+      const disabled = date < minDate;
+      return '<button type="button" class="flight-calendar-day' + (input.dataset.iso === iso ? " selected" : "") + '" data-date="' + iso + '"' + (disabled ? " disabled" : "") + ">" + (i + 1) + "</button>";
+    }).join("") + "</div>";
+  panel.querySelectorAll("[data-step]").forEach((button) => button.addEventListener("click", () => {
+    renderFlightCalendar(input, new Date(monthDate.getFullYear(), monthDate.getMonth() + Number(button.dataset.step), 1));
+  }));
+  panel.querySelectorAll("[data-date]").forEach((button) => button.addEventListener("click", () => {
+    const date = new Date(button.dataset.date + "T00:00:00");
+    input.dataset.iso = button.dataset.date;
+    input.value = formatFlightDate(date);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    closeFlightDatePickers();
+  }));
+}
+
 function openDatePicker(type) {
   let id = type;
   if (type === "dep") id = "depDate";
   else if (type === "ret") id = "retDate";
   const input = document.getElementById(id);
-  if (input) input.showPicker?.() || input.click();
+  if (!input) return;
+  const panel = input.closest(".input-wrapper")?.querySelector(".flight-date-panel");
+  if (!panel) return;
+  const selected = input.dataset.iso ? new Date(input.dataset.iso + "T00:00:00") : new Date();
+  renderFlightCalendar(input, new Date(selected.getFullYear(), selected.getMonth(), 1));
+  closeFlightDatePickers();
+  panel.classList.add("show");
+  input.setAttribute("aria-expanded", "true");
 }
 
 // ============ PASSENGERS ============
@@ -376,6 +431,16 @@ function closeAllHeroDropdowns() {
 
 // Outside click handler for all hero search dropdowns
 document.addEventListener("click", (e) => {
+  if (!e.target.closest(".flight-date-panel") && !e.target.closest("#depDate, #retDate")) {
+    closeFlightDatePickers();
+  }
+  // Keep airport lists open while interacting with the flight form, and
+  // dismiss both when the user clicks anywhere outside that form.
+  if (!e.target.closest("#flightSearchForm")) {
+    document.getElementById("fromPanel")?.classList.remove("show");
+    document.getElementById("toPanel")?.classList.remove("show");
+    closeFlightDatePickers();
+  }
   if (!e.target.closest("#cabinTrigger")) {
     document.getElementById("cabinMenu")?.classList.remove("show");
     document.getElementById("cabinTrigger")?.classList.remove("open");
@@ -428,17 +493,17 @@ function handleFlightSearch(e) {
     showAlert("Departure and arrival cities cannot be the same.", "error");
     return false;
   }
-  const depDate = document.getElementById("depDate").value;
+  const depDate = document.getElementById("depDate").dataset.iso;
   if (!depDate) {
     showAlert("Please select a departure date.", "error");
     return false;
   }
-  if (tripType === "roundtrip" && !document.getElementById("retDate").value) {
+  if (tripType === "roundtrip" && !document.getElementById("retDate").dataset.iso) {
     showAlert("Please select a return date.", "error");
     return false;
   }
-  const departure = document.getElementById("depDate").value;
-  const returnDate = document.getElementById("retDate").value;
+  const departure = document.getElementById("depDate").dataset.iso;
+  const returnDate = document.getElementById("retDate").dataset.iso;
   if (
     tripType === "roundtrip" &&
     new Date(returnDate) < new Date(departure)
@@ -1160,12 +1225,27 @@ window.addEventListener("scroll", () => {
 // ******************************************** INIT start ********************************************
 document.addEventListener("DOMContentLoaded", () => {
   updatePaxInput();
-  // Set min dates
-  const today = new Date().toISOString().split("T")[0];
-  if (document.getElementById("depDate"))
-    document.getElementById("depDate").min = today;
-  if (document.getElementById("retDate"))
-    document.getElementById("retDate").min = today;
+  // Initialize the site-styled flight date dropdowns.
+  const now = new Date();
+  const today = flightDateISO(now);
+  document.querySelectorAll("#depDate, #retDate").forEach((input) => {
+    const wrapper = input.closest(".input-wrapper");
+    const panel = document.createElement("div");
+    panel.className = "dropdown-panel flight-date-panel";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-label", input.id === "depDate" ? "Choose departure date" : "Choose return date");
+    wrapper?.appendChild(panel);
+    wrapper?.addEventListener("click", (event) => {
+      if (event.target.closest(".flight-date-panel")) return;
+      event.preventDefault();
+      openDatePicker(input.id === "depDate" ? "dep" : "ret");
+    });
+  });
+  const departureInput = document.getElementById("depDate");
+  if (departureInput) {
+    departureInput.dataset.iso = flightDateISO(now);
+    departureInput.value = formatFlightDate(now);
+  }
   if (document.getElementById("umrahStartDate")) {
     document.getElementById("umrahStartDate").min = today;
     document
